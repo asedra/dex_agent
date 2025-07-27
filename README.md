@@ -1,27 +1,76 @@
-# Windows PowerShell Agent
+# DexAgents - Windows PowerShell Agent Management
 
-Windows cihazlarda PowerShell komutlarını API üzerinden güvenli bir şekilde çalıştıran FastAPI tabanlı agent.
+Modern ve kullanıcı dostu Windows PowerShell komutlarını API üzerinden güvenli şekilde çalıştıran kapsamlı yönetim sistemi.
 
-## Özellikler
+## 🚀 Özellikler
 
+### Backend (FastAPI)
 - 🔐 **Güvenli API**: Bearer token authentication
 - ⚡ **Asenkron İşlem**: Hızlı komut çalıştırma
 - 🛡️ **Güvenlik**: Timeout ve komut validasyonu
 - 📊 **Sistem Bilgileri**: CPU, RAM, disk kullanımı
 - 🔄 **Batch İşlemler**: Çoklu komut çalıştırma
 - 📝 **Detaylı Loglama**: Komut çalıştırma geçmişi
+- 🗄️ **SQLite Database**: Agent verilerinin kalıcı saklanması
+- 👥 **Agent Management**: Agent kayıt, güncelleme, silme
 
-## Kurulum
+### Frontend (Next.js)
+- 🎨 **Modern UI/UX**: Tailwind CSS ve shadcn/ui
+- 📱 **Responsive Design**: Tüm cihazlarda mükemmel görünüm
+- ⚡ **Real-time Updates**: Gerçek zamanlı sistem bilgileri
+- 🔧 **PowerShell Integration**: Komut çalıştırma ve yönetimi
+- 👥 **Agent Management**: Agent'ları izleme ve yönetme
+- 🌙 **Dark/Light Mode**: Tema desteği
+
+## 🏗️ Proje Yapısı
+
+```
+dexagents/
+├── app.py                 # FastAPI backend
+├── database.py           # SQLite database manager
+├── populate_db.py        # Database population script
+├── requirements.txt       # Python bağımlılıkları
+├── env.example           # Environment variables
+├── test_client.py        # API test client
+├── start.bat            # Windows başlatma scripti
+├── dexagents.db         # SQLite database (auto-created)
+├── frontend/            # Next.js frontend
+│   ├── app/            # Next.js App Router
+│   ├── components/     # UI bileşenleri
+│   ├── lib/           # Utility fonksiyonları
+│   └── package.json   # Node.js bağımlılıkları
+└── README.md          # Bu dosya
+```
+
+## 🛠️ Teknolojiler
+
+### Backend
+- **FastAPI**: Modern Python web framework
+- **Uvicorn**: ASGI server
+- **Pydantic**: Data validation
+- **psutil**: System monitoring
+- **python-dotenv**: Environment variables
+- **SQLite**: Lightweight database for agent data
+
+### Frontend
+- **Next.js 15**: React framework
+- **TypeScript**: Tip güvenliği
+- **Tailwind CSS**: Styling
+- **shadcn/ui**: UI bileşenleri
+- **Lucide React**: İkonlar
+
+## 📦 Kurulum
 
 ### Gereksinimler
 
 - Python 3.11+
+- Node.js 18+
 - Windows 10/11
 - PowerShell 5.1+
 
-### Adımlar
+### Backend Kurulumu
 
-1. **Bağımlılıkları yükleyin:**
+1. **Python bağımlılıklarını yükleyin:**
 ```bash
 pip install -r requirements.txt
 ```
@@ -34,129 +83,241 @@ copy env.example .env
 3. **API token'ını ayarlayın:**
 `.env` dosyasında `API_TOKEN` değerini güvenli bir token ile değiştirin.
 
-## Kullanım
+4. **Database'i başlatın (opsiyonel):**
+```bash
+# Test verileri ile database'i doldur
+python populate_db.py
+```
 
-### Sunucuyu Başlatma
+### Frontend Kurulumu
 
+1. **Frontend klasörüne gidin:**
+```bash
+cd frontend
+```
+
+2. **Node.js bağımlılıklarını yükleyin:**
+```bash
+pnpm install
+```
+
+3. **Environment dosyasını oluşturun:**
+```bash
+cp .env.example .env.local
+```
+
+## 🚀 Çalıştırma
+
+### Hızlı Başlatma (Windows)
+
+```bash
+# Backend ve frontend'i birlikte başlat
+start.bat
+```
+
+### Manuel Başlatma
+
+1. **Backend'i başlatın:**
 ```bash
 python app.py
 ```
 
-Veya uvicorn ile:
+2. **Frontend'i başlatın (yeni terminal):**
 ```bash
-uvicorn app:app --host 0.0.0.0 --port 8000
+cd frontend
+pnpm dev
 ```
 
-### API Endpoints
+3. **Tarayıcıda açın:**
+- Backend API: http://localhost:8000
+- Frontend: http://localhost:3000
+- API Docs: http://localhost:8000/docs
 
-#### 1. Health Check
-```http
-GET /
-```
+## 🔧 API Endpoints
 
-#### 2. Sistem Bilgileri
-```http
-GET /system/info
-Authorization: Bearer your_api_token
-```
+### Backend API
 
-#### 3. Tek Komut Çalıştırma
-```http
-POST /execute
-Authorization: Bearer your_api_token
-Content-Type: application/json
+| Endpoint | Method | Açıklama |
+|----------|--------|----------|
+| `/` | GET | Health check |
+| `/api/health` | GET | Frontend health check |
+| `/system/info` | GET | Sistem bilgileri |
+| `/execute` | POST | Tek komut çalıştırma |
+| `/execute/batch` | POST | Çoklu komut çalıştırma |
+| `/api/agents` | GET | Tüm agent'ları listele |
+| `/api/agents/{id}` | GET | Agent detayları |
+| `/api/agents` | POST | Yeni agent oluştur |
+| `/api/agents/{id}` | PUT | Agent güncelle |
+| `/api/agents/{id}` | DELETE | Agent sil |
+| `/api/agents/register` | POST | Mevcut sistemi agent olarak kaydet |
 
-{
-  "command": "Get-Process",
-  "timeout": 30,
-  "working_directory": "C:\\",
-  "run_as_admin": false
-}
-```
-
-#### 4. Batch Komut Çalıştırma
-```http
-POST /execute/batch
-Authorization: Bearer your_api_token
-Content-Type: application/json
-
-[
-  {
-    "command": "Get-Service",
-    "timeout": 30
-  },
-  {
-    "command": "Get-ComputerInfo",
-    "timeout": 60
-  }
-]
-```
-
-## Güvenlik
-
-- **API Token**: Tüm istekler için Bearer token gerekli
-- **Timeout**: Komutlar için maksimum çalışma süresi
-- **Working Directory**: Güvenli dizin kontrolü
-- **Error Handling**: Hata durumlarında güvenli yanıt
-
-## Örnek Kullanım
-
-### PowerShell Komutları
+### Örnek Kullanım
 
 ```bash
 # Sistem bilgilerini al
 curl -X GET "http://localhost:8000/system/info" \
   -H "Authorization: Bearer your_token"
 
-# Process listesi al
+# PowerShell komutu çalıştır
 curl -X POST "http://localhost:8000/execute" \
   -H "Authorization: Bearer your_token" \
   -H "Content-Type: application/json" \
   -d '{"command": "Get-Process | Select-Object Name,Id,CPU"}'
-
-# Disk kullanımını kontrol et
-curl -X POST "http://localhost:8000/execute" \
-  -H "Authorization: Bearer your_token" \
-  -H "Content-Type: application/json" \
-  -d '{"command": "Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID,Size,FreeSpace"}'
 ```
 
-## Yapılandırma
+## 📱 Frontend Sayfaları
+
+### Dashboard (`/`)
+- Sistem genel durumu
+- Agent istatistikleri
+- Hızlı eylemler
+- Son aktiviteler
+
+### Agents (`/agents`)
+- Agent listesi
+- Filtreleme ve arama
+- Toplu eylemler
+- Detay görüntüleme
+
+### PowerShell Library (`/powershell`)
+- Komut kütüphanesi
+- Kategori filtreleme
+- Komut çalıştırma
+- Sonuç görüntüleme
+
+### Agent Details (`/agents/[id]`)
+- Agent detayları
+- Sistem bilgileri
+- Komut geçmişi
+- Ayarlar
+
+## 🔒 Güvenlik
+
+### Backend
+- **API Token**: Bearer token authentication
+- **Timeout**: Komutlar için maksimum çalışma süresi
+- **Working Directory**: Güvenli dizin kontrolü
+- **Error Handling**: Hata durumlarında güvenli yanıt
+
+### Frontend
+- **CORS**: Backend'de yapılandırılmış
+- **Input Validation**: Form validasyonu
+- **Error Handling**: Güvenli hata yönetimi
+- **Environment Variables**: Güvenli konfigürasyon
+
+## 🧪 Test
+
+### Backend Test
+
+```bash
+# Test client'ı çalıştır
+python test_client.py
+```
+
+### Frontend Test
+
+```bash
+cd frontend
+
+# Linting
+pnpm lint
+
+# Type checking
+pnpm type-check
+
+# Build test
+pnpm build
+```
+
+## 📊 Yapılandırma
 
 ### Environment Variables
 
-| Değişken | Açıklama | Varsayılan |
-|-----------|----------|------------|
-| `API_TOKEN` | API güvenlik token'ı | `default_token` |
-| `HOST` | Sunucu host adresi | `0.0.0.0` |
-| `PORT` | Sunucu port numarası | `8000` |
-| `LOG_LEVEL` | Log seviyesi | `INFO` |
-| `DEFAULT_TIMEOUT` | Varsayılan timeout (saniye) | `30` |
-| `MAX_TIMEOUT` | Maksimum timeout (saniye) | `300` |
-
-## Geliştirme
-
-### Proje Yapısı
-
-```
-dexagents/
-├── app.py              # Ana FastAPI uygulaması
-├── requirements.txt    # Python bağımlılıkları
-├── env.example        # Environment variables örneği
-├── README.md          # Dokümantasyon
-└── .vscode/          # VS Code ayarları
+#### Backend (.env)
+```env
+API_TOKEN=your_secure_api_token_here
+HOST=0.0.0.0
+PORT=8000
+LOG_LEVEL=INFO
+DEFAULT_TIMEOUT=30
+MAX_TIMEOUT=300
 ```
 
-### Test Etme
+#### Frontend (.env.local)
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_TOKEN=default_token
+NEXT_PUBLIC_APP_NAME=DexAgents
+```
+
+## 🚀 Deployment
+
+### Production Backend
 
 ```bash
-# Sunucuyu başlat
-python app.py
-
-# Başka bir terminal'de test et
-curl http://localhost:8000/
+# Gunicorn ile production
+pip install gunicorn
+gunicorn app:app -w 4 -k uvicorn.workers.UvicornWorker
 ```
 
-## Lisans
+### Production Frontend
 
-MIT License 
+```bash
+cd frontend
+pnpm build
+pnpm start
+```
+
+## 📝 Geliştirme
+
+### Backend Geliştirme
+
+1. **Yeni endpoint ekleme:**
+```python
+@app.get("/new-endpoint")
+async def new_endpoint():
+    return {"message": "New endpoint"}
+```
+
+2. **Model ekleme:**
+```python
+class NewModel(BaseModel):
+    field: str = Field(..., description="Field description")
+```
+
+### Frontend Geliştirme
+
+1. **Yeni sayfa ekleme:**
+```bash
+mkdir frontend/app/new-page
+touch frontend/app/new-page/page.tsx
+```
+
+2. **API client'a method ekleme:**
+```typescript
+// lib/api.ts
+async newMethod(): Promise<any> {
+  return this.request('/new-endpoint')
+}
+```
+
+## 🤝 Katkıda Bulunma
+
+1. Fork yapın
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
+4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
+5. Pull request oluşturun
+
+## 📄 Lisans
+
+MIT License - Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+
+## 📞 İletişim
+
+- **Proje**: [GitHub Repository](https://github.com/your-username/dexagents)
+- **Issues**: [GitHub Issues](https://github.com/your-username/dexagents/issues)
+
+---
+
+**DexAgents** - Windows PowerShell Agent Management System 

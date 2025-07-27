@@ -2,7 +2,7 @@ import os
 import subprocess
 import asyncio
 import logging
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import psutil
 from dotenv import load_dotenv
+from database import db_manager
 
 # Environment variables
 load_dotenv()
@@ -19,22 +20,28 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="Windows PowerShell Agent",
+    title="DexAgents - Windows PowerShell Agent",
     description="API for executing PowerShell commands on Windows devices",
     version="1.0.0"
 )
 
-# CORS middleware ekle
+# CORS middleware - Frontend entegrasyonu için güncellendi
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # Frontend URL'leri
+    allow_origins=[
+        "http://localhost:3000",  # Next.js default
+        "http://localhost:5173",  # Vite default
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "*"  # Development için tüm origin'lere izin ver
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Security
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)  # Frontend için auto_error=False
 
 # Models
 class PowerShellCommand(BaseModel):
@@ -58,13 +65,43 @@ class SystemInfo(BaseModel):
     memory_usage: float
     disk_usage: Dict[str, float]
 
-# Security middleware
-async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Verify API token"""
+class Agent(BaseModel):
+    id: Optional[str] = None
+    hostname: str
+    ip: Optional[str] = None
+    os: Optional[str] = None
+    version: Optional[str] = None
+    status: str = "offline"
+    last_seen: Optional[str] = None
+    tags: List[str] = []
+    system_info: Optional[Dict[str, Any]] = None
+
+class AgentUpdate(BaseModel):
+    hostname: Optional[str] = None
+    ip: Optional[str] = None
+    os: Optional[str] = None
+    version: Optional[str] = None
+    status: Optional[str] = None
+    tags: Optional[List[str]] = None
+    system_info: Optional[Dict[str, Any]] = None
+
+# Security middleware - Frontend için daha esnek
+async def verify_token(credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)):
+    """Verify API token - Frontend için daha esnek"""
+    if not credentials:
+        # Development için token kontrolünü atla
+        if os.getenv("ENVIRONMENT", "development") == "development":
+            return "development_token"
+        raise HTTPException(status_code=401, detail="Missing API token")
+    
     token = credentials.credentials
     expected_token = os.getenv("API_TOKEN", "default_token")
     
+    # Debug logging
+    logger.info(f"Token verification - Received: {token[:10]}..., Expected: {expected_token[:10]}...")
+    
     if token != expected_token:
+        logger.warning(f"Token mismatch - Received: {token}, Expected: {expected_token}")
         raise HTTPException(status_code=401, detail="Invalid API token")
     
     return token
@@ -159,7 +196,12 @@ class PowerShellService:
 @app.get("/")
 async def root():
     """Health check endpoint"""
-    return {"message": "Windows PowerShell Agent is running", "status": "healthy"}
+    return {
+        "message": "DexAgents - Windows PowerShell Agent is running", 
+        "status": "healthy",
+        "version": "1.0.0",
+        "timestamp": datetime.now().isoformat()
+    }
 
 @app.get("/system/info", response_model=SystemInfo)
 async def get_system_info(token: str = Depends(verify_token)):
@@ -251,6 +293,169 @@ async def execute_batch_commands(
             ))
     
     return results
+
+# Agent Management Endpoints
+@app.get("/api/agents", response_model=List[Agent])
+async def get_agents(token: str = Depends(verify_token)):
+    """Get all agents"""
+    try:
+        agents = db_manager.get_agents()
+        return agents
+    except Exception as e:
+        logger.error(f"Error getting agents: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get agents")
+
+@app.get("/api/agents/{agent_id}", response_model=Agent)
+async def get_agent(agent_id: str, token: str = Depends(verify_token)):
+    """Get a specific agent by ID"""
+    try:
+        agent = db_manager.get_agent(agent_id)
+        if not agent:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        return agent
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting agent {agent_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get agent")
+
+@app.post("/api/agents", response_model=Agent)
+async def create_agent(agent: Agent, token: str = Depends(verify_token)):
+    """Create a new agent"""
+    try:
+        agent_data = agent.dict()
+        agent_id = db_manager.add_agent(agent_data)
+        return db_manager.get_agent(agent_id)
+    except Exception as e:
+        logger.error(f"Error creating agent: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create agent")
+
+@app.put("/api/agents/{agent_id}", response_model=Agent)
+async def update_agent(agent_id: str, agent_update: AgentUpdate, token: str = Depends(verify_token)):
+    """Update an existing agent"""
+    try:
+        # Check if agent exists
+        existing_agent = db_manager.get_agent(agent_id)
+        if not existing_agent:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        
+        # Update agent
+        update_data = {k: v for k, v in agent_update.dict().items() if v is not None}
+        if update_data:
+            success = db_manager.update_agent(agent_id, update_data)
+            if not success:
+                raise HTTPException(status_code=500, detail="Failed to update agent")
+        
+        return db_manager.get_agent(agent_id)
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating agent {agent_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to update agent")
+
+@app.delete("/api/agents/{agent_id}")
+async def delete_agent(agent_id: str, token: str = Depends(verify_token)):
+    """Delete an agent"""
+    try:
+        success = db_manager.delete_agent(agent_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        return {"message": "Agent deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error deleting agent {agent_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete agent")
+
+@app.get("/api/agents/{agent_id}/commands", response_model=List[Dict[str, Any]])
+async def get_agent_commands(agent_id: str, limit: int = 50, token: str = Depends(verify_token)):
+    """Get command history for an agent"""
+    try:
+        # Check if agent exists
+        agent = db_manager.get_agent(agent_id)
+        if not agent:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        
+        commands = db_manager.get_command_history(agent_id, limit)
+        return commands
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting commands for agent {agent_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get command history")
+
+# Auto-register current system as an agent
+@app.post("/api/agents/register", response_model=Agent)
+async def register_current_system(token: str = Depends(verify_token)):
+    """Register the current system as an agent"""
+    try:
+        # Get system info
+        system_info = await get_system_info_internal()
+        
+        # Create agent data
+        agent_data = {
+            "hostname": system_info.hostname,
+            "os": system_info.os_version,
+            "version": "2.1.4",  # Default version
+            "status": "online",
+            "last_seen": datetime.now().isoformat(),
+            "tags": ["Auto-Registered"],
+            "system_info": system_info.dict()
+        }
+        
+        # Add to database
+        agent_id = db_manager.add_agent(agent_data)
+        return db_manager.get_agent(agent_id)
+    except Exception as e:
+        logger.error(f"Error registering current system: {e}")
+        raise HTTPException(status_code=500, detail="Failed to register current system")
+
+# Helper function to get system info without authentication
+async def get_system_info_internal() -> SystemInfo:
+    """Get system information (internal use)"""
+    try:
+        # Get hostname
+        hostname = os.environ.get('COMPUTERNAME', 'Unknown')
+        
+        # Get OS version
+        os_version = os.environ.get('OS', 'Unknown')
+        
+        # Get CPU usage
+        cpu_usage = psutil.cpu_percent(interval=1)
+        
+        # Get memory usage
+        memory = psutil.virtual_memory()
+        memory_usage = memory.percent
+        
+        # Get disk usage
+        disk_usage = {}
+        for partition in psutil.disk_partitions():
+            try:
+                usage = psutil.disk_usage(partition.mountpoint)
+                disk_usage[partition.device] = (usage.used / usage.total) * 100
+            except PermissionError:
+                continue
+        
+        return SystemInfo(
+            hostname=hostname,
+            os_version=os_version,
+            cpu_usage=cpu_usage,
+            memory_usage=memory_usage,
+            disk_usage=disk_usage
+        )
+    except Exception as e:
+        logger.error(f"Error getting system info: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get system information")
+
+# Frontend için ek endpoint'ler
+@app.get("/api/health")
+async def api_health():
+    """Frontend için health check"""
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "version": "1.0.0"
+    }
 
 if __name__ == "__main__":
     import uvicorn
