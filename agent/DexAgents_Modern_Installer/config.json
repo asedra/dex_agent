@@ -1,0 +1,12 @@
+{
+    "server_url": "http://localhost:8000",
+    "api_token": "",
+    "agent_name": "modern_agent",
+    "tags": [
+        "windows",
+        "modern-gui"
+    ],
+    "auto_start": true,
+    "run_as_service": false,
+    "version": "3.0.0"
+}

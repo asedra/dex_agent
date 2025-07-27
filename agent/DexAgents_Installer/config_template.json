@@ -1,0 +1,12 @@
+{
+    "server_url": "http://localhost:8000",
+    "api_token": "default_token",
+    "agent_name": "agent_installed",
+    "tags": [
+        "windows",
+        "installed"
+    ],
+    "auto_start": true,
+    "run_as_service": false,
+    "version": "2.1.4"
+}

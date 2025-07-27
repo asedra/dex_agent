@@ -9,5 +9,8 @@
     "auto_start": true,
     "run_as_service": true,
     "version": "2.1.4",
-    "created_at": "2025-07-27T15:37:45.026461"
+    "created_at": "2025-07-27T15:37:45.026461",
+    "update_interval": 30,
+    "connection_timeout": 10,
+    "last_updated": "2025-07-27T16:12:39.070872"
 }

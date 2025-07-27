@@ -78,7 +78,7 @@ export default function AgentsPage() {
           ...prev,
           server_url: config.server_url,
           api_token: config.api_token,
-          tags: config.default_tags
+          tags: config.tags || []
         }))
       } catch (err) {
         console.error('Failed to fetch installer config:', err)
@@ -93,7 +93,7 @@ export default function AgentsPage() {
     const matchesSearch =
       agent.hostname.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (agent.ip && agent.ip.includes(searchTerm)) ||
-      agent.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+      (agent.tags || []).some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
     const matchesStatus = statusFilter === "all" || agent.status === statusFilter
     return matchesSearch && matchesStatus
   })
@@ -191,10 +191,10 @@ export default function AgentsPage() {
   }
 
   const handleAddTag = (tag: string) => {
-    if (tag && !agentConfig.tags.includes(tag)) {
+    if (tag && !(agentConfig.tags || []).includes(tag)) {
       setAgentConfig(prev => ({
         ...prev,
-        tags: [...prev.tags, tag]
+        tags: [...(prev.tags || []), tag]
       }))
     }
   }
@@ -202,7 +202,7 @@ export default function AgentsPage() {
   const handleRemoveTag = (tag: string) => {
     setAgentConfig(prev => ({
       ...prev,
-      tags: prev.tags.filter(t => t !== tag)
+      tags: (prev.tags || []).filter(t => t !== tag)
     }))
   }
 
@@ -296,7 +296,7 @@ export default function AgentsPage() {
                 <div className="space-y-2">
                   <Label>Tags</Label>
                   <div className="flex flex-wrap gap-2">
-                    {agentConfig.tags.map((tag) => (
+                    {(agentConfig.tags || []).map((tag) => (
                       <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => handleRemoveTag(tag)}>
                         {tag} ×
                       </Badge>
@@ -467,14 +467,14 @@ export default function AgentsPage() {
                   <TableCell>{agent.last_seen || '-'}</TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {agent.tags.slice(0, 2).map((tag) => (
+                      {(agent.tags || []).slice(0, 2).map((tag) => (
                         <Badge key={tag} variant="outline" className="text-xs">
                           {tag}
                         </Badge>
                       ))}
-                      {agent.tags.length > 2 && (
+                      {(agent.tags || []).length > 2 && (
                         <Badge variant="outline" className="text-xs">
-                          +{agent.tags.length - 2}
+                          +{(agent.tags || []).length - 2}
                         </Badge>
                       )}
                     </div>
