@@ -374,32 +374,64 @@ class DexAgentsGUI:
         """Heartbeat worker thread"""
         while not self.stop_heartbeat:
             try:
+                # Get system info
+                system_info = {
+                    "cpu_usage": psutil.cpu_percent(),
+                    "memory_usage": psutil.virtual_memory().percent,
+                    "disk_usage": {partition.device: psutil.disk_usage(partition.mountpoint).percent 
+                                  for partition in psutil.disk_partitions() if partition.device}
+                }
+                
+                # Update GUI with system info
+                self.root.after(0, lambda: self.cpu_var.set(f"{system_info['cpu_usage']:.1f}%"))
+                self.root.after(0, lambda: self.memory_var.set(f"{system_info['memory_usage']:.1f}%"))
+                
+                # Send HTTP heartbeat if agent is registered
+                if self.agent_id:
+                    try:
+                        server_url = self.config.get("server_url", "http://localhost:8000")
+                        api_token = self.config.get("api_token", "your-secret-key-here")
+                        
+                        headers = {
+                            "Authorization": f"Bearer {api_token}",
+                            "Content-Type": "application/json"
+                        }
+                        
+                        response = requests.post(
+                            f"{server_url}/api/v1/agents/{self.agent_id}/heartbeat",
+                            headers=headers,
+                            timeout=10
+                        )
+                        
+                        if response.status_code == 200:
+                            self.log_message("HTTP heartbeat sent successfully")
+                        else:
+                            self.log_message(f"HTTP heartbeat failed: {response.status_code}")
+                            
+                    except Exception as e:
+                        self.log_message(f"HTTP heartbeat error: {str(e)}")
+                
+                # Send WebSocket heartbeat if connected
                 if self.websocket and self.is_connected:
-                    # Send heartbeat message
-                    system_info = {
-                        "cpu_usage": psutil.cpu_percent(),
-                        "memory_usage": psutil.virtual_memory().percent,
-                        "disk_usage": {partition.device: psutil.disk_usage(partition.mountpoint).percent 
-                                      for partition in psutil.disk_partitions() if partition.device}
-                    }
-                    
-                    message = {
-                        "type": "heartbeat",
-                        "data": {
-                            "system_info": system_info
-                        },
-                        "timestamp": datetime.now().isoformat()
-                    }
-                    
-                    # Update GUI with system info
-                    self.root.after(0, lambda: self.cpu_var.set(f"{system_info['cpu_usage']:.1f}%"))
-                    self.root.after(0, lambda: self.memory_var.set(f"{system_info['memory_usage']:.1f}%"))
-                    
-                    # Send heartbeat asynchronously
-                    asyncio.run_coroutine_threadsafe(
-                        self.websocket.send(json.dumps(message)),
-                        asyncio.get_event_loop()
-                    )
+                    try:
+                        message = {
+                            "type": "heartbeat",
+                            "data": {
+                                "system_info": system_info
+                            },
+                            "timestamp": datetime.now().isoformat()
+                        }
+                        
+                        # Send heartbeat asynchronously
+                        asyncio.run_coroutine_threadsafe(
+                            self.websocket.send(json.dumps(message)),
+                            asyncio.get_event_loop()
+                        )
+                        
+                        self.log_message("WebSocket heartbeat sent successfully")
+                        
+                    except Exception as e:
+                        self.log_message(f"WebSocket heartbeat error: {str(e)}")
                 
                 time.sleep(30)  # Send heartbeat every 30 seconds
                 

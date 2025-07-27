@@ -21,6 +21,8 @@ class PowerShellService:
         start_time = datetime.now()
         
         try:
+            logger.info(f"Executing PowerShell command: {command}")
+            
             # Prepare PowerShell command
             if run_as_admin:
                 # Run as administrator using Start-Process
@@ -28,9 +30,13 @@ class PowerShellService:
             else:
                 ps_command = command
             
+            logger.info(f"Final PowerShell command: {ps_command}")
+            
             # Create process
             process = await asyncio.create_subprocess_exec(
                 'powershell.exe',
+                '-NoProfile',
+                '-NonInteractive',
                 '-Command',
                 ps_command,
                 stdout=asyncio.subprocess.PIPE,
