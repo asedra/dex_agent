@@ -138,25 +138,28 @@ export default function AgentDetailPage() {
         run_as_admin: runAsAdmin,
       }
 
-      const result = await apiClient.executeCommand(command)
+      // Execute command on the specific agent
+      const result = await apiClient.executeAgentCommand(agentId, command)
       setCommandResult(result)
+      setCommandDialogOpen(true)
 
       if (result.success) {
         toast({
           title: "Success",
-          description: "Command executed successfully",
+          description: "Command executed successfully on agent",
         })
       } else {
         toast({
           title: "Error",
-          description: "Command execution failed",
+          description: "Command execution failed on agent",
           variant: "destructive",
         })
       }
     } catch (err) {
+      console.error('Command execution error:', err)
       toast({
         title: "Error",
-        description: "Failed to execute command",
+        description: "Failed to execute command on agent",
         variant: "destructive",
       })
     } finally {

@@ -81,6 +81,26 @@ async def handle_agent_message(agent_id: str, message: Dict[str, Any]):
     elif message_type == "command_result":
         # Handle command execution result
         command_result = message.get("data", {})
+        command_id = message.get("command_id", "")
+        
+        logger.info(f"Command result received from agent {agent_id}, command_id: {command_id}")
+        logger.info(f"Command result data: {command_result}")
+        
+        # Store command response in WebSocket manager
+        if command_id:
+            response_data = {
+                "success": command_result.get("success", False),
+                "output": command_result.get("output", ""),
+                "error": command_result.get("error", ""),
+                "execution_time": command_result.get("execution_time", 0.0),
+                "timestamp": datetime.now().isoformat()
+            }
+            websocket_manager.store_command_response(command_id, response_data)
+            logger.info(f"Command response stored for command_id: {command_id}")
+        else:
+            logger.warning(f"No command_id in command result from agent {agent_id}")
+        
+        # Also store in database
         db_manager.add_command_history(agent_id, {
             "command": command_result.get("command", ""),
             "success": command_result.get("success", False),
@@ -88,6 +108,8 @@ async def handle_agent_message(agent_id: str, message: Dict[str, Any]):
             "error": command_result.get("error", ""),
             "execution_time": command_result.get("execution_time", 0.0)
         })
+        
+        logger.info(f"Command result processed for agent {agent_id}: {command_result.get('success', False)}")
         
     elif message_type == "register":
         # Handle agent registration

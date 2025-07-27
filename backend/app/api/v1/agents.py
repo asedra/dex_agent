@@ -9,6 +9,9 @@ import socket
 import platform
 import psutil
 from datetime import datetime
+import json
+import asyncio
+from ...schemas.command import PowerShellCommand, CommandResponse
 
 logger = logging.getLogger(__name__)
 
@@ -123,22 +126,95 @@ async def delete_agent(agent_id: str, token: str = Depends(verify_token)):
         logger.error(f"Error deleting agent {agent_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.get("/{agent_id}/commands", response_model=List[Dict[str, Any]])
-async def get_agent_commands(agent_id: str, limit: int = 50, token: str = Depends(verify_token)):
-    """Get command history for an agent"""
+@router.post("/{agent_id}/command", response_model=CommandResponse)
+async def execute_agent_command(
+    agent_id: str,
+    command: PowerShellCommand,
+    token: str = Depends(verify_token)
+):
+    """Execute a PowerShell command on a specific agent"""
     try:
-        # Verify agent exists
-        agent = db_manager.get_agent(agent_id)
-        if not agent:
+        # Check if agent exists and is online
+        agent_data = db_manager.get_agent(agent_id)
+        if not agent_data:
             raise HTTPException(status_code=404, detail="Agent not found")
         
-        commands = db_manager.get_command_history(agent_id, limit)
-        return commands
+        # Check if agent is connected via WebSocket
+        if agent_id not in websocket_manager.agent_connections:
+            raise HTTPException(status_code=400, detail="Agent is not connected")
+        
+        # Execute command on agent via WebSocket
+        command_data = {
+            "command": command.command,
+            "timeout": command.timeout or 30,
+            "working_directory": command.working_directory,
+            "run_as_admin": command.run_as_admin or False
+        }
+        
+        # Send command to agent and get command ID
+        command_id = await websocket_manager.execute_command_on_agent(agent_id, command_data)
+        
+        # Wait for response (with timeout)
+        timeout_seconds = command.timeout or 30
+        start_time = datetime.now()
+        
+        logger.info(f"Waiting for command response: {command_id}, timeout: {timeout_seconds}s")
+        
+        while (datetime.now() - start_time).total_seconds() < timeout_seconds:
+            response = websocket_manager.get_command_response(command_id)
+            if response:
+                logger.info(f"Command response received for {command_id}: {response.get('success', False)}")
+                # Convert agent response to CommandResponse
+                return CommandResponse(
+                    success=response.get("success", False),
+                    output=response.get("output", ""),
+                    error=response.get("error"),
+                    execution_time=response.get("execution_time", 0.0),
+                    timestamp=response.get("timestamp", datetime.now().isoformat()),
+                    command=command.command
+                )
+            
+            await asyncio.sleep(0.1)  # Wait 100ms before checking again
+        
+        # Timeout reached
+        logger.warning(f"Command {command_id} timed out for agent {agent_id}")
+        return CommandResponse(
+            success=False,
+            output="",
+            error=f"Command timed out after {timeout_seconds} seconds",
+            execution_time=timeout_seconds,
+            timestamp=datetime.now().isoformat(),
+            command=command.command
+        )
+            
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Error getting commands for agent {agent_id}: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        logger.error(f"Error executing command on agent {agent_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to execute command on agent")
+
+@router.get("/{agent_id}/commands", response_model=List[CommandResponse])
+async def get_agent_command_history(
+    agent_id: str,
+    limit: int = 50,
+    token: str = Depends(verify_token)
+):
+    """Get command execution history for a specific agent"""
+    try:
+        # Check if agent exists
+        agent_data = db_manager.get_agent(agent_id)
+        if not agent_data:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        
+        # Get command history from database
+        commands = db_manager.get_agent_commands(agent_id, limit)
+        return commands
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting command history for agent {agent_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get command history")
 
 @router.post("/{agent_id}/refresh")
 async def refresh_agent(agent_id: str, token: str = Depends(verify_token)):

@@ -14,6 +14,8 @@ class WebSocketManager:
         self.agent_connections: Dict[str, str] = {}  # agent_id -> connection_id
         self.connection_agents: Dict[str, str] = {}  # connection_id -> agent_id
         self.connection_info: Dict[str, Dict[str, Any]] = {}
+        self.pending_commands: Dict[str, Dict[str, Any]] = {}  # command_id -> command_info
+        self.command_responses: Dict[str, Dict[str, Any]] = {}  # command_id -> response
     
     async def connect(self, websocket: WebSocket, agent_id: Optional[str] = None) -> str:
         """Accept WebSocket connection and return connection ID"""
@@ -25,6 +27,8 @@ class WebSocketManager:
         if agent_id:
             self.agent_connections[agent_id] = connection_id
             self.connection_agents[connection_id] = agent_id
+            logger.info(f"Agent {agent_id} mapped to connection {connection_id}")
+            logger.info(f"Current agent connections: {list(self.agent_connections.keys())}")
         
         self.connection_info[connection_id] = {
             "connected_at": datetime.now().isoformat(),
@@ -69,6 +73,68 @@ class WebSocketManager:
             connection_id = self.agent_connections[agent_id]
             return await self.send_message(connection_id, message)
         return False
+    
+    async def execute_command_on_agent(self, agent_id: str, command: Dict[str, Any]) -> str:
+        """Execute command on agent and return command ID"""
+        logger.info(f"Attempting to execute command on agent {agent_id}")
+        logger.info(f"Connected agents: {list(self.agent_connections.keys())}")
+        
+        if agent_id not in self.agent_connections:
+            logger.error(f"Agent {agent_id} is not connected. Available agents: {list(self.agent_connections.keys())}")
+            raise ValueError(f"Agent {agent_id} is not connected")
+        
+        command_id = f"cmd_{datetime.now().timestamp()}_{uuid.uuid4().hex[:8]}"
+        
+        # Store command info
+        self.pending_commands[command_id] = {
+            "agent_id": agent_id,
+            "command": command.get("command", ""),
+            "timestamp": datetime.now(),
+            "status": "pending"
+        }
+        
+        # Send command to agent
+        command_message = {
+            "type": "command",
+            "command_id": command_id,
+            "data": {
+                **command,
+                "command_id": command_id  # Also include command_id in data for agent
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        logger.info(f"Sending command {command_id} to agent {agent_id}: {command_message}")
+        success = await self.send_to_agent(agent_id, command_message)
+        if not success:
+            del self.pending_commands[command_id]
+            logger.error(f"Failed to send command to agent {agent_id}")
+            raise ValueError(f"Failed to send command to agent {agent_id}")
+        
+        logger.info(f"Command {command_id} sent to agent {agent_id}")
+        return command_id
+    
+    def store_command_response(self, command_id: str, response: Dict[str, Any]):
+        """Store command response from agent"""
+        self.command_responses[command_id] = response
+        if command_id in self.pending_commands:
+            self.pending_commands[command_id]["status"] = "completed"
+            self.pending_commands[command_id]["response"] = response
+        
+        logger.info(f"Command response stored for {command_id}")
+    
+    def get_command_response(self, command_id: str) -> Optional[Dict[str, Any]]:
+        """Get command response"""
+        response = self.command_responses.get(command_id)
+        if response:
+            logger.info(f"Found command response for {command_id}: {response.get('success', False)}")
+        else:
+            logger.debug(f"No command response found for {command_id}")
+        return response
+    
+    def get_pending_command(self, command_id: str) -> Optional[Dict[str, Any]]:
+        """Get pending command info"""
+        return self.pending_commands.get(command_id)
     
     async def broadcast(self, message: Dict[str, Any], exclude_connection: Optional[str] = None):
         """Broadcast message to all connections"""

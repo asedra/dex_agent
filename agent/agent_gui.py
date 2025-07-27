@@ -648,8 +648,12 @@ class DexAgentsGUI:
             command = command_data.get("command", "")
             timeout = command_data.get("timeout", 30)
             working_directory = command_data.get("working_directory")
+            run_as_admin = command_data.get("run_as_admin", False)
+            command_id = command_data.get("command_id", "")
             
             self.log_message(f"Executing command: {command}")
+            self.log_message(f"Command ID: {command_id}")
+            self.log_message(f"Command data: {command_data}")
             
             # Execute command
             import subprocess
@@ -658,30 +662,38 @@ class DexAgentsGUI:
             start_time = time.time()
             
             try:
+                # Prepare PowerShell command
+                if run_as_admin:
+                    # Run as administrator using Start-Process
+                    ps_command = f'Start-Process powershell -ArgumentList "-Command", "{command}" -Verb RunAs -Wait'
+                else:
+                    ps_command = command
+                
                 process = subprocess.Popen(
-                    command,
-                    shell=True,
+                    ['powershell.exe', '-NoProfile', '-NonInteractive', '-Command', ps_command],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
-                    cwd=working_directory,
-                    timeout=timeout
+                    cwd=working_directory
                 )
                 
-                stdout, stderr = process.communicate()
-                execution_time = time.time() - start_time
-                
-                success = process.returncode == 0
-                output = stdout.decode('utf-8', errors='ignore')
-                error = stderr.decode('utf-8', errors='ignore')
-                
-                self.log_message(f"Command completed: {success}")
-                
-            except subprocess.TimeoutExpired:
-                success = False
-                output = ""
-                error = "Command timed out"
-                execution_time = timeout
-                self.log_message("Command timed out")
+                try:
+                    stdout, stderr = process.communicate(timeout=timeout)
+                    execution_time = time.time() - start_time
+                    
+                    success = process.returncode == 0
+                    output = stdout.decode('utf-8', errors='ignore')
+                    error = stderr.decode('utf-8', errors='ignore')
+                    
+                    self.log_message(f"Command completed: {success}")
+                    
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    process.wait()
+                    success = False
+                    output = ""
+                    error = "Command timed out"
+                    execution_time = time.time() - start_time
+                    self.log_message("Command timed out")
                 
             except Exception as e:
                 success = False
@@ -693,6 +705,7 @@ class DexAgentsGUI:
             # Send result back to server
             result_message = {
                 "type": "command_result",
+                "command_id": command_id,
                 "data": {
                     "command": command,
                     "success": success,
@@ -744,6 +757,9 @@ def main():
     # Auto-start if configured
     if app.config.get("auto_start", False):
         root.after(1000, app.toggle_agent)  # Start after 1 second
+    else:
+        # Auto-start agent after 2 seconds for testing
+        root.after(2000, app.toggle_agent)
     
     root.mainloop()
 
