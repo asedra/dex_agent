@@ -7,26 +7,52 @@ DexAgents, Windows sistemlerinde PowerShell komutlarını uzaktan çalıştırma
 ```
 dexagents/
 ├── backend/           # FastAPI Backend Server
-│   ├── app.py        # Ana server uygulaması (29KB)
-│   ├── database.py   # SQLite veritabanı işlemleri (8.6KB)
-│   ├── debug_agents.py # Test agent'ları (3KB)
+│   ├── app/          # Ana uygulama modülü
+│   │   ├── api/      # API endpoint'leri
+│   │   │   └── v1/   # API v1 endpoint'leri
+│   │   │       ├── agents.py      # Agent yönetimi
+│   │   │       ├── commands.py    # PowerShell komutları
+│   │   │       ├── installer.py   # Installer yönetimi
+│   │   │       └── system.py      # Sistem bilgileri
+│   │   ├── core/     # Çekirdek modüller
+│   │   │   ├── config.py          # Konfigürasyon
+│   │   │   ├── database.py        # Veritabanı işlemleri
+│   │   │   └── auth.py            # Kimlik doğrulama
+│   │   ├── schemas/  # Pydantic modelleri
+│   │   │   ├── agent.py           # Agent şemaları
+│   │   │   ├── command.py         # Komut şemaları
+│   │   │   └── system.py          # Sistem şemaları
+│   │   ├── services/ # İş mantığı servisleri
+│   │   │   ├── powershell_service.py    # PowerShell servisi
+│   │   │   └── agent_installer_service.py # Installer servisi
+│   │   └── main.py   # Ana uygulama girişi
+│   ├── tests/        # Test dosyaları
+│   │   └── test_api.py
 │   ├── requirements.txt # Python dependencies
-│   ├── start_server.py # Server başlatma script'i
-│   └── dexagents.db  # SQLite database (20KB)
+│   ├── run.py        # Server başlatma script'i
+│   ├── env.example   # Environment variables örneği
+│   ├── .gitignore    # Git ignore dosyası
+│   └── README.md     # Backend dokümantasyonu
 ├── frontend/         # Next.js Frontend
 │   ├── app/          # Next.js 14 app router
+│   │   ├── agents/   # Agent sayfaları
+│   │   ├── powershell/ # PowerShell sayfası
+│   │   ├── schedules/ # Zamanlanmış görevler
+│   │   └── audit/    # Audit logları
 │   ├── components/   # React components
+│   │   └── ui/       # shadcn/ui bileşenleri
 │   ├── lib/          # Utility functions
+│   │   └── api.ts    # API client
 │   ├── package.json  # Node.js dependencies
-│   └── start_frontend.py # Frontend başlatma script'i
+│   └── next.config.mjs # Next.js konfigürasyonu
 ├── agent/            # Windows Agent (GUI)
-│   ├── agent_gui.py  # Tkinter GUI uygulaması (19KB)
+│   ├── agent_gui.py  # Tkinter GUI uygulaması
 │   ├── requirements.txt # Agent dependencies
-│   ├── build_exe.py  # EXE build script'i (4.5KB)
+│   ├── build_exe.py  # EXE build script'i
 │   ├── config.json   # Agent konfigürasyonu
-│   ├── DexAgents_Installer.zip # Kurulum paketi (12MB)
+│   ├── DexAgents_Installer.zip # Kurulum paketi
 │   ├── DexAgents_Installer/ # Kurulum klasörü
-│   │   ├── DexAgentsAgent.exe # Ana executable (12MB)
+│   │   ├── DexAgentsAgent.exe # Ana executable
 │   │   ├── config.json # Varsayılan konfigürasyon
 │   │   └── README.txt # Kurulum talimatları
 │   └── logs/         # Log dosyaları
@@ -46,7 +72,8 @@ dexagents/
 
 ```bash
 cd backend
-python start_server.py
+pip install -r requirements.txt
+python run.py
 ```
 
 Backend server http://localhost:8000 adresinde çalışacak.
@@ -55,7 +82,8 @@ Backend server http://localhost:8000 adresinde çalışacak.
 
 ```bash
 cd frontend
-python start_frontend.py
+npm install
+npm run dev
 ```
 
 Frontend http://localhost:3000 adresinde çalışacak.
@@ -79,7 +107,7 @@ DexAgentsAgent.exe
 ```bash
 cd backend
 pip install -r requirements.txt
-python app.py
+python run.py
 ```
 
 ### Frontend Geliştirme
@@ -122,8 +150,15 @@ Bu işlem:
 - SQLite (veritabanı)
 - psutil (sistem monitoring)
 
+**Mimari:**
+- **Modüler Yapı**: API, Core, Schemas, Services ayrımı
+- **Separation of Concerns**: İş mantığı ve API endpoint'leri ayrı
+- **Versioned API**: `/api/v1/` prefix ile API versiyonlama
+- **Centralized Config**: Merkezi konfigürasyon yönetimi
+- **Structured Logging**: Yapılandırılmış log sistemi
+
 **Özellikler:**
-- ✅ REST API endpoints
+- ✅ REST API endpoints (v1)
 - ✅ Agent yönetimi (CRUD işlemleri)
 - ✅ PowerShell komut çalıştırma
 - ✅ Sistem bilgileri toplama
@@ -131,16 +166,19 @@ Bu işlem:
 - ✅ Token tabanlı authentication
 - ✅ Real-time agent monitoring
 - ✅ Batch komut çalıştırma
+- ✅ Test data seeding
 
 **API Endpoints:**
 ```
 GET  /                    # Health check
-GET  /api/agents         # Agent listesi
-POST /api/agents/register # Agent kayıt
-GET  /api/agents/{id}    # Agent detayı
-POST /api/agents/{id}/command # Komut çalıştır
-GET  /api/installer/config # Varsayılan config
-POST /api/installer/create # Installer oluştur
+GET  /api/v1/agents/     # Agent listesi
+POST /api/v1/agents/register # Agent kayıt
+GET  /api/v1/agents/{id} # Agent detayı
+POST /api/v1/agents/seed # Test data oluştur
+POST /api/v1/agents/{id}/command # Komut çalıştır
+GET  /api/v1/installer/config # Varsayılan config
+POST /api/v1/installer/create # Installer oluştur
+GET  /api/v1/system/info # Sistem bilgileri
 ```
 
 ### 🌐 Frontend (Next.js)
@@ -161,6 +199,7 @@ POST /api/installer/create # Installer oluştur
 - ✅ Responsive tasarım
 - ✅ Dark/Light mode
 - ✅ Form validasyonu
+- ✅ Error handling
 
 **Sayfalar:**
 - `/` - Dashboard
@@ -240,7 +279,7 @@ POST /api/installer/create # Installer oluştur
 ```bash
 cd backend
 pip install gunicorn
-gunicorn app:app -w 4 -k uvicorn.workers.UvicornWorker
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker
 ```
 
 ### Production Frontend
@@ -278,10 +317,10 @@ python build_exe.py
 ### 1. Sistem Başlatma
 ```bash
 # Terminal 1: Backend
-cd backend && python start_server.py
+cd backend && python run.py
 
 # Terminal 2: Frontend  
-cd frontend && python start_frontend.py
+cd frontend && npm run dev
 
 # Terminal 3: Agent (opsiyonel)
 cd agent && python agent_gui.py
@@ -305,11 +344,13 @@ cd agent && python agent_gui.py
 - **Port 8000 kullanımda**: `netstat -ano | findstr :8000`
 - **Python dependencies**: `pip install -r requirements.txt`
 - **Database erişimi**: Dosya yazma izinlerini kontrol et
+- **Module import hataları**: `python -m app.main` ile çalıştır
 
 ### Frontend Sorunları
 - **Node.js yüklü değil**: https://nodejs.org/
 - **Port 3000 kullanımda**: `netstat -ano | findstr :3000`
 - **npm dependencies**: `npm install`
+- **API endpoint hataları**: Backend'in çalıştığından emin ol
 
 ### Agent Sorunları
 - **Server URL yanlış**: Backend'in çalıştığından emin ol
@@ -323,14 +364,14 @@ cd agent && python agent_gui.py
 
 #### Agent Listesi
 ```bash
-GET /api/agents
-Authorization: Bearer your_token
+GET /api/v1/agents/
+Authorization: Bearer your-secret-key-here
 ```
 
 #### Agent Kayıt
 ```bash
-POST /api/agents/register
-Authorization: Bearer your_token
+POST /api/v1/agents/register
+Authorization: Bearer your-secret-key-here
 Content-Type: application/json
 
 {
@@ -347,10 +388,16 @@ Content-Type: application/json
 }
 ```
 
+#### Test Data Oluşturma
+```bash
+POST /api/v1/agents/seed
+Authorization: Bearer your-secret-key-here
+```
+
 #### PowerShell Komut Çalıştırma
 ```bash
-POST /api/agents/{agent_id}/command
-Authorization: Bearer your_token
+POST /api/v1/agents/{agent_id}/command
+Authorization: Bearer your-secret-key-here
 Content-Type: application/json
 
 {
@@ -363,19 +410,19 @@ Content-Type: application/json
 
 #### Varsayılan Config
 ```bash
-GET /api/installer/config
-Authorization: Bearer your_token
+GET /api/v1/installer/config
+Authorization: Bearer your-secret-key-here
 ```
 
 #### Installer Oluşturma
 ```bash
-POST /api/installer/create
-Authorization: Bearer your_token
+POST /api/v1/installer/create
+Authorization: Bearer your-secret-key-here
 Content-Type: application/json
 
 {
   "server_url": "http://localhost:8000",
-  "api_token": "default_token",
+  "api_token": "your-secret-key-here",
   "agent_name": "test_agent",
   "tags": ["windows", "test"],
   "auto_start": true,
@@ -383,19 +430,34 @@ Content-Type: application/json
 }
 ```
 
+### System Endpoints
+
+#### Sistem Bilgileri
+```bash
+GET /api/v1/system/info
+Authorization: Bearer your-secret-key-here
+```
+
 ## 🛠️ Geliştirme
 
 ### Yeni Endpoint Ekleme
 ```python
-# backend/app.py
-@app.get("/new-endpoint")
+# backend/app/api/v1/new_endpoint.py
+from fastapi import APIRouter, Depends
+from ...core.auth import verify_token
+
+router = APIRouter()
+
+@router.get("/new-endpoint")
 async def new_endpoint(token: str = Depends(verify_token)):
     return {"message": "New endpoint"}
 ```
 
 ### Yeni Model Ekleme
 ```python
-# backend/app.py
+# backend/app/schemas/new_model.py
+from pydantic import BaseModel, Field
+
 class NewModel(BaseModel):
     field: str = Field(..., description="Field description")
 ```
@@ -410,7 +472,7 @@ touch frontend/app/new-page/page.tsx
 ```typescript
 // frontend/lib/api.ts
 async newMethod(): Promise<any> {
-  return this.request('/new-endpoint')
+  return this.request('/api/v1/new-endpoint')
 }
 ```
 
