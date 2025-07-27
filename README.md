@@ -13,6 +13,9 @@ Modern ve kullanıcı dostu Windows PowerShell komutlarını API üzerinden güv
 - 📝 **Detaylı Loglama**: Komut çalıştırma geçmişi
 - 🗄️ **SQLite Database**: Agent verilerinin kalıcı saklanması
 - 👥 **Agent Management**: Agent kayıt, güncelleme, silme
+- 🔍 **Real System Information**: PowerShell ile gerçek sistem bilgileri
+- 📊 **Performance Monitoring**: Gerçek zamanlı CPU, memory, disk izleme
+- 🔄 **Live Updates**: Sistem bilgilerini güncelleme
 
 ### Frontend (Next.js)
 - 🎨 **Modern UI/UX**: Tailwind CSS ve shadcn/ui
@@ -26,20 +29,25 @@ Modern ve kullanıcı dostu Windows PowerShell komutlarını API üzerinden güv
 
 ```
 dexagents/
-├── app.py                 # FastAPI backend
-├── database.py           # SQLite database manager
-├── populate_db.py        # Database population script
-├── requirements.txt       # Python bağımlılıkları
-├── env.example           # Environment variables
-├── test_client.py        # API test client
-├── start.bat            # Windows başlatma scripti
-├── dexagents.db         # SQLite database (auto-created)
-├── frontend/            # Next.js frontend
-│   ├── app/            # Next.js App Router
-│   ├── components/     # UI bileşenleri
-│   ├── lib/           # Utility fonksiyonları
-│   └── package.json   # Node.js bağımlılıkları
-└── README.md          # Bu dosya
+├── app.py                    # FastAPI backend
+├── database.py              # SQLite database manager
+├── populate_db.py           # Test database population script
+├── populate_real_agents.py  # Real system data population script
+├── update_real_system_info.py # Real-time system info updater
+├── debug_agents.py          # Agent debugging script
+├── test_integration.py      # End-to-end integration tests
+├── requirements.txt          # Python bağımlılıkları
+├── env.example              # Environment variables
+├── .env                     # Environment configuration
+├── test_client.py           # API test client
+├── start.bat               # Windows başlatma scripti
+├── dexagents.db            # SQLite database (auto-created)
+├── frontend/               # Next.js frontend
+│   ├── app/               # Next.js App Router
+│   ├── components/        # UI bileşenleri
+│   ├── lib/              # Utility fonksiyonları
+│   └── package.json      # Node.js bağımlılıkları
+└── README.md             # Bu dosya
 ```
 
 ## 🛠️ Teknolojiler
@@ -83,10 +91,16 @@ copy env.example .env
 3. **API token'ını ayarlayın:**
 `.env` dosyasında `API_TOKEN` değerini güvenli bir token ile değiştirin.
 
-4. **Database'i başlatın (opsiyonel):**
+4. **Database'i gerçek sistem bilgileriyle başlatın:**
 ```bash
-# Test verileri ile database'i doldur
-python populate_db.py
+# Gerçek sistem bilgileri ile database'i doldur
+python populate_real_agents.py
+```
+
+5. **Gerçek zamanlı sistem bilgilerini güncellemek için:**
+```bash
+# Mevcut sistem agent'ını güncelle
+python update_real_system_info.py
 ```
 
 ### Frontend Kurulumu
@@ -149,6 +163,8 @@ pnpm dev
 | `/api/agents` | POST | Yeni agent oluştur |
 | `/api/agents/{id}` | PUT | Agent güncelle |
 | `/api/agents/{id}` | DELETE | Agent sil |
+| `/api/agents/{id}/commands` | GET | Agent komut geçmişi |
+| `/api/agents/{id}/refresh` | POST | Agent bilgilerini gerçek zamanlı güncelle |
 | `/api/agents/register` | POST | Mevcut sistemi agent olarak kaydet |
 
 ### Örnek Kullanım

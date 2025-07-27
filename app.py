@@ -384,6 +384,48 @@ async def get_agent_commands(agent_id: str, limit: int = 50, token: str = Depend
         logger.error(f"Error getting commands for agent {agent_id}: {e}")
         raise HTTPException(status_code=500, detail="Failed to get command history")
 
+@app.post("/api/agents/{agent_id}/refresh")
+async def refresh_agent(agent_id: str, token: str = Depends(verify_token)):
+    """Refresh agent with real-time system information"""
+    try:
+        # Get the agent first
+        agent = db_manager.get_agent(agent_id)
+        if not agent:
+            raise HTTPException(status_code=404, detail="Agent not found")
+        
+        # Get real-time system information
+        system_info = await get_system_info_internal()
+        
+        # Update agent with real-time data
+        update_data = {
+            'ip': system_info.hostname,  # We'll get IP from system info
+            'os': system_info.os_version,
+            'version': system_info.os_version.split()[-1] if system_info.os_version else 'Unknown',
+            'status': 'online',
+            'last_seen': datetime.now().isoformat(),
+            'system_info': {
+                'hostname': system_info.hostname,
+                'os_version': system_info.os_version,
+                'cpu_usage': system_info.cpu_usage,
+                'memory_usage': system_info.memory_usage,
+                'disk_usage': system_info.disk_usage,
+                'processor_name': 'Unknown'  # We'll get this from PowerShell later
+            }
+        }
+        
+        success = db_manager.update_agent(agent_id, update_data)
+        if success:
+            updated_agent = db_manager.get_agent(agent_id)
+            return {"message": "Agent refreshed successfully", "agent": updated_agent}
+        else:
+            raise HTTPException(status_code=500, detail="Failed to refresh agent")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error refreshing agent {agent_id}: {e}")
+        raise HTTPException(status_code=500, detail="Failed to refresh agent")
+
 # Auto-register current system as an agent
 @app.post("/api/agents/register", response_model=Agent)
 async def register_current_system(token: str = Depends(verify_token)):

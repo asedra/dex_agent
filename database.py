@@ -69,7 +69,8 @@ class DatabaseManager:
             
             # Generate ID if not provided
             if 'id' not in agent_data:
-                agent_data['id'] = f"agent_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+                import time
+                agent_data['id'] = f"agent_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{int(time.time() * 1000) % 1000}"
             
             # Convert tags to JSON string
             tags_json = json.dumps(agent_data.get('tags', []))

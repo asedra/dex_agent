@@ -20,7 +20,8 @@ import {
   HardDrive,
   Cpu,
   Network,
-  Shield
+  Shield,
+  RefreshCw
 } from "lucide-react"
 import { apiClient, Agent, SystemInfo } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
@@ -32,30 +33,53 @@ export default function AgentDetailPage() {
   const [agent, setAgent] = useState<Agent | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
   const { toast } = useToast()
 
-  useEffect(() => {
-    const fetchAgent = async () => {
-      try {
-        setLoading(true)
-        const agentData = await apiClient.getAgentDetails(agentId)
-        setAgent(agentData)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch agent')
-        toast({
-          title: "Error",
-          description: "Failed to load agent details",
-          variant: "destructive",
-        })
-      } finally {
-        setLoading(false)
-      }
+  const fetchAgent = async () => {
+    try {
+      setLoading(true)
+      const agentData = await apiClient.getAgentDetails(agentId)
+      setAgent(agentData)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch agent')
+      toast({
+        title: "Error",
+        description: "Failed to load agent details",
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
     }
+  }
 
+  const handleRefresh = async () => {
+    if (!agent?.id) return
+    
+    try {
+      setRefreshing(true)
+      const result = await apiClient.refreshAgent(agent.id)
+      setAgent(result.agent)
+      toast({
+        title: "Success",
+        description: "Agent information refreshed successfully",
+      })
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to refresh agent information",
+        variant: "destructive",
+      })
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
+  useEffect(() => {
     if (agentId) {
       fetchAgent()
     }
-  }, [agentId, toast])
+  }, [agentId])
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -134,6 +158,16 @@ export default function AgentDetailPage() {
         <div className="flex items-center gap-2">
           {getStatusIcon(agent.status)}
           {getStatusBadge(agent.status)}
+          <Button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            variant="outline"
+            size="sm"
+            className="ml-2"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
         </div>
       </div>
 
