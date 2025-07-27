@@ -6,6 +6,7 @@ from typing import Optional, Dict, Any
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import psutil
 from dotenv import load_dotenv
@@ -21,6 +22,15 @@ app = FastAPI(
     title="Windows PowerShell Agent",
     description="API for executing PowerShell commands on Windows devices",
     version="1.0.0"
+)
+
+# CORS middleware ekle
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # Frontend URL'leri
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Security
