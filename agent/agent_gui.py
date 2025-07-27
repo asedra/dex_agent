@@ -12,6 +12,10 @@ import asyncio
 import logging
 from datetime import datetime
 import os
+import sys
+
+# Create logs directory if it doesn't exist
+os.makedirs('logs', exist_ok=True)
 
 # Configure logging
 logging.basicConfig(
@@ -38,6 +42,7 @@ class DexAgentsGUI:
         self.is_connected = False
         self.heartbeat_thread = None
         self.stop_heartbeat = False
+        self.event_loop = None
         
         # Create GUI
         self.create_widgets()
@@ -48,11 +53,14 @@ class DexAgentsGUI:
         try:
             if os.path.exists('config.json'):
                 with open('config.json', 'r') as f:
-                    return json.load(f)
+                    config = json.load(f)
+                    logger.info("Configuration loaded from file")
+                    return config
         except Exception as e:
             logger.error(f"Error loading config: {e}")
         
-        return {
+        # Default configuration
+        default_config = {
             "server_url": "http://localhost:8000",
             "api_token": "your-secret-key-here",
             "agent_name": socket.gethostname(),
@@ -60,6 +68,9 @@ class DexAgentsGUI:
             "auto_start": False,
             "run_as_service": False
         }
+        
+        logger.info("Using default configuration")
+        return default_config
     
     def save_config(self):
         """Save configuration to file"""
@@ -75,6 +86,9 @@ class DexAgentsGUI:
             
             with open('config.json', 'w') as f:
                 json.dump(config, f, indent=2)
+            
+            # Update internal config
+            self.config = config
             
             logger.info("Configuration saved")
             messagebox.showinfo("Success", "Configuration saved successfully!")
@@ -100,98 +114,191 @@ class DexAgentsGUI:
         
         # Server URL
         ttk.Label(conn_frame, text="Server URL:").grid(row=0, column=0, sticky=tk.W, padx=(0, 5))
-        self.server_url_var = tk.StringVar()
-        ttk.Entry(conn_frame, textvariable=self.server_url_var, width=50).grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(0, 5))
+        self.server_url_var = tk.StringVar(value=self.config.get("server_url", "http://localhost:8000"))
+        server_entry = ttk.Entry(conn_frame, textvariable=self.server_url_var, width=40)
+        server_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(0, 5))
+        
+        # Test Connection Button
+        test_btn = ttk.Button(conn_frame, text="Test Connection", command=self.test_connection)
+        test_btn.grid(row=0, column=2)
         
         # API Token
-        ttk.Label(conn_frame, text="API Token:").grid(row=1, column=0, sticky=tk.W, padx=(0, 5))
-        self.api_token_var = tk.StringVar()
-        ttk.Entry(conn_frame, textvariable=self.api_token_var, width=50, show="*").grid(row=1, column=1, sticky=(tk.W, tk.E), padx=(0, 5))
+        ttk.Label(conn_frame, text="API Token:").grid(row=1, column=0, sticky=tk.W, padx=(0, 5), pady=(5, 0))
+        self.api_token_var = tk.StringVar(value=self.config.get("api_token", "your-secret-key-here"))
+        token_entry = ttk.Entry(conn_frame, textvariable=self.api_token_var, width=40, show="*")
+        token_entry.grid(row=1, column=1, sticky=(tk.W, tk.E), padx=(0, 5), pady=(5, 0))
+        
+        # Agent Settings Frame
+        agent_frame = ttk.LabelFrame(main_frame, text="Agent Settings", padding="5")
+        agent_frame.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+        agent_frame.columnconfigure(1, weight=1)
         
         # Agent Name
-        ttk.Label(conn_frame, text="Agent Name:").grid(row=2, column=0, sticky=tk.W, padx=(0, 5))
-        self.agent_name_var = tk.StringVar()
-        ttk.Entry(conn_frame, textvariable=self.agent_name_var, width=50).grid(row=2, column=1, sticky=(tk.W, tk.E), padx=(0, 5))
+        ttk.Label(agent_frame, text="Agent Name:").grid(row=0, column=0, sticky=tk.W, padx=(0, 5))
+        self.agent_name_var = tk.StringVar(value=self.config.get("agent_name", socket.gethostname()))
+        name_entry = ttk.Entry(agent_frame, textvariable=self.agent_name_var, width=40)
+        name_entry.grid(row=0, column=1, sticky=(tk.W, tk.E), padx=(0, 5))
         
         # Tags
-        ttk.Label(conn_frame, text="Tags:").grid(row=3, column=0, sticky=tk.W, padx=(0, 5))
-        self.tags_var = tk.StringVar()
-        ttk.Entry(conn_frame, textvariable=self.tags_var, width=50).grid(row=3, column=1, sticky=(tk.W, tk.E), padx=(0, 5))
+        ttk.Label(agent_frame, text="Tags:").grid(row=1, column=0, sticky=tk.W, padx=(0, 5), pady=(5, 0))
+        self.tags_var = tk.StringVar(value=",".join(self.config.get("tags", [])))
+        tags_entry = ttk.Entry(agent_frame, textvariable=self.tags_var, width=40)
+        tags_entry.grid(row=1, column=1, sticky=(tk.W, tk.E), padx=(0, 5), pady=(5, 0))
         
-        # Options Frame
-        options_frame = ttk.LabelFrame(main_frame, text="Options", padding="5")
-        options_frame.grid(row=1, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+        # Options
+        self.auto_start_var = tk.BooleanVar(value=self.config.get("auto_start", False))
+        auto_start_cb = ttk.Checkbutton(agent_frame, text="Auto Start", variable=self.auto_start_var)
+        auto_start_cb.grid(row=2, column=0, sticky=tk.W, pady=(5, 0))
         
-        # Auto Start
-        self.auto_start_var = tk.BooleanVar()
-        ttk.Checkbutton(options_frame, text="Auto-start agent", variable=self.auto_start_var).grid(row=0, column=0, sticky=tk.W)
+        self.run_as_service_var = tk.BooleanVar(value=self.config.get("run_as_service", False))
+        service_cb = ttk.Checkbutton(agent_frame, text="Run as Service", variable=self.run_as_service_var)
+        service_cb.grid(row=2, column=1, sticky=tk.W, pady=(5, 0))
         
-        # Run as Service
-        self.run_as_service_var = tk.BooleanVar()
-        ttk.Checkbutton(options_frame, text="Run as Windows service", variable=self.run_as_service_var).grid(row=0, column=1, sticky=tk.W, padx=(20, 0))
+        # Control Buttons Frame
+        control_frame = ttk.Frame(main_frame)
+        control_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+        
+        # Save Config Button
+        save_btn = ttk.Button(control_frame, text="Save Config", command=self.save_config)
+        save_btn.pack(side=tk.LEFT, padx=(0, 5))
+        
+        # Register Agent Button
+        register_btn = ttk.Button(control_frame, text="Register Agent", command=self.register_agent)
+        register_btn.pack(side=tk.LEFT, padx=(0, 5))
+        
+        # Start/Stop Agent Button
+        self.toggle_btn = ttk.Button(control_frame, text="Start Agent", command=self.toggle_agent)
+        self.toggle_btn.pack(side=tk.LEFT, padx=(0, 5))
         
         # Status Frame
         status_frame = ttk.LabelFrame(main_frame, text="Status", padding="5")
-        status_frame.grid(row=2, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+        status_frame.grid(row=3, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
         status_frame.columnconfigure(1, weight=1)
         
         # Connection Status
         ttk.Label(status_frame, text="Connection:").grid(row=0, column=0, sticky=tk.W, padx=(0, 5))
-        self.connection_status_var = tk.StringVar(value="Disconnected")
-        self.connection_status_label = ttk.Label(status_frame, textvariable=self.connection_status_var, foreground="red")
-        self.connection_status_label.grid(row=0, column=1, sticky=tk.W)
+        self.connection_var = tk.StringVar(value="Disconnected")
+        connection_label = ttk.Label(status_frame, textvariable=self.connection_var, foreground="red")
+        connection_label.grid(row=0, column=1, sticky=tk.W)
         
-        # Agent Status
-        ttk.Label(status_frame, text="Agent:").grid(row=1, column=0, sticky=tk.W, padx=(0, 5))
-        self.agent_status_var = tk.StringVar(value="Not registered")
-        self.agent_status_label = ttk.Label(status_frame, textvariable=self.agent_status_var)
-        self.agent_status_label.grid(row=1, column=1, sticky=tk.W)
+        # Agent ID
+        ttk.Label(status_frame, text="Agent ID:").grid(row=1, column=0, sticky=tk.W, padx=(0, 5), pady=(5, 0))
+        self.agent_id_var = tk.StringVar(value="Not registered")
+        agent_id_label = ttk.Label(status_frame, textvariable=self.agent_id_var)
+        agent_id_label.grid(row=1, column=1, sticky=tk.W, pady=(5, 0))
         
-        # System Info
-        ttk.Label(status_frame, text="CPU:").grid(row=2, column=0, sticky=tk.W, padx=(0, 5))
-        self.cpu_var = tk.StringVar(value="0%")
-        ttk.Label(status_frame, textvariable=self.cpu_var).grid(row=2, column=1, sticky=tk.W)
+        # System Info Frame
+        sys_frame = ttk.LabelFrame(main_frame, text="System Information", padding="5")
+        sys_frame.grid(row=4, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(0, 10))
+        sys_frame.columnconfigure(1, weight=1)
         
-        ttk.Label(status_frame, text="Memory:").grid(row=3, column=0, sticky=tk.W, padx=(0, 5))
-        self.memory_var = tk.StringVar(value="0%")
-        ttk.Label(status_frame, textvariable=self.memory_var).grid(row=3, column=1, sticky=tk.W)
+        # CPU Usage
+        ttk.Label(sys_frame, text="CPU Usage:").grid(row=0, column=0, sticky=tk.W, padx=(0, 5))
+        self.cpu_var = tk.StringVar(value="0.0%")
+        cpu_label = ttk.Label(sys_frame, textvariable=self.cpu_var)
+        cpu_label.grid(row=0, column=1, sticky=tk.W)
         
-        # Buttons Frame
-        buttons_frame = ttk.Frame(main_frame)
-        buttons_frame.grid(row=3, column=0, columnspan=2, pady=(0, 10))
-        
-        # Test Connection Button
-        ttk.Button(buttons_frame, text="Test Connection", command=self.test_connection).pack(side=tk.LEFT, padx=(0, 5))
-        
-        # Save Config Button
-        ttk.Button(buttons_frame, text="Save Config", command=self.save_config).pack(side=tk.LEFT, padx=(0, 5))
-        
-        # Start/Stop Button
-        self.start_stop_button = ttk.Button(buttons_frame, text="Start Agent", command=self.toggle_agent)
-        self.start_stop_button.pack(side=tk.LEFT, padx=(0, 5))
+        # Memory Usage
+        ttk.Label(sys_frame, text="Memory Usage:").grid(row=1, column=0, sticky=tk.W, padx=(0, 5), pady=(5, 0))
+        self.memory_var = tk.StringVar(value="0.0%")
+        memory_label = ttk.Label(sys_frame, textvariable=self.memory_var)
+        memory_label.grid(row=1, column=1, sticky=tk.W, pady=(5, 0))
         
         # Log Frame
-        log_frame = ttk.LabelFrame(main_frame, text="Logs", padding="5")
-        log_frame.grid(row=4, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
+        log_frame = ttk.LabelFrame(main_frame, text="Log", padding="5")
+        log_frame.grid(row=5, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S), pady=(0, 10))
         log_frame.columnconfigure(0, weight=1)
         log_frame.rowconfigure(0, weight=1)
-        main_frame.rowconfigure(4, weight=1)
+        main_frame.rowconfigure(5, weight=1)
         
         # Log Text
-        self.log_text = scrolledtext.ScrolledText(log_frame, height=15, width=80)
+        self.log_text = scrolledtext.ScrolledText(log_frame, height=10, width=80)
         self.log_text.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
         
         # Clear Log Button
-        ttk.Button(log_frame, text="Clear Log", command=self.clear_log).grid(row=1, column=0, pady=(5, 0))
+        clear_btn = ttk.Button(log_frame, text="Clear Log", command=self.clear_log)
+        clear_btn.grid(row=1, column=0, sticky=tk.E, pady=(5, 0))
     
     def load_config_to_gui(self):
         """Load configuration into GUI fields"""
-        self.server_url_var.set(self.config.get("server_url", ""))
-        self.api_token_var.set(self.config.get("api_token", ""))
-        self.agent_name_var.set(self.config.get("agent_name", ""))
+        self.server_url_var.set(self.config.get("server_url", "http://localhost:8000"))
+        self.api_token_var.set(self.config.get("api_token", "your-secret-key-here"))
+        self.agent_name_var.set(self.config.get("agent_name", socket.gethostname()))
         self.tags_var.set(",".join(self.config.get("tags", [])))
         self.auto_start_var.set(self.config.get("auto_start", False))
         self.run_as_service_var.set(self.config.get("run_as_service", False))
+    
+    def test_connection(self):
+        """Test connection to server"""
+        try:
+            server_url = self.server_url_var.get()
+            api_token = self.api_token_var.get()
+            
+            if not server_url or not api_token:
+                messagebox.showerror("Error", "Please enter server URL and API token")
+                return
+            
+            # Test HTTP connection
+            headers = {"Authorization": f"Bearer {api_token}"}
+            response = requests.get(f"{server_url}/", headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                messagebox.showinfo("Success", "Connection test successful!")
+                self.log_message("Connection test successful")
+            else:
+                messagebox.showerror("Error", f"Connection test failed: {response.status_code}")
+                self.log_message(f"Connection test failed: {response.status_code}")
+                
+        except Exception as e:
+            messagebox.showerror("Error", f"Connection test failed: {str(e)}")
+            self.log_message(f"Connection test failed: {str(e)}")
+    
+    def register_agent(self):
+        """Register agent with server"""
+        try:
+            server_url = self.server_url_var.get()
+            api_token = self.api_token_var.get()
+            agent_name = self.agent_name_var.get()
+            tags = [tag.strip() for tag in self.tags_var.get().split(',') if tag.strip()]
+            
+            # Get system information
+            system_info = {
+                "cpu_usage": psutil.cpu_percent(),
+                "memory_usage": psutil.virtual_memory().percent,
+                "disk_usage": {partition.device: psutil.disk_usage(partition.mountpoint).percent 
+                              for partition in psutil.disk_partitions() if partition.device}
+            }
+            
+            # Register agent
+            headers = {"Authorization": f"Bearer {api_token}", "Content-Type": "application/json"}
+            agent_data = {
+                "hostname": agent_name,
+                "os": platform.system(),
+                "version": platform.version(),
+                "tags": tags,
+                "system_info": system_info
+            }
+            
+            response = requests.post(
+                f"{server_url}/api/v1/agents/register",
+                headers=headers,
+                json=agent_data,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                agent_info = response.json()
+                self.agent_id = agent_info["id"]
+                self.log_message(f"Agent registered successfully: {self.agent_id}")
+                self.agent_id_var.set(f"Registered: {self.agent_id}")
+                return True
+            else:
+                self.log_message(f"Agent registration failed: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_message(f"Agent registration error: {str(e)}")
+            return False
     
     def log_message(self, message):
         """Add message to log"""
@@ -266,7 +373,7 @@ class DexAgentsGUI:
                 agent_info = response.json()
                 self.agent_id = agent_info["id"]
                 self.log_message(f"Agent registered successfully: {self.agent_id}")
-                self.agent_status_var.set(f"Registered: {self.agent_id}")
+                self.agent_id_var.set(f"Registered: {self.agent_id}")
                 return True
             else:
                 self.log_message(f"Agent registration failed: {response.status_code}")
@@ -301,6 +408,82 @@ class DexAgentsGUI:
         except Exception as e:
             self.log_message(f"WebSocket worker error: {str(e)}")
     
+    def start_heartbeat(self):
+        """Start heartbeat thread"""
+        self.stop_heartbeat = False
+        self.heartbeat_thread = threading.Thread(target=self.heartbeat_worker)
+        self.heartbeat_thread.daemon = True
+        self.heartbeat_thread.start()
+    
+    def heartbeat_worker(self):
+        """Heartbeat worker thread"""
+        while not self.stop_heartbeat:
+            try:
+                # Get system info
+                system_info = {
+                    "cpu_usage": psutil.cpu_percent(),
+                    "memory_usage": psutil.virtual_memory().percent,
+                    "disk_usage": {partition.device: psutil.disk_usage(partition.mountpoint).percent 
+                                  for partition in psutil.disk_partitions() if partition.device}
+                }
+                
+                # Update GUI with system info
+                self.root.after(0, lambda: self.cpu_var.set(f"{system_info['cpu_usage']:.1f}%"))
+                self.root.after(0, lambda: self.memory_var.set(f"{system_info['memory_usage']:.1f}%"))
+                
+                # Send HTTP heartbeat if agent is registered
+                if self.agent_id:
+                    try:
+                        server_url = self.config.get("server_url", "http://localhost:8000")
+                        api_token = self.config.get("api_token", "your-secret-key-here")
+                        
+                        headers = {
+                            "Authorization": f"Bearer {api_token}",
+                            "Content-Type": "application/json"
+                        }
+                        
+                        response = requests.post(
+                            f"{server_url}/api/v1/agents/{self.agent_id}/heartbeat",
+                            headers=headers,
+                            timeout=10
+                        )
+                        
+                        if response.status_code == 200:
+                            self.log_message("HTTP heartbeat sent successfully")
+                        else:
+                            self.log_message(f"HTTP heartbeat failed: {response.status_code}")
+                            
+                    except Exception as e:
+                        self.log_message(f"HTTP heartbeat error: {str(e)}")
+                
+                # Send WebSocket heartbeat if connected
+                if self.websocket and self.is_connected and self.event_loop:
+                    try:
+                        message = {
+                            "type": "heartbeat",
+                            "data": {
+                                "system_info": system_info
+                            },
+                            "timestamp": datetime.now().isoformat()
+                        }
+                        
+                        # Send heartbeat asynchronously using the stored event loop
+                        asyncio.run_coroutine_threadsafe(
+                            self.websocket.send(json.dumps(message)),
+                            self.event_loop
+                        )
+                        
+                        self.log_message("WebSocket heartbeat sent successfully")
+                        
+                    except Exception as e:
+                        self.log_message(f"WebSocket heartbeat error: {str(e)}")
+                
+                time.sleep(30)  # Send heartbeat every 30 seconds
+                
+            except Exception as e:
+                self.log_message(f"Heartbeat error: {str(e)}")
+                time.sleep(30)
+    
     async def websocket_handler(self, websocket_url):
         """Handle WebSocket connection"""
         try:
@@ -308,9 +491,11 @@ class DexAgentsGUI:
                 self.websocket = websocket
                 self.is_connected = True
                 
+                # Store event loop for heartbeat thread
+                self.event_loop = asyncio.get_running_loop()
+                
                 # Update GUI
-                self.root.after(0, lambda: self.connection_status_var.set("Connected"))
-                self.root.after(0, lambda: self.connection_status_label.config(foreground="green"))
+                self.root.after(0, lambda: self.connection_var.set("Connected"))
                 
                 self.log_message("WebSocket connected")
                 
@@ -329,11 +514,11 @@ class DexAgentsGUI:
         finally:
             self.is_connected = False
             self.websocket = None
+            self.event_loop = None
             self.stop_heartbeat = True
             
             # Update GUI
-            self.root.after(0, lambda: self.connection_status_var.set("Disconnected"))
-            self.root.after(0, lambda: self.connection_status_label.config(foreground="red"))
+            self.root.after(0, lambda: self.connection_var.set("Disconnected"))
     
     async def send_registration_message(self, websocket):
         """Send registration message to server"""
@@ -412,7 +597,7 @@ class DexAgentsGUI:
                         self.log_message(f"HTTP heartbeat error: {str(e)}")
                 
                 # Send WebSocket heartbeat if connected
-                if self.websocket and self.is_connected:
+                if self.websocket and self.is_connected and self.event_loop:
                     try:
                         message = {
                             "type": "heartbeat",
@@ -422,10 +607,10 @@ class DexAgentsGUI:
                             "timestamp": datetime.now().isoformat()
                         }
                         
-                        # Send heartbeat asynchronously
+                        # Send heartbeat asynchronously using the stored event loop
                         asyncio.run_coroutine_threadsafe(
                             self.websocket.send(json.dumps(message)),
-                            asyncio.get_event_loop()
+                            self.event_loop
                         )
                         
                         self.log_message("WebSocket heartbeat sent successfully")
@@ -535,16 +720,17 @@ class DexAgentsGUI:
                     return
             
             self.start_websocket_connection()
-            self.start_stop_button.config(text="Stop Agent")
+            self.toggle_btn.config(text="Stop Agent")
             self.log_message("Agent started")
         else:
             # Stop agent
             self.stop_heartbeat = True
-            if self.websocket:
-                asyncio.run_coroutine_threadsafe(self.websocket.close(), asyncio.get_event_loop())
+            if self.websocket and self.event_loop:
+                asyncio.run_coroutine_threadsafe(self.websocket.close(), self.event_loop)
             
             self.is_connected = False
-            self.start_stop_button.config(text="Start Agent")
+            self.event_loop = None
+            self.toggle_btn.config(text="Start Agent")
             self.log_message("Agent stopped")
 
 def main():
