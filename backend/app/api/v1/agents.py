@@ -1,9 +1,13 @@
 from typing import List, Dict, Any
 from fastapi import APIRouter, HTTPException, Depends
-from ...schemas.agent import Agent, AgentUpdate
+from ...schemas.agent import Agent, AgentUpdate, AgentRegister
 from ...core.database import db_manager
 from ...core.auth import verify_token
+from ...core.websocket_manager import websocket_manager
 import logging
+import socket
+import platform
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +18,14 @@ async def get_agents(token: str = Depends(verify_token)):
     """Get all agents"""
     try:
         agents_data = db_manager.get_agents()
-        return [Agent(**agent) for agent in agents_data]
+        agents = []
+        
+        for agent_data in agents_data:
+            # Check if agent is currently connected
+            agent_data['is_connected'] = websocket_manager.is_agent_connected(agent_data['id'])
+            agents.append(Agent(**agent_data))
+        
+        return agents
     except Exception as e:
         logger.error(f"Error getting agents: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
@@ -26,6 +37,9 @@ async def get_agent(agent_id: str, token: str = Depends(verify_token)):
         agent_data = db_manager.get_agent(agent_id)
         if not agent_data:
             raise HTTPException(status_code=404, detail="Agent not found")
+        
+        # Check if agent is currently connected
+        agent_data['is_connected'] = websocket_manager.is_agent_connected(agent_id)
         return Agent(**agent_data)
     except HTTPException:
         raise
@@ -33,15 +47,39 @@ async def get_agent(agent_id: str, token: str = Depends(verify_token)):
         logger.error(f"Error getting agent {agent_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.post("/", response_model=Agent)
-async def create_agent(agent: Agent, token: str = Depends(verify_token)):
-    """Create a new agent"""
+@router.post("/register", response_model=Agent)
+async def register_agent(agent_data: AgentRegister, token: str = Depends(verify_token)):
+    """Register a new agent"""
     try:
-        agent_id = db_manager.add_agent(agent.dict())
-        agent.id = agent_id
-        return agent
+        # Check if agent with same hostname already exists
+        existing_agent = db_manager.get_agent_by_hostname(agent_data.hostname)
+        if existing_agent:
+            # Update existing agent instead of creating new one
+            update_data = agent_data.dict(exclude_unset=True)
+            update_data['status'] = 'online'
+            update_data['last_seen'] = datetime.now().isoformat()
+            
+            db_manager.update_agent(existing_agent['id'], update_data)
+            existing_agent.update(update_data)
+            existing_agent['is_connected'] = websocket_manager.is_agent_connected(existing_agent['id'])
+            
+            logger.info(f"Agent {existing_agent['id']} updated during registration")
+            return Agent(**existing_agent)
+        
+        # Create new agent
+        agent_dict = agent_data.dict()
+        agent_dict['status'] = 'online'
+        agent_dict['last_seen'] = datetime.now().isoformat()
+        
+        agent_id = db_manager.add_agent(agent_dict)
+        agent_dict['id'] = agent_id
+        agent_dict['is_connected'] = False  # Will be updated when WebSocket connects
+        
+        logger.info(f"New agent {agent_id} registered")
+        return Agent(**agent_dict)
+        
     except Exception as e:
-        logger.error(f"Error creating agent: {str(e)}")
+        logger.error(f"Error registering agent: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.put("/{agent_id}", response_model=Agent)
@@ -62,6 +100,7 @@ async def update_agent(agent_id: str, agent_update: AgentUpdate, token: str = De
         
         # Return updated agent
         updated_agent = db_manager.get_agent(agent_id)
+        updated_agent['is_connected'] = websocket_manager.is_agent_connected(agent_id)
         return Agent(**updated_agent)
     except HTTPException:
         raise
@@ -122,30 +161,26 @@ async def refresh_agent(agent_id: str, token: str = Depends(verify_token)):
         logger.error(f"Error refreshing agent {agent_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.post("/register", response_model=Agent)
-async def register_current_system(token: str = Depends(verify_token)):
-    """Register the current system as an agent"""
+@router.get("/connected", response_model=List[Agent])
+async def get_connected_agents(token: str = Depends(verify_token)):
+    """Get list of currently connected agents"""
     try:
-        import socket
-        import platform
+        connected_agents = websocket_manager.get_connected_agents()
+        agents_info = []
         
-        hostname = socket.gethostname()
+        for agent_id in connected_agents:
+            agent_data = db_manager.get_agent(agent_id)
+            if agent_data:
+                agent_data['is_connected'] = True
+                connection_info = websocket_manager.get_connection_info(
+                    websocket_manager.agent_connections[agent_id]
+                )
+                agent_data['connection_info'] = connection_info
+                agents_info.append(Agent(**agent_data))
         
-        # Create agent data
-        agent_data = {
-            "hostname": hostname,
-            "os": platform.system(),
-            "version": platform.version(),
-            "status": "online",
-            "tags": ["auto-registered"]
-        }
-        
-        agent_id = db_manager.add_agent(agent_data)
-        agent_data["id"] = agent_id
-        
-        return Agent(**agent_data)
+        return agents_info
     except Exception as e:
-        logger.error(f"Error registering current system: {str(e)}")
+        logger.error(f"Error getting connected agents: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.post("/seed", response_model=List[Agent])
@@ -183,6 +218,7 @@ async def seed_test_data(token: str = Depends(verify_token)):
         for agent_data in test_agents:
             agent_id = db_manager.add_agent(agent_data)
             agent_data["id"] = agent_id
+            agent_data["is_connected"] = websocket_manager.is_agent_connected(agent_id)
             created_agents.append(Agent(**agent_data))
         
         return created_agents

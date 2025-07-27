@@ -13,11 +13,13 @@ dexagents/
 │   │   │       ├── agents.py      # Agent yönetimi
 │   │   │       ├── commands.py    # PowerShell komutları
 │   │   │       ├── installer.py   # Installer yönetimi
-│   │   │       └── system.py      # Sistem bilgileri
+│   │   │       ├── system.py      # Sistem bilgileri
+│   │   │       └── websocket.py   # WebSocket endpoint'leri
 │   │   ├── core/     # Çekirdek modüller
 │   │   │   ├── config.py          # Konfigürasyon
 │   │   │   ├── database.py        # Veritabanı işlemleri
-│   │   │   └── auth.py            # Kimlik doğrulama
+│   │   │   ├── auth.py            # Kimlik doğrulama
+│   │   │   └── websocket_manager.py # WebSocket yönetimi
 │   │   ├── schemas/  # Pydantic modelleri
 │   │   │   ├── agent.py           # Agent şemaları
 │   │   │   ├── command.py         # Komut şemaları
@@ -92,6 +94,7 @@ Frontend http://localhost:3000 adresinde çalışacak.
 
 ```bash
 cd agent
+pip install -r requirements.txt
 python agent_gui.py
 ```
 
@@ -149,6 +152,7 @@ Bu işlem:
 - Pydantic 2.5.0
 - SQLite (veritabanı)
 - psutil (sistem monitoring)
+- WebSocket desteği
 
 **Mimari:**
 - **Modüler Yapı**: API, Core, Schemas, Services ayrımı
@@ -156,9 +160,11 @@ Bu işlem:
 - **Versioned API**: `/api/v1/` prefix ile API versiyonlama
 - **Centralized Config**: Merkezi konfigürasyon yönetimi
 - **Structured Logging**: Yapılandırılmış log sistemi
+- **WebSocket Manager**: WebSocket bağlantılarını yöneten merkezi sistem
 
 **Özellikler:**
 - ✅ REST API endpoints (v1)
+- ✅ WebSocket tabanlı real-time iletişim
 - ✅ Agent yönetimi (CRUD işlemleri)
 - ✅ PowerShell komut çalıştırma
 - ✅ Sistem bilgileri toplama
@@ -167,6 +173,7 @@ Bu işlem:
 - ✅ Real-time agent monitoring
 - ✅ Batch komut çalıştırma
 - ✅ Test data seeding
+- ✅ Duplicate agent kayıt önleme
 
 **API Endpoints:**
 ```
@@ -174,11 +181,13 @@ GET  /                    # Health check
 GET  /api/v1/agents/     # Agent listesi
 POST /api/v1/agents/register # Agent kayıt
 GET  /api/v1/agents/{id} # Agent detayı
+GET  /api/v1/agents/connected # Bağlı agent'lar
 POST /api/v1/agents/seed # Test data oluştur
 POST /api/v1/agents/{id}/command # Komut çalıştır
 GET  /api/v1/installer/config # Varsayılan config
 POST /api/v1/installer/create # Installer oluştur
 GET  /api/v1/system/info # Sistem bilgileri
+WS   /api/v1/ws/{agent_id} # WebSocket endpoint
 ```
 
 ### 🌐 Frontend (Next.js)
@@ -214,11 +223,13 @@ GET  /api/v1/system/info # Sistem bilgileri
 **Teknolojiler:**
 - Tkinter (GUI framework)
 - requests (HTTP client)
+- websockets (WebSocket client)
 - psutil (sistem monitoring)
 - PyInstaller (EXE oluşturma)
 
 **Özellikler:**
 - ✅ Tkinter tabanlı GUI
+- ✅ WebSocket tabanlı real-time iletişim
 - ✅ Connection ayarları
 - ✅ Real-time system monitoring
 - ✅ Log görüntüleme
@@ -226,6 +237,8 @@ GET  /api/v1/system/info # Sistem bilgileri
 - ✅ Config kaydetme/yükleme
 - ✅ Windows service desteği
 - ✅ Auto-start seçeneği
+- ✅ Duplicate kayıt önleme
+- ✅ Heartbeat sistemi
 
 **GUI Bileşenleri:**
 - Connection Settings (Server URL, API Token, Agent Name, Tags)
@@ -251,6 +264,7 @@ GET  /api/v1/system/info # Sistem bilgileri
 - Config dosyası şifreleme
 - Log dosyası güvenliği
 - Network bağlantı güvenliği
+- WebSocket bağlantı güvenliği
 
 ## 📊 Monitoring ve Logging
 
@@ -267,11 +281,94 @@ GET  /api/v1/system/info # Sistem bilgileri
 - Connection durumu
 - Error logları
 - Performance metrikleri
+- WebSocket bağlantı durumu
 
 ### Log Yönetimi
 - Backend: Console ve file logging
 - Frontend: Browser console logging
 - Agent: File-based logging (logs/agent.log)
+
+## 🔄 WebSocket İletişim Protokolü
+
+### Agent → Server Mesajları
+
+#### Registration
+```json
+{
+  "type": "register",
+  "data": {
+    "hostname": "DESKTOP-ABC123",
+    "os": "Windows",
+    "version": "10.0.19045",
+    "tags": ["windows", "gui-agent"],
+    "system_info": {
+      "cpu_usage": 25.5,
+      "memory_usage": 60.2,
+      "disk_usage": {"C:": 75.0}
+    }
+  },
+  "timestamp": "2024-01-01T12:00:00"
+}
+```
+
+#### Heartbeat
+```json
+{
+  "type": "heartbeat",
+  "data": {
+    "system_info": {
+      "cpu_usage": 25.5,
+      "memory_usage": 60.2,
+      "disk_usage": {"C:": 75.0}
+    }
+  },
+  "timestamp": "2024-01-01T12:00:00"
+}
+```
+
+#### Command Result
+```json
+{
+  "type": "command_result",
+  "data": {
+    "command": "Get-Process",
+    "success": true,
+    "output": "Process list...",
+    "error": "",
+    "execution_time": 1.5,
+    "exit_code": 0
+  },
+  "timestamp": "2024-01-01T12:00:00"
+}
+```
+
+### Server → Agent Mesajları
+
+#### Welcome
+```json
+{
+  "type": "welcome",
+  "data": {
+    "agent_id": "agent_123",
+    "connection_id": "conn_456",
+    "message": "Connected to DexAgents server"
+  },
+  "timestamp": "2024-01-01T12:00:00"
+}
+```
+
+#### Command
+```json
+{
+  "type": "command",
+  "data": {
+    "command": "Get-Process | Select-Object Name,Id,CPU",
+    "timeout": 30,
+    "working_directory": "C:\\"
+  },
+  "timestamp": "2024-01-01T12:00:00"
+}
+```
 
 ## 🚀 Deployment
 
@@ -337,6 +434,7 @@ cd agent && python agent_gui.py
 - Agent durumu takibi
 - Log dosyaları inceleme
 - Performance analizi
+- WebSocket bağlantı durumu
 
 ## 🐛 Troubleshooting
 
@@ -345,6 +443,7 @@ cd agent && python agent_gui.py
 - **Python dependencies**: `pip install -r requirements.txt`
 - **Database erişimi**: Dosya yazma izinlerini kontrol et
 - **Module import hataları**: `python -m app.main` ile çalıştır
+- **WebSocket bağlantı sorunları**: Firewall ayarlarını kontrol et
 
 ### Frontend Sorunları
 - **Node.js yüklü değil**: https://nodejs.org/
@@ -357,6 +456,8 @@ cd agent && python agent_gui.py
 - **API token geçersiz**: Backend'deki token'ı kontrol et
 - **Firewall**: Windows Firewall ayarlarını kontrol et
 - **Log dosyaları**: `logs/agent.log` dosyasını incele
+- **WebSocket bağlantı sorunları**: Network ayarlarını kontrol et
+- **Duplicate kayıt**: Aynı hostname ile tekrar kayıt olmaya çalışıyorsa mevcut agent güncellenir
 
 ## 📝 API Dokümantasyonu
 
@@ -378,7 +479,6 @@ Content-Type: application/json
   "hostname": "DESKTOP-ABC123",
   "os": "Windows 10",
   "version": "2.1.4",
-  "status": "online",
   "tags": ["windows", "gui-agent"],
   "system_info": {
     "cpu_usage": 25.5,
@@ -386,6 +486,12 @@ Content-Type: application/json
     "disk_usage": {"C:": 75.0}
   }
 }
+```
+
+#### Bağlı Agent'lar
+```bash
+GET /api/v1/agents/connected
+Authorization: Bearer your-secret-key-here
 ```
 
 #### Test Data Oluşturma
@@ -404,6 +510,13 @@ Content-Type: application/json
   "command": "Get-Process | Select-Object Name,Id,CPU",
   "timeout": 30
 }
+```
+
+### WebSocket Endpoints
+
+#### WebSocket Bağlantısı
+```bash
+WS /api/v1/ws/{agent_id}
 ```
 
 ### Installer Endpoints
@@ -494,4 +607,4 @@ Proje hakkında sorularınız için issue açabilirsiniz.
 
 ---
 
-**DexAgents** - Windows Endpoint Management Platform v2.1.4 
+**DexAgents** - Windows Endpoint Management Platform v2.2.0 

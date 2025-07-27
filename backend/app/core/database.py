@@ -40,6 +40,8 @@ class DatabaseManager:
                     last_seen TIMESTAMP,
                     tags TEXT,  -- JSON array as string
                     system_info TEXT,  -- JSON object as string
+                    connection_id TEXT,
+                    is_connected BOOLEAN DEFAULT FALSE,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -81,8 +83,8 @@ class DatabaseManager:
             
             cursor.execute('''
                 INSERT OR REPLACE INTO agents 
-                (id, hostname, ip, os, version, status, last_seen, tags, system_info, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (id, hostname, ip, os, version, status, last_seen, tags, system_info, connection_id, is_connected, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
                 agent_data['id'],
                 agent_data['hostname'],
@@ -93,6 +95,8 @@ class DatabaseManager:
                 agent_data.get('last_seen', datetime.now().isoformat()),
                 tags_json,
                 system_info_json,
+                agent_data.get('connection_id'),
+                agent_data.get('is_connected', False),
                 datetime.now().isoformat()
             ))
             
@@ -133,6 +137,22 @@ class DatabaseManager:
             
             return None
     
+    def get_agent_by_hostname(self, hostname: str) -> Optional[Dict[str, Any]]:
+        """Get agent by hostname"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM agents WHERE hostname = ?', (hostname,))
+            row = cursor.fetchone()
+            
+            if row:
+                agent = dict(row)
+                # Parse JSON fields
+                agent['tags'] = json.loads(agent['tags']) if agent['tags'] else []
+                agent['system_info'] = json.loads(agent['system_info']) if agent['system_info'] else {}
+                return agent
+            
+            return None
+    
     def update_agent(self, agent_id: str, update_data: Dict[str, Any]) -> bool:
         """Update an existing agent"""
         with self.get_connection() as conn:
@@ -148,7 +168,7 @@ class DatabaseManager:
             values = []
             
             for field, value in update_data.items():
-                if field in ['hostname', 'ip', 'os', 'version', 'status', 'last_seen']:
+                if field in ['hostname', 'ip', 'os', 'version', 'status', 'last_seen', 'connection_id', 'is_connected']:
                     update_fields.append(f"{field} = ?")
                     values.append(value)
                 elif field == 'tags':
@@ -232,6 +252,17 @@ class DatabaseManager:
         
         if system_info:
             update_data['system_info'] = system_info
+        
+        return self.update_agent(agent_id, update_data)
+    
+    def update_agent_connection(self, agent_id: str, connection_id: Optional[str], is_connected: bool) -> bool:
+        """Update agent connection status"""
+        update_data = {
+            'connection_id': connection_id,
+            'is_connected': is_connected,
+            'status': 'online' if is_connected else 'offline',
+            'last_seen': datetime.now().isoformat()
+        }
         
         return self.update_agent(agent_id, update_data)
 
