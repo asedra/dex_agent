@@ -69,6 +69,7 @@ export default function AgentDetailPage() {
   const [commandInput, setCommandInput] = useState("")
   const [runAsAdmin, setRunAsAdmin] = useState(false)
   const [timeout, setTimeout] = useState(30)
+  const [activeTab, setActiveTab] = useState("overview")
   const { toast } = useToast()
 
   const fetchAgent = async () => {
@@ -93,13 +94,20 @@ export default function AgentDetailPage() {
     
     try {
       setRefreshing(true)
+      console.log('Refreshing agent:', agent.id)
+      
       const result = await apiClient.refreshAgent(agent.id)
+      console.log('Refresh result:', result)
+      
+      // Update agent state with the refreshed data
       setAgent(result.agent)
+      
       toast({
         title: "Success",
         description: "Agent information refreshed successfully",
       })
     } catch (err) {
+      console.error('Refresh error:', err)
       toast({
         title: "Error",
         description: "Failed to refresh agent information",
@@ -290,6 +298,11 @@ export default function AgentDetailPage() {
     }
   }, [agentId])
 
+  // Debug: Log agent state changes
+  useEffect(() => {
+    console.log('Agent state changed:', agent)
+  }, [agent])
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "online":
@@ -356,6 +369,11 @@ export default function AgentDetailPage() {
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+      {/* Debug info */}
+      <div className="bg-yellow-100 p-2 rounded text-xs">
+        <strong>Debug:</strong> Agent ID: {agent.id}, Status: {agent.status}, Last Seen: {agent.last_seen}
+      </div>
+      
       <div className="flex items-center justify-between space-y-2">
         <div className="flex items-center gap-4">
           <SidebarTrigger />
@@ -380,7 +398,7 @@ export default function AgentDetailPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="system">System Info</TabsTrigger>
@@ -422,7 +440,7 @@ export default function AgentDetailPage() {
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-1">
-                  {agent.tags.map((tag) => (
+                  {(agent.tags || []).map((tag) => (
                     <Badge key={tag} variant="outline" className="text-xs">
                       {tag}
                     </Badge>
@@ -668,6 +686,18 @@ export default function AgentDetailPage() {
         </TabsContent>
 
         <TabsContent value="system" className="space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium">System Information</h3>
+            <Button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              variant="outline"
+              size="sm"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
           {agent.system_info ? (
             <div className="grid gap-4 md:grid-cols-2">
               <Card>

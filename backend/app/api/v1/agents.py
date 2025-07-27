@@ -7,6 +7,7 @@ from ...core.websocket_manager import websocket_manager
 import logging
 import socket
 import platform
+import psutil
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -141,20 +142,80 @@ async def get_agent_commands(agent_id: str, limit: int = 50, token: str = Depend
 
 @router.post("/{agent_id}/refresh")
 async def refresh_agent(agent_id: str, token: str = Depends(verify_token)):
-    """Refresh agent status"""
+    """Refresh agent status and return updated agent data"""
     try:
+        logger.info(f"Refresh request received for agent {agent_id}")
+        
         # Verify agent exists
         agent = db_manager.get_agent(agent_id)
         if not agent:
+            logger.error(f"Agent {agent_id} not found")
             raise HTTPException(status_code=404, detail="Agent not found")
         
-        # Update agent status to online
-        success = db_manager.update_agent_status(agent_id, "online")
+        # Check if agent is currently connected via WebSocket
+        is_connected = websocket_manager.is_agent_connected(agent_id)
+        logger.info(f"Agent {agent_id} connection status: {is_connected}")
+        
+        # Get current system info if agent is connected
+        system_info = None
+        if is_connected:
+            try:
+                # Get basic system information
+                
+                cpu_usage = psutil.cpu_percent(interval=1)
+                memory = psutil.virtual_memory()
+                disk_usage = {}
+                
+                # Get disk usage for all mounted drives
+                for partition in psutil.disk_partitions():
+                    try:
+                        usage = psutil.disk_usage(partition.mountpoint)
+                        disk_usage[partition.mountpoint] = round((usage.used / usage.total) * 100, 1)
+                    except PermissionError:
+                        continue
+                
+                system_info = {
+                    "hostname": platform.node(),
+                    "os_version": platform.platform(),
+                    "cpu_usage": cpu_usage,
+                    "memory_usage": memory.percent,
+                    "disk_usage": disk_usage
+                }
+                
+                logger.info(f"Retrieved system info for agent {agent_id}: {system_info}")
+            except Exception as e:
+                logger.error(f"Error getting system info for agent {agent_id}: {str(e)}")
+                system_info = {}
+        
+        # Update agent status based on connection
+        status = 'online' if is_connected else 'offline'
+        update_data = {
+            'status': status,
+            'last_seen': datetime.now().isoformat()
+        }
+        
+        # Add system info if available
+        if system_info:
+            update_data['system_info'] = system_info
+        
+        logger.info(f"Updating agent {agent_id} with data: {update_data}")
+        success = db_manager.update_agent(agent_id, update_data)
         
         if not success:
+            logger.error(f"Failed to update agent {agent_id}")
             raise HTTPException(status_code=500, detail="Failed to refresh agent")
         
-        return {"message": "Agent refreshed successfully"}
+        # Get updated agent data
+        updated_agent = db_manager.get_agent(agent_id)
+        updated_agent['is_connected'] = is_connected
+        
+        logger.info(f"Agent {agent_id} updated successfully")
+        logger.info(f"Returning agent data: {updated_agent}")
+        
+        return {
+            "message": "Agent refreshed successfully",
+            "agent": Agent(**updated_agent)
+        }
     except HTTPException:
         raise
     except Exception as e:

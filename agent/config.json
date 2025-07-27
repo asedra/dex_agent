@@ -1,7 +1,7 @@
 {
   "server_url": "http://localhost:8000",
   "api_token": "your-secret-key-here",
-  "agent_name": "agent_20250727_153745",
+  "agent_name": "DESKTOP-JK5G34L",
   "tags": [
     "windows",
     "gui-agent"
