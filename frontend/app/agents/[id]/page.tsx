@@ -21,11 +21,40 @@ import {
   Cpu,
   Network,
   Shield,
-  RefreshCw
+  RefreshCw,
+  Play,
+  FileText,
+  Download,
+  Upload,
+  Trash2,
+  Power
 } from "lucide-react"
-import { apiClient, Agent, SystemInfo } from "@/lib/api"
+import { apiClient, Agent, SystemInfo, PowerShellCommand, CommandResponse } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { useParams } from "next/navigation"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 export default function AgentDetailPage() {
   const params = useParams()
@@ -34,6 +63,12 @@ export default function AgentDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [commandDialogOpen, setCommandDialogOpen] = useState(false)
+  const [executingCommand, setExecutingCommand] = useState(false)
+  const [commandResult, setCommandResult] = useState<CommandResponse | null>(null)
+  const [commandInput, setCommandInput] = useState("")
+  const [runAsAdmin, setRunAsAdmin] = useState(false)
+  const [timeout, setTimeout] = useState(30)
   const { toast } = useToast()
 
   const fetchAgent = async () => {
@@ -72,6 +107,180 @@ export default function AgentDetailPage() {
       })
     } finally {
       setRefreshing(false)
+    }
+  }
+
+  const executeCommand = async () => {
+    if (!commandInput.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a command",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      setExecutingCommand(true)
+      setCommandResult(null)
+
+      const command: PowerShellCommand = {
+        command: commandInput.trim(),
+        timeout: timeout,
+        run_as_admin: runAsAdmin,
+      }
+
+      const result = await apiClient.executeCommand(command)
+      setCommandResult(result)
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Command executed successfully",
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: "Command execution failed",
+          variant: "destructive",
+        })
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to execute command",
+        variant: "destructive",
+      })
+    } finally {
+      setExecutingCommand(false)
+    }
+  }
+
+  const handleRestartAgent = async () => {
+    try {
+      const command: PowerShellCommand = {
+        command: "Restart-Computer -Force",
+        timeout: 60,
+        run_as_admin: true,
+      }
+
+      await apiClient.executeCommand(command)
+      toast({
+        title: "Success",
+        description: "Restart command sent to agent",
+      })
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to send restart command",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleShutdownAgent = async () => {
+    try {
+      const command: PowerShellCommand = {
+        command: "Stop-Computer -Force",
+        timeout: 60,
+        run_as_admin: true,
+      }
+
+      await apiClient.executeCommand(command)
+      toast({
+        title: "Success",
+        description: "Shutdown command sent to agent",
+      })
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to send shutdown command",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleGetSystemInfo = async () => {
+    try {
+      const command: PowerShellCommand = {
+        command: "Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors, CsManufacturer, CsModel",
+        timeout: 30,
+        run_as_admin: false,
+      }
+
+      const result = await apiClient.executeCommand(command)
+      setCommandResult(result)
+      setCommandInput(command.command)
+      setCommandDialogOpen(true)
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "System information retrieved",
+        })
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to get system information",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleGetProcesses = async () => {
+    try {
+      const command: PowerShellCommand = {
+        command: "Get-Process | Sort-Object CPU -Descending | Select-Object -First 10 Name, CPU, WorkingSet, Id",
+        timeout: 30,
+        run_as_admin: false,
+      }
+
+      const result = await apiClient.executeCommand(command)
+      setCommandResult(result)
+      setCommandInput(command.command)
+      setCommandDialogOpen(true)
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Process list retrieved",
+        })
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to get process list",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleGetServices = async () => {
+    try {
+      const command: PowerShellCommand = {
+        command: "Get-Service | Where-Object {$_.Status -eq 'Running'} | Select-Object Name, Status, DisplayName",
+        timeout: 30,
+        run_as_admin: false,
+      }
+
+      const result = await apiClient.executeCommand(command)
+      setCommandResult(result)
+      setCommandInput(command.command)
+      setCommandDialogOpen(true)
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Services list retrieved",
+        })
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to get services list",
+        variant: "destructive",
+      })
     }
   }
 
@@ -229,20 +438,202 @@ export default function AgentDetailPage() {
                   <Terminal className="h-5 w-5" />
                   Quick Actions
                 </CardTitle>
+                <CardDescription>Common PowerShell commands and system operations</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button className="w-full justify-start" disabled={agent.status !== 'online'}>
-                  <Terminal className="mr-2 h-4 w-4" />
-                  Run Command
-                </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Dialog open={commandDialogOpen} onOpenChange={setCommandDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full justify-start" disabled={agent.status !== 'online'}>
+                      <Terminal className="mr-2 h-4 w-4" />
+                      Run Custom Command
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Execute PowerShell Command</DialogTitle>
+                      <DialogDescription>
+                        Execute a PowerShell command on {agent.hostname}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="command">PowerShell Command</Label>
+                        <Textarea
+                          id="command"
+                          placeholder="Enter PowerShell command..."
+                          value={commandInput}
+                          onChange={(e) => setCommandInput(e.target.value)}
+                          rows={4}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="timeout">Timeout (seconds)</Label>
+                          <Input
+                            id="timeout"
+                            type="number"
+                            value={timeout}
+                            onChange={(e) => setTimeout(Number(e.target.value))}
+                            min={1}
+                            max={300}
+                          />
+                        </div>
+                        <div className="flex items-center space-x-2 pt-6">
+                          <Checkbox
+                            id="runAsAdmin"
+                            checked={runAsAdmin}
+                            onCheckedChange={(checked) => setRunAsAdmin(checked as boolean)}
+                          />
+                          <Label htmlFor="runAsAdmin">Run as Administrator</Label>
+                        </div>
+                      </div>
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setCommandDialogOpen(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={executeCommand}
+                          disabled={executingCommand || !commandInput.trim()}
+                        >
+                          {executingCommand ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Executing...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="mr-2 h-4 w-4" />
+                              Execute
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      {commandResult && (
+                        <div className="space-y-2">
+                          <Label>Command Result</Label>
+                          <div className="border rounded-md p-3 bg-muted">
+                            <div className="flex items-center gap-2 mb-2">
+                              {commandResult.success ? (
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-red-600" />
+                              )}
+                              <span className="text-sm font-medium">
+                                {commandResult.success ? 'Success' : 'Failed'}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                ({commandResult.execution_time.toFixed(2)}s)
+                              </span>
+                            </div>
+                            {commandResult.output && (
+                              <div className="space-y-1">
+                                <Label className="text-xs">Output:</Label>
+                                <pre className="text-xs bg-background p-2 rounded border overflow-auto max-h-32">
+                                  {commandResult.output}
+                                </pre>
+                              </div>
+                            )}
+                            {commandResult.error && (
+                              <div className="space-y-1">
+                                <Label className="text-xs text-red-600">Error:</Label>
+                                <pre className="text-xs bg-red-50 dark:bg-red-950 p-2 rounded border overflow-auto max-h-32 text-red-700 dark:text-red-300">
+                                  {commandResult.error}
+                                </pre>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={handleGetSystemInfo}
+                  disabled={agent.status !== 'online'}
+                >
                   <Activity className="mr-2 h-4 w-4" />
-                  View Logs
+                  Get System Info
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={handleGetProcesses}
+                  disabled={agent.status !== 'online'}
+                >
+                  <FileText className="mr-2 h-4 w-4" />
+                  Get Processes
+                </Button>
+
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={handleGetServices}
+                  disabled={agent.status !== 'online'}
+                >
                   <Settings className="mr-2 h-4 w-4" />
-                  Configure
+                  Get Services
                 </Button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start text-orange-600 hover:text-orange-700"
+                      disabled={agent.status !== 'online'}
+                    >
+                      <Power className="mr-2 h-4 w-4" />
+                      Restart Agent
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Restart Agent</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will restart the agent {agent.hostname}. The agent will be temporarily unavailable during the restart process.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleRestartAgent}>
+                        Restart
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start text-red-600 hover:text-red-700"
+                      disabled={agent.status !== 'online'}
+                    >
+                      <Power className="mr-2 h-4 w-4" />
+                      Shutdown Agent
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Shutdown Agent</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will shutdown the agent {agent.hostname}. The agent will be offline until manually restarted.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleShutdownAgent}>
+                        Shutdown
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </CardContent>
             </Card>
 

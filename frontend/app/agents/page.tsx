@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MoreHorizontal, Search, Filter, Play, Settings, Eye, CheckCircle, XCircle, Clock, Loader2, AlertTriangle } from "lucide-react"
+import { MoreHorizontal, Search, Filter, Play, Settings, Eye, CheckCircle, XCircle, Clock, Loader2, AlertTriangle, Download, Plus, Server } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,8 +18,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
-import { apiClient, Agent } from "@/lib/api"
+import { apiClient, Agent, AgentInstallerConfig, InstallerConfig } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 
 export default function AgentsPage() {
@@ -29,6 +39,17 @@ export default function AgentsPage() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [installerDialogOpen, setInstallerDialogOpen] = useState(false)
+  const [creatingInstaller, setCreatingInstaller] = useState(false)
+  const [installerConfig, setInstallerConfig] = useState<InstallerConfig | null>(null)
+  const [agentConfig, setAgentConfig] = useState<AgentInstallerConfig>({
+    server_url: "",
+    api_token: "",
+    agent_name: "",
+    tags: [],
+    auto_start: true,
+    run_as_service: true
+  })
   const { toast } = useToast()
 
   useEffect(() => {
@@ -49,7 +70,23 @@ export default function AgentsPage() {
       }
     }
 
+    const fetchInstallerConfig = async () => {
+      try {
+        const config = await apiClient.getInstallerConfig()
+        setInstallerConfig(config)
+        setAgentConfig(prev => ({
+          ...prev,
+          server_url: config.server_url,
+          api_token: config.api_token,
+          tags: config.default_tags
+        }))
+      } catch (err) {
+        console.error('Failed to fetch installer config:', err)
+      }
+    }
+
     fetchAgents()
+    fetchInstallerConfig()
   }, [toast])
 
   const filteredAgents = agents.filter((agent) => {
@@ -111,6 +148,64 @@ export default function AgentsPage() {
     }
   }
 
+  const handleCreateInstaller = async () => {
+    if (!agentConfig.server_url || !agentConfig.api_token) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      })
+      return
+    }
+
+    try {
+      setCreatingInstaller(true)
+      
+      const blob = await apiClient.createAgentInstaller(agentConfig)
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `dexagents_installer_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.zip`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      toast({
+        title: "Success",
+        description: "Agent installer created and downloaded successfully",
+      })
+      
+      setInstallerDialogOpen(false)
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Failed to create agent installer",
+        variant: "destructive",
+      })
+    } finally {
+      setCreatingInstaller(false)
+    }
+  }
+
+  const handleAddTag = (tag: string) => {
+    if (tag && !agentConfig.tags.includes(tag)) {
+      setAgentConfig(prev => ({
+        ...prev,
+        tags: [...prev.tags, tag]
+      }))
+    }
+  }
+
+  const handleRemoveTag = (tag: string) => {
+    setAgentConfig(prev => ({
+      ...prev,
+      tags: prev.tags.filter(t => t !== tag)
+    }))
+  }
+
   if (loading) {
     return (
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
@@ -148,73 +243,182 @@ export default function AgentsPage() {
           <SidebarTrigger />
           <div>
             <h2 className="text-3xl font-bold tracking-tight">Agents</h2>
-            <p className="text-muted-foreground">Manage and monitor your endpoint agents</p>
+            <p className="text-muted-foreground">Manage your endpoint agents</p>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Dialog open={installerDialogOpen} onOpenChange={setInstallerDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Download className="mr-2 h-4 w-4" />
+                Download Agent
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create Agent Installer</DialogTitle>
+                <DialogDescription>
+                  Create a Windows agent installer package for deployment on other computers.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="server_url">Server URL *</Label>
+                    <Input
+                      id="server_url"
+                      value={agentConfig.server_url}
+                      onChange={(e) => setAgentConfig(prev => ({ ...prev, server_url: e.target.value }))}
+                      placeholder="http://localhost:8000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="api_token">API Token *</Label>
+                    <Input
+                      id="api_token"
+                      value={agentConfig.api_token}
+                      onChange={(e) => setAgentConfig(prev => ({ ...prev, api_token: e.target.value }))}
+                      placeholder="default_token"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="agent_name">Agent Name (Optional)</Label>
+                  <Input
+                    id="agent_name"
+                    value={agentConfig.agent_name}
+                    onChange={(e) => setAgentConfig(prev => ({ ...prev, agent_name: e.target.value }))}
+                    placeholder="Custom agent name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Tags</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {agentConfig.tags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => handleRemoveTag(tag)}>
+                        {tag} ×
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Add tag..."
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          const input = e.target as HTMLInputElement
+                          handleAddTag(input.value)
+                          input.value = ''
+                        }
+                      }}
+                    />
+                    <Button variant="outline" size="sm" onClick={() => {
+                      const input = document.querySelector('input[placeholder="Add tag..."]') as HTMLInputElement
+                      if (input && input.value) {
+                        handleAddTag(input.value)
+                        input.value = ''
+                      }
+                    }}>
+                      Add
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="auto_start"
+                      checked={agentConfig.auto_start}
+                      onCheckedChange={(checked) => setAgentConfig(prev => ({ ...prev, auto_start: checked as boolean }))}
+                    />
+                    <Label htmlFor="auto_start">Auto-start after installation</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="run_as_service"
+                      checked={agentConfig.run_as_service}
+                      onCheckedChange={(checked) => setAgentConfig(prev => ({ ...prev, run_as_service: checked as boolean }))}
+                    />
+                    <Label htmlFor="run_as_service">Run as Windows service</Label>
+                  </div>
+                </div>
+
+                <div className="bg-muted p-3 rounded-md">
+                  <h4 className="font-medium mb-2">Installation Instructions</h4>
+                  <ol className="text-sm space-y-1 list-decimal list-inside">
+                    <li>Download the installer package</li>
+                    <li>Extract the ZIP file on the target computer</li>
+                    <li>Run <code className="bg-background px-1 rounded">install.bat</code> as administrator</li>
+                    <li>The agent will be installed as a Windows service</li>
+                    <li>Check the logs at <code className="bg-background px-1 rounded">C:\Program Files\DexAgents\logs\agent.log</code></li>
+                  </ol>
+                </div>
+
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setInstallerDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleCreateInstaller}
+                    disabled={creatingInstaller || !agentConfig.server_url || !agentConfig.api_token}
+                  >
+                    {creatingInstaller ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="mr-2 h-4 w-4" />
+                        Create Installer
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by hostname, IP, or tags..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-8"
-                />
-              </div>
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="online">Online</SelectItem>
-                <SelectItem value="offline">Offline</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-              </SelectContent>
-            </Select>
+      {/* Filters */}
+      <div className="flex items-center gap-4">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search agents..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8"
+            />
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Bulk Actions */}
-      {selectedAgents.length > 0 && (
-        <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <p className="text-blue-800 dark:text-blue-200">{selectedAgents.length} agent(s) selected</p>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline">
-                  <Play className="mr-2 h-4 w-4" />
-                  Run Command
-                </Button>
-                <Button size="sm" variant="outline">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Bulk Actions
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="online">Online</SelectItem>
+            <SelectItem value="offline">Offline</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* Agents Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Agents ({filteredAgents.length})</CardTitle>
-          <CardDescription>List of all registered endpoint agents</CardDescription>
+          <CardTitle>Agent List</CardTitle>
+          <CardDescription>
+            {filteredAgents.length} agent{filteredAgents.length !== 1 ? 's' : ''} found
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -226,11 +430,10 @@ export default function AgentsPage() {
                     onCheckedChange={handleSelectAll}
                   />
                 </TableHead>
-                <TableHead>Hostname</TableHead>
-                <TableHead>IP Address</TableHead>
-                <TableHead>OS</TableHead>
-                <TableHead>Version</TableHead>
+                <TableHead>Agent</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>IP Address</TableHead>
+                <TableHead>Operating System</TableHead>
                 <TableHead>Last Seen</TableHead>
                 <TableHead>Tags</TableHead>
                 <TableHead className="w-12"></TableHead>
@@ -245,34 +448,41 @@ export default function AgentsPage() {
                       onCheckedChange={(checked) => handleSelectAgent(agent.id || '', checked as boolean)}
                     />
                   </TableCell>
-                  <TableCell className="font-medium">
-                    <Link href={`/agents/${agent.id || ''}`} className="hover:underline">
-                      {agent.hostname}
-                    </Link>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Server className="h-4 w-4 text-muted-foreground" />
+                      <Link href={`/agents/${agent.id}`} className="font-medium hover:underline">
+                        {agent.hostname}
+                      </Link>
+                    </div>
                   </TableCell>
-                  <TableCell>{agent.ip || '-'}</TableCell>
-                  <TableCell>{agent.os || '-'}</TableCell>
-                  <TableCell>{agent.version || '-'}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
                       {getStatusIcon(agent.status)}
                       {getStatusBadge(agent.status)}
                     </div>
                   </TableCell>
-                  <TableCell className="text-muted-foreground">{agent.last_seen || '-'}</TableCell>
+                  <TableCell>{agent.ip || '-'}</TableCell>
+                  <TableCell>{agent.os || '-'}</TableCell>
+                  <TableCell>{agent.last_seen || '-'}</TableCell>
                   <TableCell>
-                    <div className="flex gap-1 flex-wrap">
-                      {agent.tags.map((tag) => (
+                    <div className="flex flex-wrap gap-1">
+                      {agent.tags.slice(0, 2).map((tag) => (
                         <Badge key={tag} variant="outline" className="text-xs">
                           {tag}
                         </Badge>
                       ))}
+                      {agent.tags.length > 2 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{agent.tags.length - 2}
+                        </Badge>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button variant="ghost" size="sm">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
