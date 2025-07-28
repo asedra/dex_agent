@@ -75,7 +75,7 @@ export default function AgentDetailPage() {
   const fetchAgent = async () => {
     try {
       setLoading(true)
-      const agentData = await apiClient.getAgentDetails(agentId)
+      const agentData = await apiClient.getAgent(agentId)
       setAgent(agentData)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch agent')
@@ -100,7 +100,7 @@ export default function AgentDetailPage() {
       console.log('Refresh result:', result)
       
       // Update agent state with the refreshed data
-      setAgent(result.agent)
+      setAgent(result)
       
       toast({
         title: "Success",
@@ -139,7 +139,7 @@ export default function AgentDetailPage() {
       }
 
       // Execute command on the specific agent
-      const result = await apiClient.executeAgentCommand(agentId, command)
+      const result = await apiClient.executeAgentCommand(agentId, command.command)
       setCommandResult(result)
       setCommandDialogOpen(true)
 
@@ -546,7 +546,7 @@ export default function AgentDetailPage() {
                                 {commandResult.success ? 'Success' : 'Failed'}
                               </span>
                               <span className="text-sm text-muted-foreground">
-                                ({commandResult.execution_time.toFixed(2)}s)
+                                ({commandResult.execution_time?.toFixed(2) || '0.00'}s)
                               </span>
                             </div>
                             {commandResult.output && (
@@ -748,7 +748,7 @@ export default function AgentDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {Object.entries(agent.system_info.disk_usage).map(([drive, usage]) => (
+                    {agent.system_info.disk_usage && Object.entries(agent.system_info.disk_usage).map(([drive, usage]) => (
                       <div key={drive} className="space-y-1">
                         <div className="flex justify-between">
                           <span className="text-sm text-muted-foreground">{drive}</span>

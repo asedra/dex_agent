@@ -335,7 +335,7 @@ export default function PowerShellLibraryPage() {
                                     {executionResult.success ? "Success" : "Failed"}
                                   </span>
                                   <span className="text-sm text-muted-foreground">
-                                    ({executionResult.execution_time.toFixed(2)}s)
+                                    ({executionResult.execution_time?.toFixed(2) || '0.00'}s)
                                   </span>
                                 </div>
                                 {executionResult.output && (

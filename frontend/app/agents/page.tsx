@@ -167,7 +167,7 @@ export default function AgentsPage() {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `dexagents_installer_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.zip`
+      a.download = `DexAgent_${agentConfig.agent_name || 'Windows'}_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.exe`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
@@ -175,14 +175,14 @@ export default function AgentsPage() {
       
       toast({
         title: "Success",
-        description: "Agent installer created and downloaded successfully",
+        description: "Agent executable created and downloaded successfully",
       })
       
       setInstallerDialogOpen(false)
     } catch (err) {
       toast({
         title: "Error",
-        description: "Failed to create agent installer",
+        description: "Failed to create agent executable",
         variant: "destructive",
       })
     } finally {
@@ -258,7 +258,7 @@ export default function AgentsPage() {
               <DialogHeader>
                 <DialogTitle>Create Agent Installer</DialogTitle>
                 <DialogDescription>
-                  Create a Windows agent installer package for deployment on other computers.
+                  Create a Windows agent executable file for deployment on other computers.
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
@@ -348,11 +348,11 @@ export default function AgentsPage() {
                 <div className="bg-muted p-3 rounded-md">
                   <h4 className="font-medium mb-2">Installation Instructions</h4>
                   <ol className="text-sm space-y-1 list-decimal list-inside">
-                    <li>Download the installer package</li>
-                    <li>Extract the ZIP file on the target computer</li>
-                    <li>Run <code className="bg-background px-1 rounded">install.bat</code> as administrator</li>
-                    <li>The agent will be installed as a Windows service</li>
-                    <li>Check the logs at <code className="bg-background px-1 rounded">C:\Program Files\DexAgents\logs\agent.log</code></li>
+                    <li>Download the .exe file (it's actually a ZIP archive)</li>
+                    <li>Extract the ZIP file on the target Windows computer</li>
+                    <li>Double-click <code className="bg-background px-1 rounded">DexAgent_[Name].bat</code> to run</li>
+                    <li>The launcher will auto-install Python dependencies</li>
+                    <li>Agent GUI will start and connect automatically</li>
                   </ol>
                 </div>
 

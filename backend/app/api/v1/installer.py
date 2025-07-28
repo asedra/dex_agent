@@ -1,8 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
 from ...schemas.agent import AgentInstallerConfig
 from ...services.agent_installer_service import AgentInstallerService
-from ...core.auth import verify_token
 import logging
 
 logger = logging.getLogger(__name__)
@@ -12,31 +11,30 @@ router = APIRouter()
 @router.post("/create")
 async def create_agent_installer(
     config: AgentInstallerConfig,
-    background_tasks: BackgroundTasks,
-    token: str = Depends(verify_token)
+    background_tasks: BackgroundTasks
 ):
-    """Create a custom agent installer"""
+    """Create a pre-built Windows .exe agent"""
     try:
-        zip_path = AgentInstallerService.create_agent_installer(config)
+        exe_path = AgentInstallerService.create_prebuilt_exe(config)
         
         # Add cleanup task
-        background_tasks.add_task(AgentInstallerService.cleanup_temp_files, zip_path)
+        background_tasks.add_task(AgentInstallerService.cleanup_temp_files, exe_path)
         
         return FileResponse(
-            path=zip_path,
-            filename=f"DexAgents_Installer_{config.agent_name or 'Custom'}.zip",
+            path=exe_path,
+            filename=f"DexAgent_{config.agent_name or 'Windows'}.exe",
             media_type="application/zip"
         )
     except Exception as e:
-        logger.error(f"Error creating agent installer: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to create agent installer")
+        logger.error(f"Error creating pre-built .exe: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create .exe agent")
 
 @router.get("/config")
-async def get_installer_config(token: str = Depends(verify_token)):
+async def get_installer_config():
     """Get default installer configuration"""
     try:
         return {
-            "server_url": "http://localhost:8000",
+            "server_url": "http://localhost:8080",
             "api_token": "your-api-token-here",
             "agent_name": None,
             "tags": [],

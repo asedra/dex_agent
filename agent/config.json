@@ -1,11 +1,8 @@
 {
-  "server_url": "http://localhost:8000",
-  "api_token": "your-secret-key-here",
-  "agent_name": "DESKTOP-JK5G34L",
-  "tags": [
-    "windows",
-    "gui-agent"
-  ],
+  "server_url": "ws://localhost:8080",
+  "api_token": "test-token", 
+  "agent_name": "WindowsTestAgent",
+  "tags": ["windows", "test", "demo"],
   "auto_start": true,
-  "run_as_service": true
+  "run_as_service": false
 }

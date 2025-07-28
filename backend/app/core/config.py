@@ -1,4 +1,5 @@
 from typing import List
+import os
 
 class Settings:
     # API Settings
@@ -8,28 +9,22 @@ class Settings:
     DESCRIPTION: str = "API for executing PowerShell commands on Windows devices"
     
     # Security
-    SECRET_KEY: str = "your-secret-key-here"
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     
-    # CORS
-    BACKEND_CORS_ORIGINS: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173",
-        "*"
-    ]
+    # CORS - Allow all origins for development
+    BACKEND_CORS_ORIGINS: List[str] = ["*"]
     
     # Database
-    DATABASE_URL: str = "dexagents.db"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "dexagents.db")
     
     # PowerShell Settings
-    DEFAULT_TIMEOUT: int = 30
-    MAX_TIMEOUT: int = 300
+    DEFAULT_TIMEOUT: int = int(os.getenv("DEFAULT_TIMEOUT", "30"))
+    MAX_TIMEOUT: int = int(os.getenv("MAX_TIMEOUT", "300"))
     
     # Agent Settings
-    AGENT_INSTALLER_PATH: str = "agent_installers"
-    TEMP_DIR: str = "temp"
+    AGENT_INSTALLER_PATH: str = os.getenv("AGENT_INSTALLER_PATH", "agent_installers")
+    TEMP_DIR: str = os.getenv("TEMP_DIR", "temp")
         
 
 

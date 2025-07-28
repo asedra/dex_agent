@@ -1,0 +1,22 @@
+# DexAgents Code Owners
+# These owners will be requested for review when anyone opens a pull request.
+
+# Global owners
+* @dexagents-team
+
+# Frontend
+/frontend/ @frontend-team @dexagents-team
+
+# Backend
+/backend/ @backend-team @dexagents-team  
+
+# Infrastructure and DevOps
+/docker-compose*.yml @devops-team @dexagents-team
+/Dockerfile* @devops-team @dexagents-team
+/.github/ @devops-team @dexagents-team
+/nginx/ @devops-team @dexagents-team
+/scripts/ @devops-team @dexagents-team
+
+# Security sensitive files
+/.env* @security-team @dexagents-team
+/secrets/ @security-team @dexagents-team

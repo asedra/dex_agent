@@ -81,18 +81,20 @@ async def handle_agent_message(agent_id: str, message: Dict[str, Any]):
     elif message_type == "command_result":
         # Handle command execution result
         command_result = message.get("data", {})
-        command_id = message.get("command_id", "")
+        command_id = command_result.get("command_id", "") or message.get("command_id", "")
         
         logger.info(f"Command result received from agent {agent_id}, command_id: {command_id}")
         logger.info(f"Command result data: {command_result}")
         
         # Store command response in WebSocket manager
         if command_id:
+            # Extract result data - it might be nested
+            result_data = command_result.get("result", command_result)
             response_data = {
-                "success": command_result.get("success", False),
-                "output": command_result.get("output", ""),
-                "error": command_result.get("error", ""),
-                "execution_time": command_result.get("execution_time", 0.0),
+                "success": result_data.get("success", False),
+                "output": result_data.get("output", ""),
+                "error": result_data.get("error", ""),
+                "execution_time": result_data.get("execution_time", 0.0),
                 "timestamp": datetime.now().isoformat()
             }
             websocket_manager.store_command_response(command_id, response_data)
@@ -100,14 +102,18 @@ async def handle_agent_message(agent_id: str, message: Dict[str, Any]):
         else:
             logger.warning(f"No command_id in command result from agent {agent_id}")
         
-        # Also store in database
-        db_manager.add_command_history(agent_id, {
-            "command": command_result.get("command", ""),
-            "success": command_result.get("success", False),
-            "output": command_result.get("output", ""),
-            "error": command_result.get("error", ""),
-            "execution_time": command_result.get("execution_time", 0.0)
-        })
+        # Also store in database (ignore database errors for now)
+        try:
+            result_data = command_result.get("result", command_result)
+            db_manager.add_command_history(agent_id, {
+                "command": result_data.get("command", ""),
+                "success": result_data.get("success", False),
+                "output": result_data.get("output", ""),
+                "error": result_data.get("error", ""),
+                "execution_time": result_data.get("execution_time", 0.0)
+            })
+        except Exception as e:
+            logger.warning(f"Could not store command history in database: {e}")
         
         logger.info(f"Command result processed for agent {agent_id}: {command_result.get('success', False)}")
         
@@ -124,7 +130,7 @@ async def handle_agent_message(agent_id: str, message: Dict[str, Any]):
     else:
         logger.warning(f"Unknown message type from agent {agent_id}: {message_type}")
 
-@router.post("/agents/{agent_id}/command")
+@router.post("/send/{agent_id}/command")
 async def send_command_to_agent(agent_id: str, command: AgentCommand):
     """Send command to specific agent via WebSocket"""
     if not websocket_manager.is_agent_connected(agent_id):
@@ -147,19 +153,26 @@ async def send_command_to_agent(agent_id: str, command: AgentCommand):
     
     return {"message": "Command sent to agent", "agent_id": agent_id}
 
-@router.get("/agents/connected")
+@router.get("/connected")  
 async def get_connected_agents():
     """Get list of connected agents"""
-    connected_agents = websocket_manager.get_connected_agents()
-    agents_info = []
-    
-    for agent_id in connected_agents:
-        agent_data = db_manager.get_agent(agent_id)
-        if agent_data:
-            connection_info = websocket_manager.get_connection_info(
-                websocket_manager.agent_connections[agent_id]
-            )
-            agent_data["connection_info"] = connection_info
-            agents_info.append(agent_data)
-    
-    return agents_info 
+    try:
+        connected_agents = websocket_manager.get_connected_agents()
+        agents_info = []
+        
+        for agent_id in connected_agents:
+            agent_data = db_manager.get_agent(agent_id)
+            if agent_data:
+                try:
+                    connection_info = websocket_manager.get_connection_info(
+                        websocket_manager.agent_connections[agent_id]
+                    )
+                    agent_data["connection_info"] = connection_info
+                except Exception as e:
+                    logger.warning(f"Could not get connection info for agent {agent_id}: {e}")
+                agents_info.append(agent_data)
+        
+        return {"connected_agents": agents_info, "count": len(agents_info)}
+    except Exception as e:
+        logger.error(f"Error getting connected agents: {e}")
+        return {"connected_agents": [], "count": 0, "error": str(e)} 
