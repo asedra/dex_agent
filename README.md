@@ -1,610 +1,475 @@
 # DexAgents - Windows Endpoint Management Platform
 
-DexAgents, Windows sistemlerinde PowerShell komutlarını uzaktan çalıştırmak ve sistem agent'larını yönetmek için geliştirilmiş modern bir platformdur. Backend, Frontend ve Agent olmak üzere üç ana bileşenden oluşur.
+Modern Windows sistemleri için kapsamlı uzak yönetim ve PowerShell komut çalıştırma platformu. Docker desteği, gelişmiş veritabanı yönetimi ve real-time monitoring ile güçlendirilmiştir.
+
+![DexAgents Dashboard](https://img.shields.io/badge/Platform-Windows-blue) ![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green) ![Next.js](https://img.shields.io/badge/Frontend-Next.js-black) ![Docker](https://img.shields.io/badge/Deploy-Docker-blue)
+
+## 🚀 Hızlı Başlangıç (Docker)
+
+### Gereksinimler
+- **Docker** ve **Docker Compose**
+- **Git**
+
+### 1. Projeyi Klonla
+```bash
+git clone https://github.com/asedra/dex_agent.git
+cd dex_agent
+```
+
+### 2. Docker ile Başlat
+```bash
+docker-compose up -d --build
+```
+
+### 3. Servislere Erişim
+- **🌐 Web Dashboard**: http://localhost:3000
+- **🔧 Backend API**: http://localhost:8080
+- **📊 Health Check**: http://localhost:8080/api/v1/system/health
 
 ## 🏗️ Proje Mimarisi
 
 ```
 dexagents/
-├── backend/           # FastAPI Backend Server
-│   ├── app/          # Ana uygulama modülü
-│   │   ├── api/      # API endpoint'leri
-│   │   │   └── v1/   # API v1 endpoint'leri
-│   │   │       ├── agents.py      # Agent yönetimi
-│   │   │       ├── commands.py    # PowerShell komutları
-│   │   │       ├── installer.py   # Installer yönetimi
-│   │   │       ├── system.py      # Sistem bilgileri
-│   │   │       └── websocket.py   # WebSocket endpoint'leri
-│   │   ├── core/     # Çekirdek modüller
-│   │   │   ├── config.py          # Konfigürasyon
-│   │   │   ├── database.py        # Veritabanı işlemleri
-│   │   │   ├── auth.py            # Kimlik doğrulama
+├── backend/                    # FastAPI Backend Server
+│   ├── app/
+│   │   ├── api/v1/            # REST API Endpoints
+│   │   │   ├── agents.py      # Agent yönetimi
+│   │   │   ├── commands.py    # PowerShell komutları
+│   │   │   ├── installer.py   # Agent installer
+│   │   │   ├── system.py      # Sistem bilgileri
+│   │   │   └── websocket.py   # WebSocket endpoints
+│   │   ├── core/              # Çekirdek modüller
+│   │   │   ├── config.py      # Konfigürasyon
+│   │   │   ├── database.py    # SQLite veritabanı (Enhanced)
+│   │   │   ├── auth.py        # Authentication
 │   │   │   └── websocket_manager.py # WebSocket yönetimi
-│   │   ├── schemas/  # Pydantic modelleri
-│   │   │   ├── agent.py           # Agent şemaları
-│   │   │   ├── command.py         # Komut şemaları
-│   │   │   └── system.py          # Sistem şemaları
-│   │   ├── services/ # İş mantığı servisleri
-│   │   │   ├── powershell_service.py    # PowerShell servisi
-│   │   │   └── agent_installer_service.py # Installer servisi
-│   │   └── main.py   # Ana uygulama girişi
-│   ├── tests/        # Test dosyaları
-│   │   └── test_api.py
-│   ├── requirements.txt # Python dependencies
-│   ├── run.py        # Server başlatma script'i
-│   ├── env.example   # Environment variables örneği
-│   ├── .gitignore    # Git ignore dosyası
-│   └── README.md     # Backend dokümantasyonu
-├── frontend/         # Next.js Frontend
-│   ├── app/          # Next.js 14 app router
-│   │   ├── agents/   # Agent sayfaları
-│   │   ├── powershell/ # PowerShell sayfası
-│   │   ├── schedules/ # Zamanlanmış görevler
-│   │   └── audit/    # Audit logları
-│   ├── components/   # React components
-│   │   └── ui/       # shadcn/ui bileşenleri
-│   ├── lib/          # Utility functions
-│   │   └── api.ts    # API client
-│   ├── package.json  # Node.js dependencies
-│   └── next.config.mjs # Next.js konfigürasyonu
-├── agent/            # Windows Agent (GUI)
-│   ├── agent_gui.py  # Tkinter GUI uygulaması
-│   ├── requirements.txt # Agent dependencies
-│   ├── build_exe.py  # EXE build script'i
-│   ├── config.json   # Agent konfigürasyonu
-│   ├── DexAgents_Installer.zip # Kurulum paketi
-│   ├── DexAgents_Installer/ # Kurulum klasörü
-│   │   ├── DexAgentsAgent.exe # Ana executable
-│   │   ├── config.json # Varsayılan konfigürasyon
-│   │   └── README.txt # Kurulum talimatları
-│   └── logs/         # Log dosyaları
-├── README.md         # Bu dosya
-└── .gitignore        # Git ignore dosyası
+│   │   ├── models/            # 🆕 Database modelleri
+│   │   │   ├── agent.py       # Agent veri modeli
+│   │   │   ├── user.py        # User modeli
+│   │   │   ├── command.py     # Komut geçmişi
+│   │   │   ├── group.py       # Agent grupları
+│   │   │   ├── alert.py       # Sistem uyarıları
+│   │   │   ├── metric.py      # Performans metrikleri
+│   │   │   ├── audit.py       # Audit logları
+│   │   │   ├── session.py     # Oturum yönetimi
+│   │   │   └── task.py        # Zamanlanmış görevler
+│   │   ├── migrations/        # 🆕 Database migration sistemi
+│   │   │   ├── migration_manager.py
+│   │   │   ├── v001_initial_schema.py
+│   │   │   └── v002_add_indexes.py
+│   │   ├── schemas/           # Pydantic şemaları
+│   │   ├── services/          # İş mantığı servisleri
+│   │   └── main.py            # Ana uygulama
+│   ├── Dockerfile             # 🆕 Docker yapılandırması
+│   ├── requirements.txt       # Python dependencies
+│   └── run.py                 # Server başlatma
+├── frontend/                  # Next.js 15 Frontend
+│   ├── app/                   # Next.js App Router
+│   │   ├── agents/            # Agent yönetimi sayfaları
+│   │   ├── powershell/        # PowerShell komut arayüzü
+│   │   ├── schedules/         # Zamanlanmış görevler
+│   │   ├── audit/             # Audit log görüntüleyici
+│   │   └── settings/          # Sistem ayarları
+│   ├── components/            # React bileşenleri
+│   │   ├── ui/                # shadcn/ui komponenları
+│   │   ├── app-sidebar.tsx    # Ana navigasyon
+│   │   ├── error-boundary.tsx # Hata yakalama
+│   │   └── theme-provider.tsx # Tema yönetimi
+│   ├── lib/                   # Utility fonksiyonları
+│   │   ├── api.ts             # API client
+│   │   └── utils.ts           # Yardımcı fonksiyonlar
+│   ├── Dockerfile             # 🆕 Docker yapılandırması
+│   ├── package.json           # Node.js dependencies
+│   └── next.config.mjs        # Next.js yapılandırması
+├── agent/                     # Windows Agent Uygulamaları
+│   ├── agent_gui.py           # Modern Tkinter GUI
+│   ├── modern_agent_gui.py    # Enhanced GUI versiyonu
+│   ├── websocket_agent.py     # WebSocket client
+│   ├── config_manager.py      # Konfigürasyon yönetimi
+│   ├── logger.py              # Log sistemi
+│   ├── build_exe.py           # EXE build script
+│   └── requirements.txt       # Agent dependencies
+├── docker-compose.yml         # 🆕 Docker Compose yapılandırması
+├── docker-compose.prod.yml    # 🆕 Production yapılandırması
+├── nginx/                     # 🆕 Nginx reverse proxy
+└── scripts/                   # 🆕 Deployment scriptleri
 ```
 
-## 🚀 Hızlı Başlangıç
+## 🆕 Yeni Özellikler (v3.0)
 
-### Gereksinimler
-- **Python 3.11+**
-- **Node.js 18+**
-- **Windows 10/11**
-- **PowerShell 5.1+**
+### 🗄️ Enhanced Database Schema
+- **10 Tablo**: agents, users, groups, metrics, alerts, audit_logs, sessions, scheduled_tasks, command_history
+- **Migration Sistemi**: Version kontrolü ile database şeması yönetimi
+- **Model Sınıfları**: Tam ORM benzeri veri modelleri
+- **Index Optimizasyonu**: Performans için optimize edilmiş indexler
+- **Audit Logging**: Tüm sistem aktivitelerinin kaydı
+- **Session Management**: Güvenli kullanıcı oturum yönetimi
 
-### 1. Backend Server'ı Başlat
+### 🐳 Docker Support
+- **Multi-stage Builds**: Optimize edilmiş Docker imajları
+- **Health Checks**: Container sağlık kontrolü
+- **Volume Management**: Persistent data depolama
+- **Network Isolation**: Güvenli container iletişimi
+- **Production Ready**: Nginx reverse proxy ile production deployment
 
-```bash
-cd backend
-pip install -r requirements.txt
-python run.py
-```
+### 📊 Advanced Monitoring
+- **Agent Metrics**: CPU, memory, disk kullanımı izleme
+- **Alert System**: Sistem uyarıları ve bildirimler
+- **Performance Tracking**: Gerçek zamanlı performans takibi
+- **Historical Data**: Geçmiş metrik verileri
 
-Backend server http://localhost:8000 adresinde çalışacak.
-
-### 2. Frontend'i Başlat
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend http://localhost:3000 adresinde çalışacak.
-
-### 3. Agent'ı Çalıştır
-
-```bash
-cd agent
-pip install -r requirements.txt
-python agent_gui.py
-```
-
-Veya executable'ı çalıştır:
-```bash
-cd agent
-DexAgentsAgent.exe
-```
+### 🔐 Enhanced Security
+- **User Management**: Kullanıcı hesapları ve roller
+- **Session Security**: Güvenli oturum yönetimi
+- **Audit Trail**: Tüm işlemlerin audit kaydı
+- **API Authentication**: Token bazlı güvenlik
 
 ## 🔧 Geliştirme Ortamı
 
-### Backend Geliştirme
+### Local Development (Python/Node)
 ```bash
+# Backend
 cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 python run.py
-```
 
-### Frontend Geliştirme
-```bash
+# Frontend
 cd frontend
 npm install
 npm run dev
 ```
 
-### Agent Geliştirme
+### Docker Development
 ```bash
-cd agent
-pip install -r requirements.txt
-python agent_gui.py
+# Development ortamında çalıştır
+docker-compose up -d
+
+# Logları takip et
+docker-compose logs -f
+
+# Servis durumunu kontrol et
+docker-compose ps
 ```
 
-## 📦 Agent EXE Oluşturma
+## 📦 Database Schema
 
-Agent'ı executable olarak oluşturmak için:
+### 🗃️ Ana Tablolar
 
-```bash
-cd agent
-python build_exe.py
+#### **agents** - Agent bilgileri
+```sql
+- id (TEXT PRIMARY KEY)
+- hostname (TEXT NOT NULL)
+- ip, os, version, status
+- last_seen, tags, system_info
+- connection_id, is_connected
+- created_at, updated_at
 ```
 
-Bu işlem:
-- Python dependencies'leri yükler
-- PyInstaller ile EXE oluşturur
-- Kurulum paketi hazırlar
-- `DexAgents_Installer.zip` dosyası oluşturur
-
-## 🎯 Bileşen Detayları
-
-### 🔧 Backend (FastAPI)
-
-**Teknolojiler:**
-- FastAPI 0.104.1
-- Uvicorn 0.24.0
-- Pydantic 2.5.0
-- SQLite (veritabanı)
-- psutil (sistem monitoring)
-- WebSocket desteği
-
-**Mimari:**
-- **Modüler Yapı**: API, Core, Schemas, Services ayrımı
-- **Separation of Concerns**: İş mantığı ve API endpoint'leri ayrı
-- **Versioned API**: `/api/v1/` prefix ile API versiyonlama
-- **Centralized Config**: Merkezi konfigürasyon yönetimi
-- **Structured Logging**: Yapılandırılmış log sistemi
-- **WebSocket Manager**: WebSocket bağlantılarını yöneten merkezi sistem
-
-**Özellikler:**
-- ✅ REST API endpoints (v1)
-- ✅ WebSocket tabanlı real-time iletişim
-- ✅ Agent yönetimi (CRUD işlemleri)
-- ✅ PowerShell komut çalıştırma
-- ✅ Sistem bilgileri toplama
-- ✅ Installer paketi oluşturma
-- ✅ Token tabanlı authentication
-- ✅ Real-time agent monitoring
-- ✅ Batch komut çalıştırma
-- ✅ Test data seeding
-- ✅ Duplicate agent kayıt önleme
-
-**API Endpoints:**
-```
-GET  /                    # Health check
-GET  /api/v1/agents/     # Agent listesi
-POST /api/v1/agents/register # Agent kayıt
-GET  /api/v1/agents/{id} # Agent detayı
-GET  /api/v1/agents/connected # Bağlı agent'lar
-POST /api/v1/agents/seed # Test data oluştur
-POST /api/v1/agents/{id}/command # Komut çalıştır
-GET  /api/v1/installer/config # Varsayılan config
-POST /api/v1/installer/create # Installer oluştur
-GET  /api/v1/system/info # Sistem bilgileri
-WS   /api/v1/ws/{agent_id} # WebSocket endpoint
+#### **users** - Kullanıcı yönetimi
+```sql
+- id (INTEGER PRIMARY KEY)
+- username, email (UNIQUE)
+- password_hash, is_active, is_admin
+- created_at, updated_at
 ```
 
-### 🌐 Frontend (Next.js)
-
-**Teknolojiler:**
-- Next.js 15.2.4
-- TypeScript
-- Tailwind CSS
-- shadcn/ui components
-- Lucide React icons
-
-**Özellikler:**
-- ✅ Modern React UI
-- ✅ Agent dashboard
-- ✅ Quick Actions (PowerShell komutları)
-- ✅ Agent download menüsü
-- ✅ Real-time status güncellemeleri
-- ✅ Responsive tasarım
-- ✅ Dark/Light mode
-- ✅ Form validasyonu
-- ✅ Error handling
-
-**Sayfalar:**
-- `/` - Dashboard
-- `/agents` - Agent listesi
-- `/agents/[id]` - Agent detayı
-- `/powershell` - PowerShell komutları
-- `/schedules` - Zamanlanmış görevler
-- `/audit` - Audit logları
-
-### 🖥️ Agent (GUI)
-
-**Teknolojiler:**
-- Tkinter (GUI framework)
-- requests (HTTP client)
-- websockets (WebSocket client)
-- psutil (sistem monitoring)
-- PyInstaller (EXE oluşturma)
-
-**Özellikler:**
-- ✅ Tkinter tabanlı GUI
-- ✅ WebSocket tabanlı real-time iletişim
-- ✅ Connection ayarları
-- ✅ Real-time system monitoring
-- ✅ Log görüntüleme
-- ✅ Web interface entegrasyonu
-- ✅ Config kaydetme/yükleme
-- ✅ Windows service desteği
-- ✅ Auto-start seçeneği
-- ✅ Duplicate kayıt önleme
-- ✅ Heartbeat sistemi
-
-**GUI Bileşenleri:**
-- Connection Settings (Server URL, API Token, Agent Name, Tags)
-- Options (Auto-start, Run as service)
-- Status Display (Connection, Agent, CPU, Memory)
-- Log Management (Built-in log viewer)
-- Action Buttons (Start/Stop, Test Connection, Save Config)
-
-## 🔐 Güvenlik
-
-### Authentication
-- Bearer token tabanlı API authentication
-- Güvenli token doğrulama
-- CORS middleware yapılandırması
-
-### PowerShell Güvenliği
-- Komut timeout kontrolü
-- Working directory kısıtlaması
-- Admin yetki kontrolü
-- Hata durumunda güvenli yanıt
-
-### Agent Güvenliği
-- Config dosyası şifreleme
-- Log dosyası güvenliği
-- Network bağlantı güvenliği
-- WebSocket bağlantı güvenliği
-
-## 📊 Monitoring ve Logging
-
-### Sistem Metrikleri
-- CPU kullanımı (real-time)
-- Memory kullanımı (real-time)
-- Disk kullanımı (partition bazında)
-- Network durumu
-- Process listesi
-
-### Agent Durumu
-- Online/Offline durumu
-- Son görülme zamanı
-- Connection durumu
-- Error logları
-- Performance metrikleri
-- WebSocket bağlantı durumu
-
-### Log Yönetimi
-- Backend: Console ve file logging
-- Frontend: Browser console logging
-- Agent: File-based logging (logs/agent.log)
-
-## 🔄 WebSocket İletişim Protokolü
-
-### Agent → Server Mesajları
-
-#### Registration
-```json
-{
-  "type": "register",
-  "data": {
-    "hostname": "DESKTOP-ABC123",
-    "os": "Windows",
-    "version": "10.0.19045",
-    "tags": ["windows", "gui-agent"],
-    "system_info": {
-      "cpu_usage": 25.5,
-      "memory_usage": 60.2,
-      "disk_usage": {"C:": 75.0}
-    }
-  },
-  "timestamp": "2024-01-01T12:00:00"
-}
+#### **agent_metrics** - Performans metrikleri
+```sql
+- id (INTEGER PRIMARY KEY)
+- agent_id (FOREIGN KEY)
+- cpu_usage, memory_usage, disk_usage
+- network_in, network_out, process_count
+- timestamp
 ```
 
-#### Heartbeat
-```json
-{
-  "type": "heartbeat",
-  "data": {
-    "system_info": {
-      "cpu_usage": 25.5,
-      "memory_usage": 60.2,
-      "disk_usage": {"C:": 75.0}
-    }
-  },
-  "timestamp": "2024-01-01T12:00:00"
-}
+#### **alerts** - Sistem uyarıları
+```sql
+- id (INTEGER PRIMARY KEY)
+- agent_id (FOREIGN KEY)
+- alert_type, severity, message
+- details, is_resolved, resolved_at
+- created_at
 ```
 
-#### Command Result
-```json
-{
-  "type": "command_result",
-  "data": {
-    "command": "Get-Process",
-    "success": true,
-    "output": "Process list...",
-    "error": "",
-    "execution_time": 1.5,
-    "exit_code": 0
-  },
-  "timestamp": "2024-01-01T12:00:00"
-}
-```
-
-### Server → Agent Mesajları
-
-#### Welcome
-```json
-{
-  "type": "welcome",
-  "data": {
-    "agent_id": "agent_123",
-    "connection_id": "conn_456",
-    "message": "Connected to DexAgents server"
-  },
-  "timestamp": "2024-01-01T12:00:00"
-}
-```
-
-#### Command
-```json
-{
-  "type": "command",
-  "data": {
-    "command": "Get-Process | Select-Object Name,Id,CPU",
-    "timeout": 30,
-    "working_directory": "C:\\"
-  },
-  "timestamp": "2024-01-01T12:00:00"
-}
+#### **audit_logs** - Sistem audit kayıtları
+```sql
+- id (INTEGER PRIMARY KEY)
+- user_id (FOREIGN KEY)
+- action, resource_type, resource_id
+- details, ip_address, user_agent
+- timestamp
 ```
 
 ## 🚀 Deployment
 
-### Production Backend
+### Production Docker Deployment
 ```bash
-cd backend
-pip install gunicorn
-gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker
+# Production build
+docker-compose -f docker-compose.prod.yml up -d --build
+
+# SSL sertifikası için
+# nginx/ssl/ klasörüne sertifikalarınızı koyun
+
+# Reverse proxy ile:
+# Frontend: https://yourdomain.com
+# API: https://yourdomain.com/api
 ```
 
-### Production Frontend
+### Manual Production Deployment
 ```bash
+# Backend
+cd backend
+pip install gunicorn
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+
+# Frontend
 cd frontend
 npm run build
 npm start
 ```
 
-### Agent Distribution
-```bash
-cd agent
-python build_exe.py
-# DexAgents_Installer.zip dosyası oluşturulur
+## 🔄 API Endpoints (v1)
+
+### 🖥️ Agent Management
+```http
+GET    /api/v1/agents                    # Agent listesi
+POST   /api/v1/agents/register           # Agent kayıt
+GET    /api/v1/agents/{id}               # Agent detayı
+PUT    /api/v1/agents/{id}               # Agent güncelle
+DELETE /api/v1/agents/{id}               # Agent sil
+GET    /api/v1/agents/connected          # Aktif agent'lar
+POST   /api/v1/agents/{id}/command       # Komut çalıştır
+GET    /api/v1/agents/{id}/metrics       # Agent metrikleri
+GET    /api/v1/agents/{id}/alerts        # Agent uyarıları
 ```
 
-## 📦 Agent Kurulum Paketi
-
-**Dosya:** `DexAgents_Installer.zip` (12MB)
-
-**İçerik:**
-- `DexAgentsAgent.exe` (12MB) - Ana uygulama
-- `config.json` - Varsayılan konfigürasyon
-- `README.txt` - Kurulum talimatları
-
-**Kurulum Adımları:**
-1. ZIP dosyasını hedef bilgisayara kopyala
-2. Dosyayı aç ve içeriğini çıkar
-3. `DexAgentsAgent.exe` dosyasını çalıştır
-4. Connection ayarlarını yapılandır
-5. "Start Agent" butonuna tıkla
-
-## 🔄 Workflow
-
-### 1. Sistem Başlatma
-```bash
-# Terminal 1: Backend
-cd backend && python run.py
-
-# Terminal 2: Frontend  
-cd frontend && npm run dev
-
-# Terminal 3: Agent (opsiyonel)
-cd agent && python agent_gui.py
+### 👥 User Management
+```http
+POST   /api/v1/users/register            # Kullanıcı kayıt
+POST   /api/v1/users/login               # Giriş yap
+POST   /api/v1/users/logout              # Çıkış yap
+GET    /api/v1/users/profile             # Profil bilgisi
+PUT    /api/v1/users/profile             # Profil güncelle
 ```
 
-### 2. Agent Yönetimi
-1. Web interface'den agent'ları görüntüle
-2. Agent detaylarını incele
-3. Quick Actions ile PowerShell komutları çalıştır
-4. Agent download menüsünden installer oluştur
+### 📊 Monitoring
+```http
+GET    /api/v1/metrics                   # Sistem metrikleri
+GET    /api/v1/alerts                    # Aktif uyarılar
+POST   /api/v1/alerts/{id}/resolve       # Uyarı çöz
+GET    /api/v1/audit                     # Audit logları
+```
 
-### 3. Monitoring
-- Real-time sistem metrikleri
-- Agent durumu takibi
-- Log dosyaları inceleme
-- Performance analizi
-- WebSocket bağlantı durumu
+### 🔌 WebSocket Endpoints
+```http
+WS     /api/v1/ws/{agent_id}             # Agent WebSocket
+WS     /api/v1/ws/dashboard              # Dashboard WebSocket
+```
+
+## 🛠️ Agent Features
+
+### 🖥️ Modern GUI Agent
+- **Tkinter tabanlı modern arayüz**
+- **Real-time sistem monitoring**
+- **WebSocket bağlantısı**
+- **Configuration management**
+- **Auto-start ve service desteği**
+- **Log viewer entegrasyonu**
+
+### 📱 Multiple Agent Versions
+- **Simple Agent**: Temel özellikler
+- **Modern Agent**: Gelişmiş GUI ve özellikler
+- **Headless Agent**: GUI olmadan çalışan versiyon
+
+## 🔐 Security Features
+
+### 🛡️ Authentication & Authorization
+- JWT token bazlı authentication
+- Role-based access control (RBAC)
+- Session management
+- API key authentication
+
+### 🔒 Security Headers
+- CORS protection
+- Rate limiting
+- Input validation
+- SQL injection protection
+
+### 📝 Audit Logging
+- Tüm API çağrıları loglanır
+- User actions kaydedilir
+- System events izlenir
+- Compliance reporting
+
+## 📊 Monitoring & Alerting
+
+### 📈 Real-time Metrics Collection
+- CPU, Memory, Disk usage
+- Network traffic
+- Process monitoring
+- Service status
+
+### 🚨 Alert System
+- Threshold-based alerts
+- Custom alert rules
+- Email/SMS notifications
+- Alert escalation
+
+### 📋 Dashboards
+- Real-time system overview
+- Historical trend analysis
+- Performance analytics
+- Capacity planning
+
+## 🧪 Testing
+
+### Unit Tests
+```bash
+# Backend tests
+cd backend
+python -m pytest tests/
+
+# Frontend tests
+cd frontend
+npm test
+```
+
+### Integration Tests
+```bash
+# API integration tests
+cd backend
+python -m pytest tests/integration/
+
+# E2E tests
+cd frontend
+npm run test:e2e
+```
 
 ## 🐛 Troubleshooting
 
-### Backend Sorunları
-- **Port 8000 kullanımda**: `netstat -ano | findstr :8000`
-- **Python dependencies**: `pip install -r requirements.txt`
-- **Database erişimi**: Dosya yazma izinlerini kontrol et
-- **Module import hataları**: `python -m app.main` ile çalıştır
-- **WebSocket bağlantı sorunları**: Firewall ayarlarını kontrol et
-
-### Frontend Sorunları
-- **Node.js yüklü değil**: https://nodejs.org/
-- **Port 3000 kullanımda**: `netstat -ano | findstr :3000`
-- **npm dependencies**: `npm install`
-- **API endpoint hataları**: Backend'in çalıştığından emin ol
-
-### Agent Sorunları
-- **Server URL yanlış**: Backend'in çalıştığından emin ol
-- **API token geçersiz**: Backend'deki token'ı kontrol et
-- **Firewall**: Windows Firewall ayarlarını kontrol et
-- **Log dosyaları**: `logs/agent.log` dosyasını incele
-- **WebSocket bağlantı sorunları**: Network ayarlarını kontrol et
-- **Duplicate kayıt**: Aynı hostname ile tekrar kayıt olmaya çalışıyorsa mevcut agent güncellenir
-
-## 📝 API Dokümantasyonu
-
-### Agent Endpoints
-
-#### Agent Listesi
+### Docker Issues
 ```bash
-GET /api/v1/agents/
-Authorization: Bearer your-secret-key-here
+# Container loglarını kontrol et
+docker-compose logs backend
+docker-compose logs frontend
+
+# Container'ları yeniden başlat
+docker-compose restart
+
+# Volume'ları temizle
+docker-compose down -v
+docker-compose up -d --build
 ```
 
-#### Agent Kayıt
+### Database Issues
 ```bash
-POST /api/v1/agents/register
-Authorization: Bearer your-secret-key-here
-Content-Type: application/json
+# Database migration çalıştır
+docker exec -it dexagents-backend-dev python -c "from app.migrations.migration_manager import MigrationManager; MigrationManager('/app/dexagents.db').run_migrations()"
 
-{
-  "hostname": "DESKTOP-ABC123",
-  "os": "Windows 10",
-  "version": "2.1.4",
-  "tags": ["windows", "gui-agent"],
-  "system_info": {
-    "cpu_usage": 25.5,
-    "memory_usage": 60.2,
-    "disk_usage": {"C:": 75.0}
-  }
-}
+# Database'i sıfırla
+docker-compose down -v
+docker-compose up -d --build
 ```
 
-#### Bağlı Agent'lar
+### Network Issues
 ```bash
-GET /api/v1/agents/connected
-Authorization: Bearer your-secret-key-here
+# Port kontrolü
+netstat -tulpn | grep :8080
+netstat -tulpn | grep :3000
+
+# Firewall kontrolü
+sudo ufw status
 ```
 
-#### Test Data Oluşturma
-```bash
-POST /api/v1/agents/seed
-Authorization: Bearer your-secret-key-here
+## 📈 Performance Optimization
+
+### Database Optimization
+- Index optimization
+- Query performance tuning
+- Connection pooling
+- Lazy loading
+
+### Frontend Optimization
+- Code splitting
+- Image optimization
+- Caching strategies
+- Bundle size optimization
+
+### Backend Optimization
+- Async/await usage
+- Memory management
+- Response compression
+- Database query optimization
+
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions Workflow
+```yaml
+# .github/workflows/ci.yml
+name: CI/CD Pipeline
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to production
+        run: |
+          docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
-#### PowerShell Komut Çalıştırma
-```bash
-POST /api/v1/agents/{agent_id}/command
-Authorization: Bearer your-secret-key-here
-Content-Type: application/json
+## 📊 System Requirements
 
-{
-  "command": "Get-Process | Select-Object Name,Id,CPU",
-  "timeout": 30
-}
-```
+### Minimum Requirements
+- **RAM**: 2GB
+- **Storage**: 10GB
+- **CPU**: 2 cores
+- **OS**: Linux/Windows/macOS (Docker)
 
-### WebSocket Endpoints
+### Recommended Requirements
+- **RAM**: 4GB+
+- **Storage**: 50GB+
+- **CPU**: 4+ cores
+- **OS**: Linux (Production)
 
-#### WebSocket Bağlantısı
-```bash
-WS /api/v1/ws/{agent_id}
-```
+## 🤝 Contributing
 
-### Installer Endpoints
+### Development Workflow
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Make changes and test
+4. Commit: `git commit -m 'Add amazing feature'`
+5. Push: `git push origin feature/amazing-feature`
+6. Create Pull Request
 
-#### Varsayılan Config
-```bash
-GET /api/v1/installer/config
-Authorization: Bearer your-secret-key-here
-```
+### Code Standards
+- **Python**: PEP 8, Type hints, Docstrings
+- **TypeScript**: ESLint, Prettier
+- **React**: Hooks, Functional components
+- **Docker**: Multi-stage builds, Security best practices
 
-#### Installer Oluşturma
-```bash
-POST /api/v1/installer/create
-Authorization: Bearer your-secret-key-here
-Content-Type: application/json
+## 📄 License
 
-{
-  "server_url": "http://localhost:8000",
-  "api_token": "your-secret-key-here",
-  "agent_name": "test_agent",
-  "tags": ["windows", "test"],
-  "auto_start": true,
-  "run_as_service": true
-}
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### System Endpoints
+## 📞 Support
 
-#### Sistem Bilgileri
-```bash
-GET /api/v1/system/info
-Authorization: Bearer your-secret-key-here
-```
-
-## 🛠️ Geliştirme
-
-### Yeni Endpoint Ekleme
-```python
-# backend/app/api/v1/new_endpoint.py
-from fastapi import APIRouter, Depends
-from ...core.auth import verify_token
-
-router = APIRouter()
-
-@router.get("/new-endpoint")
-async def new_endpoint(token: str = Depends(verify_token)):
-    return {"message": "New endpoint"}
-```
-
-### Yeni Model Ekleme
-```python
-# backend/app/schemas/new_model.py
-from pydantic import BaseModel, Field
-
-class NewModel(BaseModel):
-    field: str = Field(..., description="Field description")
-```
-
-### Frontend Sayfa Ekleme
-```bash
-mkdir frontend/app/new-page
-touch frontend/app/new-page/page.tsx
-```
-
-### API Client'a Method Ekleme
-```typescript
-// frontend/lib/api.ts
-async newMethod(): Promise<any> {
-  return this.request('/api/v1/new-endpoint')
-}
-```
-
-## 📄 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır.
-
-## 🤝 Katkıda Bulunma
-
-1. Fork yapın
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Commit yapın (`git commit -m 'Add amazing feature'`)
-4. Push yapın (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
-
-## 📞 İletişim
-
-Proje hakkında sorularınız için issue açabilirsiniz.
+- **Issues**: [GitHub Issues](https://github.com/asedra/dex_agent/issues)
+- **Documentation**: [Wiki](https://github.com/asedra/dex_agent/wiki)
+- **Discussions**: [GitHub Discussions](https://github.com/asedra/dex_agent/discussions)
 
 ---
 
-**DexAgents** - Windows Endpoint Management Platform v2.2.0 
+**DexAgents** - Modern Windows Endpoint Management Platform v3.0
+
+🚀 **Ready for Production** | ⭐ **Star this repo** | 🐛 **Report issues**
