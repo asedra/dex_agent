@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
 from ...schemas.agent import AgentInstallerConfig
 from ...services.agent_installer_service import AgentInstallerService
+from ...services.python_agent_service import PythonAgentService
 import logging
 
 logger = logging.getLogger(__name__)
@@ -28,6 +29,27 @@ async def create_agent_installer(
     except Exception as e:
         logger.error(f"Error creating pre-built .exe: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create .exe agent")
+
+@router.post("/create-python")
+async def create_python_agent(
+    config: AgentInstallerConfig,
+    background_tasks: BackgroundTasks
+):
+    """Create a simple Python agent package"""
+    try:
+        zip_path = PythonAgentService.create_python_agent(config)
+        
+        # Add cleanup task
+        background_tasks.add_task(PythonAgentService.cleanup_temp_files, zip_path)
+        
+        return FileResponse(
+            path=zip_path,
+            filename=f"DexAgent_{config.agent_name or 'Python'}.zip",
+            media_type="application/zip"
+        )
+    except Exception as e:
+        logger.error(f"Error creating Python agent: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to create Python agent")
 
 @router.get("/config")
 async def get_installer_config():

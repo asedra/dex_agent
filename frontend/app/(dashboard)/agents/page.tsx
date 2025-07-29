@@ -18,16 +18,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import Link from "next/link"
 import { apiClient, Agent, AgentInstallerConfig, InstallerConfig } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
@@ -39,17 +29,8 @@ export default function AgentsPage() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [installerDialogOpen, setInstallerDialogOpen] = useState(false)
-  const [creatingInstaller, setCreatingInstaller] = useState(false)
   const [installerConfig, setInstallerConfig] = useState<InstallerConfig | null>(null)
-  const [agentConfig, setAgentConfig] = useState<AgentInstallerConfig>({
-    server_url: "",
-    api_token: "",
-    agent_name: "",
-    tags: [],
-    auto_start: true,
-    run_as_service: true
-  })
+  const [downloadingAgent, setDownloadingAgent] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -74,12 +55,6 @@ export default function AgentsPage() {
       try {
         const config = await apiClient.getInstallerConfig()
         setInstallerConfig(config)
-        setAgentConfig(prev => ({
-          ...prev,
-          server_url: config.server_url,
-          api_token: config.api_token,
-          tags: config.tags || []
-        }))
       } catch (err) {
         console.error('Failed to fetch installer config:', err)
       }
@@ -148,26 +123,26 @@ export default function AgentsPage() {
     }
   }
 
-  const handleCreateInstaller = async () => {
-    if (!agentConfig.server_url || !agentConfig.api_token) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      })
-      return
-    }
-
+  const handleDownloadPythonAgent = async () => {
     try {
-      setCreatingInstaller(true)
+      setDownloadingAgent(true)
       
-      const blob = await apiClient.createAgentInstaller(agentConfig)
+      const config = installerConfig || {
+        server_url: "http://localhost:8080",
+        api_token: "your-secret-key-here",
+        agent_name: "",
+        tags: [],
+        auto_start: true,
+        run_as_service: false
+      }
+
+      const blob = await apiClient.createPythonAgent(config)
       
       // Create download link
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `DexAgent_${agentConfig.agent_name || 'Windows'}_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.exe`
+      a.download = `DexAgent_Python_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.zip`
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
@@ -175,35 +150,18 @@ export default function AgentsPage() {
       
       toast({
         title: "Success",
-        description: "Agent executable created and downloaded successfully",
+        description: "Python agent package downloaded successfully",
       })
-      
-      setInstallerDialogOpen(false)
     } catch (err) {
+      console.error("Download error:", err)
       toast({
         title: "Error",
-        description: "Failed to create agent executable",
+        description: `Failed to download Python agent package: ${err instanceof Error ? err.message : 'Unknown error'}`,
         variant: "destructive",
       })
     } finally {
-      setCreatingInstaller(false)
+      setDownloadingAgent(false)
     }
-  }
-
-  const handleAddTag = (tag: string) => {
-    if (tag && !(agentConfig.tags || []).includes(tag)) {
-      setAgentConfig(prev => ({
-        ...prev,
-        tags: [...(prev.tags || []), tag]
-      }))
-    }
-  }
-
-  const handleRemoveTag = (tag: string) => {
-    setAgentConfig(prev => ({
-      ...prev,
-      tags: (prev.tags || []).filter(t => t !== tag)
-    }))
   }
 
   if (loading) {
@@ -247,142 +205,19 @@ export default function AgentsPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Dialog open={installerDialogOpen} onOpenChange={setInstallerDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
+          <Button onClick={handleDownloadPythonAgent} disabled={downloadingAgent}>
+            {downloadingAgent ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Downloading...
+              </>
+            ) : (
+              <>
                 <Download className="mr-2 h-4 w-4" />
                 Download Agent
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Create Agent Installer</DialogTitle>
-                <DialogDescription>
-                  Create a Windows agent executable file for deployment on other computers.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="server_url">Server URL *</Label>
-                    <Input
-                      id="server_url"
-                      value={agentConfig.server_url}
-                      onChange={(e) => setAgentConfig(prev => ({ ...prev, server_url: e.target.value }))}
-                      placeholder="http://localhost:8000"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="api_token">API Token *</Label>
-                    <Input
-                      id="api_token"
-                      value={agentConfig.api_token}
-                      onChange={(e) => setAgentConfig(prev => ({ ...prev, api_token: e.target.value }))}
-                      placeholder="default_token"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="agent_name">Agent Name (Optional)</Label>
-                  <Input
-                    id="agent_name"
-                    value={agentConfig.agent_name}
-                    onChange={(e) => setAgentConfig(prev => ({ ...prev, agent_name: e.target.value }))}
-                    placeholder="Custom agent name"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Tags</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {(agentConfig.tags || []).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="cursor-pointer" onClick={() => handleRemoveTag(tag)}>
-                        {tag} ×
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Add tag..."
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault()
-                          const input = e.target as HTMLInputElement
-                          handleAddTag(input.value)
-                          input.value = ''
-                        }
-                      }}
-                    />
-                    <Button variant="outline" size="sm" onClick={() => {
-                      const input = document.querySelector('input[placeholder="Add tag..."]') as HTMLInputElement
-                      if (input && input.value) {
-                        handleAddTag(input.value)
-                        input.value = ''
-                      }
-                    }}>
-                      Add
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="auto_start"
-                      checked={agentConfig.auto_start}
-                      onCheckedChange={(checked) => setAgentConfig(prev => ({ ...prev, auto_start: checked as boolean }))}
-                    />
-                    <Label htmlFor="auto_start">Auto-start after installation</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="run_as_service"
-                      checked={agentConfig.run_as_service}
-                      onCheckedChange={(checked) => setAgentConfig(prev => ({ ...prev, run_as_service: checked as boolean }))}
-                    />
-                    <Label htmlFor="run_as_service">Run as Windows service</Label>
-                  </div>
-                </div>
-
-                <div className="bg-muted p-3 rounded-md">
-                  <h4 className="font-medium mb-2">Installation Instructions</h4>
-                  <ol className="text-sm space-y-1 list-decimal list-inside">
-                    <li>Download the .exe file (it's actually a ZIP archive)</li>
-                    <li>Extract the ZIP file on the target Windows computer</li>
-                    <li>Double-click <code className="bg-background px-1 rounded">DexAgent_[Name].bat</code> to run</li>
-                    <li>The launcher will auto-install Python dependencies</li>
-                    <li>Agent GUI will start and connect automatically</li>
-                  </ol>
-                </div>
-
-                <div className="flex justify-end space-x-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setInstallerDialogOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleCreateInstaller}
-                    disabled={creatingInstaller || !agentConfig.server_url || !agentConfig.api_token}
-                  >
-                    {creatingInstaller ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating...
-                      </>
-                    ) : (
-                      <>
-                        <Download className="mr-2 h-4 w-4" />
-                        Create Installer
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
@@ -510,6 +345,31 @@ export default function AgentsPage() {
               ))}
             </TableBody>
           </Table>
+        </CardContent>
+      </Card>
+
+      {/* Info Card about Python Agent */}
+      <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-blue-800 dark:text-blue-200">
+            <Download className="h-5 w-5" />
+            Python Agent Instructions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2 text-blue-700 dark:text-blue-300">
+            <p><strong>Quick Setup:</strong></p>
+            <ol className="list-decimal list-inside space-y-1 text-sm">
+              <li>Click "Download Agent" to get the ZIP package</li>
+              <li>Extract the ZIP file on target Windows computer</li>
+              <li>Run <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">install.bat</code> (first time only)</li>
+              <li>Run <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">start_agent.bat</code> to launch</li>
+              <li>Agent will connect automatically and appear in this list</li>
+            </ol>
+            <p className="text-xs mt-2">
+              <strong>Requirements:</strong> Python 3.8+ and internet connection
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

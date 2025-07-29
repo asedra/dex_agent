@@ -17,9 +17,10 @@ class WebSocketManager:
         self.pending_commands: Dict[str, Dict[str, Any]] = {}  # command_id -> command_info
         self.command_responses: Dict[str, Dict[str, Any]] = {}  # command_id -> response
     
-    async def connect(self, websocket: WebSocket, agent_id: Optional[str] = None) -> str:
+    async def connect(self, websocket: WebSocket, agent_id: Optional[str] = None, accept: bool = True) -> str:
         """Accept WebSocket connection and return connection ID"""
-        await websocket.accept()
+        if accept:
+            await websocket.accept()
         
         connection_id = str(uuid.uuid4())
         self.active_connections[connection_id] = websocket
@@ -168,6 +169,32 @@ class WebSocketManager:
         """Update last heartbeat time"""
         if connection_id in self.connection_info:
             self.connection_info[connection_id]["last_heartbeat"] = datetime.now().isoformat()
+    
+    async def request_system_info(self, agent_id: str) -> str:
+        """Request system information update from agent"""
+        logger.info(f"Requesting system info from agent {agent_id}")
+        
+        if agent_id not in self.agent_connections:
+            logger.error(f"Agent {agent_id} is not connected")
+            raise ValueError(f"Agent {agent_id} is not connected")
+        
+        request_id = f"sysinfo_{datetime.now().timestamp()}_{uuid.uuid4().hex[:8]}"
+        
+        # Send system info request to agent
+        request_message = {
+            "type": "system_info_request",
+            "request_id": request_id,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        logger.info(f"Sending system info request {request_id} to agent {agent_id}")
+        success = await self.send_to_agent(agent_id, request_message)
+        
+        if not success:
+            logger.error(f"Failed to send system info request to agent {agent_id}")
+            raise ValueError(f"Failed to send system info request to agent {agent_id}")
+        
+        return request_id
 
 # Global WebSocket manager instance
 websocket_manager = WebSocketManager() 

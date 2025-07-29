@@ -232,36 +232,18 @@ async def refresh_agent(agent_id: str, token: str = Depends(verify_token)):
         is_connected = websocket_manager.is_agent_connected(agent_id)
         logger.info(f"Agent {agent_id} connection status: {is_connected}")
         
-        # Get current system info if agent is connected
-        system_info = None
+        # If agent is connected, request system info via WebSocket
         if is_connected:
             try:
-                # Get basic system information
+                # Request system info from agent
+                request_id = await websocket_manager.request_system_info(agent_id)
+                logger.info(f"System info request {request_id} sent to agent {agent_id}")
                 
-                cpu_usage = psutil.cpu_percent(interval=1)
-                memory = psutil.virtual_memory()
-                disk_usage = {}
+                # Wait briefly for agent to respond (we'll handle the actual update via WebSocket)
+                await asyncio.sleep(0.1)
                 
-                # Get disk usage for all mounted drives
-                for partition in psutil.disk_partitions():
-                    try:
-                        usage = psutil.disk_usage(partition.mountpoint)
-                        disk_usage[partition.mountpoint] = round((usage.used / usage.total) * 100, 1)
-                    except PermissionError:
-                        continue
-                
-                system_info = {
-                    "hostname": platform.node(),
-                    "os_version": platform.platform(),
-                    "cpu_usage": cpu_usage,
-                    "memory_usage": memory.percent,
-                    "disk_usage": disk_usage
-                }
-                
-                logger.info(f"Retrieved system info for agent {agent_id}: {system_info}")
             except Exception as e:
-                logger.error(f"Error getting system info for agent {agent_id}: {str(e)}")
-                system_info = {}
+                logger.error(f"Error requesting system info from agent {agent_id}: {str(e)}")
         
         # Update agent status based on connection
         status = 'online' if is_connected else 'offline'
@@ -269,10 +251,6 @@ async def refresh_agent(agent_id: str, token: str = Depends(verify_token)):
             'status': status,
             'last_seen': datetime.now().isoformat()
         }
-        
-        # Add system info if available
-        if system_info:
-            update_data['system_info'] = system_info
         
         logger.info(f"Updating agent {agent_id} with data: {update_data}")
         success = db_manager.update_agent(agent_id, update_data)
