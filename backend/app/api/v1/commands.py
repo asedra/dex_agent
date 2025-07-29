@@ -108,8 +108,10 @@ async def get_command_result(agent_id: str, command_id: str):
         }
         
     except Exception as e:
-        logger.error(f"Error getting command result: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to get command result")
+        logger.error(f"Error getting command result for {command_id}: {str(e)}")
+        logger.error(f"Command response exists: {response is not None if 'response' in locals() else 'response not set'}")
+        logger.error(f"Available command responses: {list(websocket_manager.command_responses.keys())}")
+        raise HTTPException(status_code=500, detail=f"Failed to get command result: {str(e)}")
 
 # Saved Commands Management
 

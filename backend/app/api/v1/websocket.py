@@ -158,7 +158,24 @@ async def websocket_endpoint(websocket: WebSocket, agent_id: str):
 
 async def handle_agent_message(agent_id: str, message: Dict[str, Any]):
     """Handle messages from agent"""
-    message_type = message.get("type")
+    try:
+        # Debug log the raw message
+        logger.info(f"Raw message from agent {agent_id}: {type(message)} - {message}")
+        
+        # If message is string, try to parse as JSON
+        if isinstance(message, str):
+            try:
+                message = json.loads(message)
+                logger.info(f"Parsed JSON message: {message}")
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse JSON message from agent {agent_id}: {e}")
+                return
+        
+        message_type = message.get("type")
+    except Exception as e:
+        logger.error(f"Error handling message from agent {agent_id}: {e}")
+        logger.error(f"Message type: {type(message)}, content: {message}")
+        return
     
     if message_type == "heartbeat":
         # Update agent status with system info
@@ -200,12 +217,20 @@ async def handle_agent_message(agent_id: str, message: Dict[str, Any]):
         
         if request_id:
             # Format response data for PowerShell results
+            # Handle both dict and list data types
+            error_msg = ""
+            execution_time = 0.0
+            
+            if isinstance(data, dict):
+                error_msg = data.get("error", "") if not success else ""
+                execution_time = data.get("execution_time", 0.0)
+            
             response_data = {
                 "status": "completed",
                 "success": success,
                 "output": data,
-                "error": data.get("error") if not success else "",
-                "execution_time": data.get("execution_time", 0.0),
+                "error": error_msg,
+                "execution_time": execution_time,
                 "timestamp": message.get("timestamp", datetime.now().isoformat())
             }
             websocket_manager.store_command_response(request_id, response_data)

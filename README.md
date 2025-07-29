@@ -95,9 +95,9 @@ dexagents/
 └── scripts/                   # 🆕 Deployment scriptleri
 ```
 
-## 🆕 Yeni Özellikler (v3.2)
+## 🆕 Yeni Özellikler (v3.3)
 
-### ⚡ PowerShell Library & Execution System
+### ⚡ Production-Ready PowerShell Library
 - **PowerShell Command Library**: Kayıtlı PowerShell komutlarının yönetimi ve çalıştırılması
 - **Real-time Command Execution**: WebSocket üzerinden PowerShell komutlarının anlık çalıştırılması
 - **Agent Selection**: Çoklu agent seçimi ve paralel komut çalıştırma
@@ -105,14 +105,17 @@ dexagents/
 - **Parameter Support**: Dinamik parametre girişi ve template sistemi
 - **System Commands**: Get System Information, Check Disk Space, Get Network Configuration
 
-### 🔧 PowerShell Page Features
+### 🔧 Advanced PowerShell Features
 - **Interactive Command Management**: Komut oluşturma, düzenleme ve silme arayüzü
+- **Edit Button Functionality**: Kullanıcı komutlarının tam düzenleme desteği
 - **Category Filtering**: System, Network, Disk, Security, Monitoring kategorileri
 - **Real-time Agent Status**: Online agent'ların anlık görüntülenmesi
 - **Execution Results**: Detaylı komut sonuçları ve hata raporlama
-- **Polling System**: Asenkron komut sonuçlarının otomatik takibi
+- **Array/List Support**: PowerShell array sonuçlarının tam desteği
 
-### 🔄 Enhanced Error Handling
+### 🔄 Production-Grade Error Handling
+- **WebSocket Message Parsing**: String ve Dict message formatlarının otomatik işlenmesi
+- **PowerShell Data Type Support**: Array, Object, String tüm data tiplerinin desteği
 - **Robust Result Processing**: Gelişmiş komut sonucu işleme ve hata yakalama
 - **Safe Property Access**: Undefined değerler için güvenli erişim
 - **Detailed Error Messages**: Kullanıcı dostu hata mesajları
@@ -454,13 +457,19 @@ docker-compose logs backend | grep "powershell_command\|PowerShell\|powershell_r
 # PowerShell Library sayfasında komut çalıştırma
 # - Agent seçin ve Run butonuna tıklayın
 # - Polling sistem otomatik olarak sonuçları getirir
-# - JSON formatında sonuçları görüntüler
+# - JSON formatında sonuçları görüntüler (Array ve Object desteği)
 
 # Agent bağlantı durumunu kontrol et
 curl -H "Authorization: Bearer your-secret-key-here" "http://localhost:8080/api/v1/agents/"
 
 # Kayıtlı PowerShell komutlarını kontrol et
 curl -H "Authorization: Bearer your-secret-key-here" "http://localhost:8080/api/v1/commands/saved"
+
+# PowerShell Array Command Test
+curl -X POST -H "Authorization: Bearer your-secret-key-here" \
+     -H "Content-Type: application/json" \
+     -d '{"name":"Test Array","command":"Get-Process | Select-Object -First 5 Name, CPU | ConvertTo-Json","category":"system"}' \
+     "http://localhost:8080/api/v1/commands/saved"
 
 # System Health kayboluyorsa - frontend refresh logic
 # Frontend refresh butonuna 3 saniye bekleyin (PowerShell command completion için)
@@ -600,6 +609,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**DexAgents** - Modern Windows Endpoint Management Platform v3.2
+**DexAgents** - Modern Windows Endpoint Management Platform v3.3
 
 🚀 **Ready for Production** | ⭐ **Star this repo** | 🐛 **Report issues**
