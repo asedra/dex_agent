@@ -97,8 +97,8 @@ dexagents/
 
 ## 🆕 Yeni Özellikler (v3.3)
 
-### ⚡ Production-Ready PowerShell Library
-- **PowerShell Command Library**: Kayıtlı PowerShell komutlarının yönetimi ve çalıştırılması
+### ⚡ Production-Ready Command Library
+- **Command Library**: Kayıtlı PowerShell komutlarının yönetimi ve çalıştırılması
 - **Real-time Command Execution**: WebSocket üzerinden PowerShell komutlarının anlık çalıştırılması
 - **Agent Selection**: Çoklu agent seçimi ve paralel komut çalıştırma
 - **JSON Response Display**: PowerShell komut sonuçlarının JSON formatında görüntülenmesi
@@ -368,7 +368,7 @@ GET    /api/v1/installer/config          # Agent configuration
 }
 ```
 
-#### PowerShell Library Command Execution
+#### Command Library Execution
 ```json
 {
   "command_id": "189b3c17-8eee-478b-8729-745d83c4cc35",
@@ -454,7 +454,7 @@ npm run test:e2e
 # Backend loglarında PowerShell komut durumunu kontrol et
 docker-compose logs backend | grep "powershell_command\|PowerShell\|powershell_result"
 
-# PowerShell Library sayfasında komut çalıştırma
+# Command Library sayfasında komut çalıştırma
 # - Agent seçin ve Run butonuna tıklayın
 # - Polling sistem otomatik olarak sonuçları getirir
 # - JSON formatında sonuçları görüntüler (Array ve Object desteği)

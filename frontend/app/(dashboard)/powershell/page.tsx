@@ -66,7 +66,7 @@ const getCategoriesWithCounts = (commands: SavedPowerShellCommand[]) => {
   return baseCategories.filter(cat => cat.id === "all" || cat.count > 0)
 }
 
-export default function PowerShellLibraryPage() {
+export default function CommandLibraryPage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCommand, setSelectedCommand] = useState<SavedPowerShellCommand | null>(null)
@@ -277,8 +277,8 @@ export default function PowerShellLibraryPage() {
         <div className="flex items-center gap-4">
           <SidebarTrigger />
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">PowerShell Library</h2>
-            <p className="text-muted-foreground">Manage and execute PowerShell commands across your agents</p>
+            <h2 className="text-3xl font-bold tracking-tight">Command Library</h2>
+            <p className="text-muted-foreground">Manage and execute commands across your agents</p>
           </div>
         </div>
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
@@ -290,9 +290,9 @@ export default function PowerShellLibraryPage() {
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Create New PowerShell Command</DialogTitle>
+              <DialogTitle>Create New Command</DialogTitle>
               <DialogDescription>
-                Create a reusable PowerShell command template with parameters
+                Create a reusable command template with parameters
               </DialogDescription>
             </DialogHeader>
             <CreateCommandForm 
@@ -322,9 +322,9 @@ export default function PowerShellLibraryPage() {
           <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
             <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Edit PowerShell Command</DialogTitle>
+                <DialogTitle>Edit Command</DialogTitle>
                 <DialogDescription>
-                  Modify the PowerShell command template and parameters
+                  Modify the command template and parameters
                 </DialogDescription>
               </DialogHeader>
               {editingCommand ? (
@@ -636,7 +636,7 @@ export default function PowerShellLibraryPage() {
               <CardContent className="text-center py-8">
                 <Terminal className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">No commands found</h3>
-                <p className="text-muted-foreground mb-4">No PowerShell commands match your current filters.</p>
+                <p className="text-muted-foreground mb-4">No commands match your current filters.</p>
                 <Button onClick={() => setCreateDialogOpen(true)}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create New Command

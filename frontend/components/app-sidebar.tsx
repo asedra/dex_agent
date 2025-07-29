@@ -31,7 +31,7 @@ const menuItems = [
     icon: Monitor,
   },
   {
-    title: "PowerShell Library",
+    title: "Command Library",
     url: "/powershell",
     icon: Terminal,
   },
