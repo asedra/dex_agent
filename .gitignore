@@ -136,4 +136,52 @@ dmypy.json
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Project specific
+agent/logs/
+backend/logs/
+backend/temp/
+backend/data/
+backend/agent_installers/
+*.db
+*.sqlite
+*.sqlite3
+*.exe
+*.zip
+test_*.py
+db_test.py
+
+# Agent specific
+agent/venv/
+agent/build/
+agent/dist/
+agent/__pycache__/
+agent/*.spec
+
+# Frontend specific
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.pnpm-store/
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/ 
