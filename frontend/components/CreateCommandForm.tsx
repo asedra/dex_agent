@@ -14,6 +14,7 @@ import { SavedPowerShellCommand, CommandParameter } from "@/lib/api"
 interface CreateCommandFormProps {
   onSubmit: (command: SavedPowerShellCommand) => void
   onCancel: () => void
+  initialData?: SavedPowerShellCommand
 }
 
 const categories = [
@@ -31,17 +32,19 @@ const parameterTypes = [
   { id: "boolean", name: "Boolean" },
 ]
 
-export default function CreateCommandForm({ onSubmit, onCancel }: CreateCommandFormProps) {
-  const [formData, setFormData] = useState<SavedPowerShellCommand>({
-    name: "",
-    description: "",
-    category: "general",
-    command: "",
-    parameters: [],
-    tags: [],
-    version: "1.0",
-    author: "User",
-  })
+export default function CreateCommandForm({ onSubmit, onCancel, initialData }: CreateCommandFormProps) {
+  const [formData, setFormData] = useState<SavedPowerShellCommand>(
+    initialData || {
+      name: "",
+      description: "",
+      category: "general", 
+      command: "",
+      parameters: [],
+      tags: [],
+      version: "1.0",
+      author: "User",
+    }
+  )
   
   const [currentTag, setCurrentTag] = useState("")
   const [newParameter, setNewParameter] = useState<CommandParameter>({
@@ -264,7 +267,7 @@ export default function CreateCommandForm({ onSubmit, onCancel }: CreateCommandF
           Cancel
         </Button>
         <Button type="submit">
-          Create Command
+          {initialData ? "Update Command" : "Create Command"}
         </Button>
       </div>
     </form>

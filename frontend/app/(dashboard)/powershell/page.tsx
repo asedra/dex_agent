@@ -78,6 +78,8 @@ export default function PowerShellLibraryPage() {
   const [loading, setLoading] = useState(true)
   const [parameterValues, setParameterValues] = useState<Record<string, any>>({})
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editingCommand, setEditingCommand] = useState<SavedPowerShellCommand | null>(null)
   const { toast } = useToast()
 
   const categories = getCategoriesWithCounts(commands)
@@ -250,6 +252,25 @@ export default function PowerShellLibraryPage() {
     }
   }
 
+  const updateCommand = async (updatedCommand: SavedPowerShellCommand) => {
+    try {
+      const updated = await apiClient.updateSavedCommand(updatedCommand.id!, updatedCommand)
+      setCommands(commands.map(cmd => cmd.id === updated.id ? updated : cmd))
+      setEditDialogOpen(false)
+      setEditingCommand(null)
+      toast({
+        title: "Success",
+        description: "Command updated successfully",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update command",
+        variant: "destructive",
+      })
+    }
+  }
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -296,6 +317,31 @@ export default function PowerShellLibraryPage() {
             />
           </DialogContent>
         </Dialog>
+
+        {editDialogOpen && (
+          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Edit PowerShell Command</DialogTitle>
+                <DialogDescription>
+                  Modify the PowerShell command template and parameters
+                </DialogDescription>
+              </DialogHeader>
+              {editingCommand ? (
+                <CreateCommandForm 
+                  initialData={editingCommand}
+                  onSubmit={updateCommand}
+                  onCancel={() => {
+                    setEditDialogOpen(false)
+                    setEditingCommand(null)
+                  }}
+                />
+              ) : (
+                <div>Loading command data...</div>
+              )}
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-4">
@@ -548,7 +594,15 @@ export default function PowerShellLibraryPage() {
                         </DialogContent>
                       </Dialog>
 
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          setEditingCommand(command)
+                          setEditDialogOpen(true)
+                        }}
+                        disabled={command.is_system}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
                       </Button>
