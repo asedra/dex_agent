@@ -18,6 +18,7 @@ class DatabaseManager:
         """Context manager for database connections"""
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row  # Enable column access by name
+        conn.execute("PRAGMA foreign_keys = ON")  # Enable foreign keys
         try:
             yield conn
         finally:
@@ -58,13 +59,143 @@ class DatabaseManager:
                     error TEXT,
                     execution_time REAL,
                     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    FOREIGN KEY (agent_id) REFERENCES agents (id)
+                    FOREIGN KEY (agent_id) REFERENCES agents (id) ON DELETE CASCADE
                 )
             ''')
+            
+            # Create users table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT UNIQUE NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    password_hash TEXT NOT NULL,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    is_admin BOOLEAN DEFAULT FALSE,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Create sessions table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS sessions (
+                    id TEXT PRIMARY KEY,
+                    user_id INTEGER NOT NULL,
+                    token TEXT UNIQUE NOT NULL,
+                    expires_at TIMESTAMP NOT NULL,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+                )
+            ''')
+            
+            # Create agent_groups table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS agent_groups (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT UNIQUE NOT NULL,
+                    description TEXT,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # Create agent_group_members table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS agent_group_members (
+                    group_id INTEGER NOT NULL,
+                    agent_id TEXT NOT NULL,
+                    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (group_id, agent_id),
+                    FOREIGN KEY (group_id) REFERENCES agent_groups (id) ON DELETE CASCADE,
+                    FOREIGN KEY (agent_id) REFERENCES agents (id) ON DELETE CASCADE
+                )
+            ''')
+            
+            # Create scheduled_tasks table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS scheduled_tasks (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL,
+                    description TEXT,
+                    command TEXT NOT NULL,
+                    cron_expression TEXT,
+                    agent_id TEXT,
+                    group_id INTEGER,
+                    is_active BOOLEAN DEFAULT TRUE,
+                    last_run TIMESTAMP,
+                    next_run TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (agent_id) REFERENCES agents (id) ON DELETE SET NULL,
+                    FOREIGN KEY (group_id) REFERENCES agent_groups (id) ON DELETE SET NULL
+                )
+            ''')
+            
+            # Create audit_logs table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS audit_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,
+                    action TEXT NOT NULL,
+                    resource_type TEXT,
+                    resource_id TEXT,
+                    details TEXT,  -- JSON object as string
+                    ip_address TEXT,
+                    user_agent TEXT,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE SET NULL
+                )
+            ''')
+            
+            # Create agent_metrics table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS agent_metrics (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    agent_id TEXT NOT NULL,
+                    cpu_usage REAL,
+                    memory_usage REAL,
+                    disk_usage REAL,
+                    network_in REAL,
+                    network_out REAL,
+                    process_count INTEGER,
+                    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (agent_id) REFERENCES agents (id) ON DELETE CASCADE
+                )
+            ''')
+            
+            # Create alerts table
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS alerts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    agent_id TEXT,
+                    alert_type TEXT NOT NULL,
+                    severity TEXT NOT NULL,
+                    message TEXT NOT NULL,
+                    details TEXT,  -- JSON object as string
+                    is_resolved BOOLEAN DEFAULT FALSE,
+                    resolved_at TIMESTAMP,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (agent_id) REFERENCES agents (id) ON DELETE CASCADE
+                )
+            ''')
+            
+            # Create indexes for better performance
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_agents_hostname ON agents(hostname)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_agents_status ON agents(status)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_command_history_agent_id ON command_history(agent_id)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_command_history_timestamp ON command_history(timestamp)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_agent_metrics_agent_id ON agent_metrics(agent_id)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_agent_metrics_timestamp ON agent_metrics(timestamp)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_alerts_agent_id ON alerts(agent_id)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_alerts_is_resolved ON alerts(is_resolved)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp)')
             
             conn.commit()
             logger.info("Database initialized successfully")
     
+    # Agent methods
     def add_agent(self, agent_data: Dict[str, Any]) -> str:
         """Add a new agent to the database"""
         with self.get_connection() as conn:
@@ -205,6 +336,30 @@ class DatabaseManager:
             
             return False
     
+    def update_agent_status(self, agent_id: str, status: str, system_info: Optional[Dict] = None) -> bool:
+        """Update agent status and optionally system info"""
+        update_data = {
+            'status': status,
+            'last_seen': datetime.now().isoformat()
+        }
+        
+        if system_info:
+            update_data['system_info'] = system_info
+        
+        return self.update_agent(agent_id, update_data)
+    
+    def update_agent_connection(self, agent_id: str, connection_id: Optional[str], is_connected: bool) -> bool:
+        """Update agent connection status"""
+        update_data = {
+            'connection_id': connection_id,
+            'is_connected': is_connected,
+            'status': 'online' if is_connected else 'offline',
+            'last_seen': datetime.now().isoformat()
+        }
+        
+        return self.update_agent(agent_id, update_data)
+    
+    # Command history methods
     def add_command_history(self, agent_id: str, command_data: Dict[str, Any]) -> int:
         """Add command execution history"""
         with self.get_connection() as conn:
@@ -243,28 +398,242 @@ class DatabaseManager:
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
     
-    def update_agent_status(self, agent_id: str, status: str, system_info: Optional[Dict] = None) -> bool:
-        """Update agent status and optionally system info"""
-        update_data = {
-            'status': status,
-            'last_seen': datetime.now().isoformat()
-        }
-        
-        if system_info:
-            update_data['system_info'] = system_info
-        
-        return self.update_agent(agent_id, update_data)
+    # User methods
+    def create_user(self, username: str, email: str, password_hash: str, is_admin: bool = False) -> Optional[int]:
+        """Create a new user"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute('''
+                    INSERT INTO users (username, email, password_hash, is_admin)
+                    VALUES (?, ?, ?, ?)
+                ''', (username, email, password_hash, is_admin))
+                
+                conn.commit()
+                return cursor.lastrowid
+            except sqlite3.IntegrityError:
+                logger.error(f"User with username '{username}' or email '{email}' already exists")
+                return None
     
-    def update_agent_connection(self, agent_id: str, connection_id: Optional[str], is_connected: bool) -> bool:
-        """Update agent connection status"""
-        update_data = {
-            'connection_id': connection_id,
-            'is_connected': is_connected,
-            'status': 'online' if is_connected else 'offline',
-            'last_seen': datetime.now().isoformat()
-        }
-        
-        return self.update_agent(agent_id, update_data)
+    def get_user(self, user_id: int) -> Optional[Dict[str, Any]]:
+        """Get user by ID"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+            row = cursor.fetchone()
+            
+            if row:
+                return dict(row)
+            return None
+    
+    def get_user_by_username(self, username: str) -> Optional[Dict[str, Any]]:
+        """Get user by username"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM users WHERE username = ?', (username,))
+            row = cursor.fetchone()
+            
+            if row:
+                return dict(row)
+            return None
+    
+    # Group methods
+    def create_agent_group(self, name: str, description: str = None) -> Optional[int]:
+        """Create a new agent group"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute('''
+                    INSERT INTO agent_groups (name, description)
+                    VALUES (?, ?)
+                ''', (name, description))
+                
+                conn.commit()
+                return cursor.lastrowid
+            except sqlite3.IntegrityError:
+                logger.error(f"Group with name '{name}' already exists")
+                return None
+    
+    def add_agent_to_group(self, group_id: int, agent_id: str) -> bool:
+        """Add an agent to a group"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute('''
+                    INSERT INTO agent_group_members (group_id, agent_id)
+                    VALUES (?, ?)
+                ''', (group_id, agent_id))
+                
+                conn.commit()
+                return True
+            except sqlite3.IntegrityError:
+                logger.error(f"Agent {agent_id} is already in group {group_id}")
+                return False
+    
+    def get_group_agents(self, group_id: int) -> List[Dict[str, Any]]:
+        """Get all agents in a group"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT a.* FROM agents a
+                JOIN agent_group_members agm ON a.id = agm.agent_id
+                WHERE agm.group_id = ?
+                ORDER BY a.hostname
+            ''', (group_id,))
+            
+            rows = cursor.fetchall()
+            agents = []
+            for row in rows:
+                agent = dict(row)
+                agent['tags'] = json.loads(agent['tags']) if agent['tags'] else []
+                agent['system_info'] = json.loads(agent['system_info']) if agent['system_info'] else {}
+                agents.append(agent)
+            
+            return agents
+    
+    # Metrics methods
+    def add_agent_metrics(self, agent_id: str, metrics: Dict[str, Any]) -> int:
+        """Add agent performance metrics"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                INSERT INTO agent_metrics 
+                (agent_id, cpu_usage, memory_usage, disk_usage, network_in, network_out, process_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                agent_id,
+                metrics.get('cpu_usage'),
+                metrics.get('memory_usage'),
+                metrics.get('disk_usage'),
+                metrics.get('network_in'),
+                metrics.get('network_out'),
+                metrics.get('process_count')
+            ))
+            
+            conn.commit()
+            return cursor.lastrowid
+    
+    def get_agent_metrics(self, agent_id: str, hours: int = 24) -> List[Dict[str, Any]]:
+        """Get agent metrics for the last N hours"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT * FROM agent_metrics 
+                WHERE agent_id = ? 
+                AND timestamp > datetime('now', '-{} hours')
+                ORDER BY timestamp DESC
+            '''.format(hours), (agent_id,))
+            
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
+    
+    # Alert methods
+    def create_alert(self, agent_id: str, alert_type: str, severity: str, message: str, details: Dict = None) -> int:
+        """Create a new alert"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            details_json = json.dumps(details) if details else None
+            
+            cursor.execute('''
+                INSERT INTO alerts (agent_id, alert_type, severity, message, details)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (agent_id, alert_type, severity, message, details_json))
+            
+            conn.commit()
+            return cursor.lastrowid
+    
+    def get_active_alerts(self, agent_id: str = None) -> List[Dict[str, Any]]:
+        """Get active alerts, optionally filtered by agent"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            if agent_id:
+                cursor.execute('''
+                    SELECT * FROM alerts 
+                    WHERE agent_id = ? AND is_resolved = FALSE
+                    ORDER BY created_at DESC
+                ''', (agent_id,))
+            else:
+                cursor.execute('''
+                    SELECT * FROM alerts 
+                    WHERE is_resolved = FALSE
+                    ORDER BY created_at DESC
+                ''')
+            
+            rows = cursor.fetchall()
+            alerts = []
+            for row in rows:
+                alert = dict(row)
+                alert['details'] = json.loads(alert['details']) if alert['details'] else {}
+                alerts.append(alert)
+            
+            return alerts
+    
+    def resolve_alert(self, alert_id: int) -> bool:
+        """Mark an alert as resolved"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            cursor.execute('''
+                UPDATE alerts 
+                SET is_resolved = TRUE, resolved_at = ?
+                WHERE id = ?
+            ''', (datetime.now().isoformat(), alert_id))
+            
+            conn.commit()
+            return cursor.rowcount > 0
+    
+    # Audit log methods
+    def add_audit_log(self, user_id: int, action: str, resource_type: str = None, 
+                      resource_id: str = None, details: Dict = None, ip_address: str = None, 
+                      user_agent: str = None) -> int:
+        """Add an audit log entry"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            details_json = json.dumps(details) if details else None
+            
+            cursor.execute('''
+                INSERT INTO audit_logs 
+                (user_id, action, resource_type, resource_id, details, ip_address, user_agent)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (user_id, action, resource_type, resource_id, details_json, ip_address, user_agent))
+            
+            conn.commit()
+            return cursor.lastrowid
+    
+    def get_audit_logs(self, user_id: int = None, limit: int = 100) -> List[Dict[str, Any]]:
+        """Get audit logs, optionally filtered by user"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            if user_id:
+                cursor.execute('''
+                    SELECT * FROM audit_logs 
+                    WHERE user_id = ?
+                    ORDER BY timestamp DESC
+                    LIMIT ?
+                ''', (user_id, limit))
+            else:
+                cursor.execute('''
+                    SELECT * FROM audit_logs 
+                    ORDER BY timestamp DESC
+                    LIMIT ?
+                ''', (limit,))
+            
+            rows = cursor.fetchall()
+            logs = []
+            for row in rows:
+                log = dict(row)
+                log['details'] = json.loads(log['details']) if log['details'] else {}
+                logs.append(log)
+            
+            return logs
 
 # Global database manager instance
-db_manager = DatabaseManager() 
+db_manager = DatabaseManager()
