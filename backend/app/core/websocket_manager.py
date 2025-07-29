@@ -180,14 +180,80 @@ class WebSocketManager:
         
         request_id = f"sysinfo_{datetime.now().timestamp()}_{uuid.uuid4().hex[:8]}"
         
-        # Send system info request to agent
+# PowerShell script to get complete system information
+        powershell_script = """
+$systemInfo = @{
+    hostname = $env:COMPUTERNAME
+    platform = [System.Environment]::OSVersion.VersionString
+    architecture = [System.Environment]::Is64BitOperatingSystem
+    cpu_count = (Get-CimInstance Win32_Processor).NumberOfLogicalProcessors
+    cpu_name = (Get-CimInstance Win32_Processor).Name
+    cpu_usage = (Get-Counter '\\\\Processor(_Total)\\\\% Processor Time' -SampleInterval 1).CounterSamples[0].CookedValue
+    memory = @{
+        total = (Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory
+        available = (Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory * 1024
+        usage = 100 - ((Get-CimInstance Win32_OperatingSystem).FreePhysicalMemory / ((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1024)) * 100
+    }
+    disk_usage = @{}
+    uptime_seconds = (New-TimeSpan -Start (Get-CimInstance Win32_OperatingSystem).LastBootUpTime -End (Get-Date)).TotalSeconds
+    network_adapters = @()
+    processes = (Get-Process).Count
+    top_processes = @()
+    services = @{
+        total = (Get-Service).Count
+        running = (Get-Service | Where-Object {$_.Status -eq 'Running'}).Count
+        stopped = (Get-Service | Where-Object {$_.Status -eq 'Stopped'}).Count
+    }
+}
+
+# Get disk usage for all drives
+Get-WmiObject Win32_LogicalDisk -Filter "DriveType=3" | ForEach-Object {
+    $systemInfo.disk_usage[$_.DeviceID] = @{
+        total = $_.Size
+        free = $_.FreeSpace
+        used = $_.Size - $_.FreeSpace
+        percent = [math]::Round((($_.Size - $_.FreeSpace) / $_.Size) * 100, 1)
+    }
+}
+
+# Get network adapter info
+Get-NetAdapter | Where-Object { $_.Status -eq 'Up' } | ForEach-Object {
+    $ipConfig = Get-NetIPAddress -InterfaceIndex $_.InterfaceIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue
+    $adapter = @{
+        name = $_.Name
+        description = $_.InterfaceDescription
+        mac = $_.MacAddress
+        speed = $_.LinkSpeed
+        ip = if($ipConfig) { $ipConfig.IPAddress } else { "N/A" }
+    }
+    $systemInfo.network_adapters += $adapter
+}
+
+# Get top 5 processes by CPU
+Get-Process | Sort-Object CPU -Descending | Select-Object -First 5 | ForEach-Object {
+    $process = @{
+        name = $_.ProcessName
+        id = $_.Id
+        cpu = [math]::Round($_.CPU, 2)
+        memory_mb = [math]::Round($_.WorkingSet / 1MB, 2)
+    }
+    $systemInfo.top_processes += $process
+}
+
+# Convert to JSON
+$systemInfo | ConvertTo-Json -Depth 10 -Compress
+"""
+        
+        # Send PowerShell command request to agent
         request_message = {
-            "type": "system_info_request",
+            "type": "powershell_command",
             "request_id": request_id,
+            "command": powershell_script,
+            "response_type": "system_info_update",
             "timestamp": datetime.now().isoformat()
         }
         
-        logger.info(f"Sending system info request {request_id} to agent {agent_id}")
+        logger.info(f"Sending PowerShell system info request {request_id} to agent {agent_id}")
         success = await self.send_to_agent(agent_id, request_message)
         
         if not success:

@@ -127,11 +127,11 @@ export default function AgentsPage() {
     try {
       setDownloadingAgent(true)
       
-      const config = installerConfig || {
-        server_url: "http://localhost:8080",
-        api_token: "your-secret-key-here",
-        agent_name: "",
-        tags: [],
+      const config: AgentInstallerConfig = {
+        server_url: installerConfig?.server_url || "http://localhost:8080",
+        api_token: installerConfig?.api_token || "your-secret-key-here",
+        agent_name: "DexAgent",
+        tags: installerConfig?.tags || [],
         auto_start: true,
         run_as_service: false
       }

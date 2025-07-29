@@ -138,47 +138,43 @@ class DexAgent:
     def _get_system_info(self) -> Dict[str, Any]:
         """Get current system information"""
         try:
-            # Get CPU info
+            return self._get_system_info_fallback()
+        except Exception as e:
+            logger.error(f"Error getting system info: {{e}}")
+            return {{}}
+    
+    def _get_system_info_fallback(self) -> Dict[str, Any]:
+        """Fallback method using psutil if PowerShell fails"""
+        try:
             cpu_percent = psutil.cpu_percent(interval=1)
-            cpu_count = psutil.cpu_count()
-            cpu_freq = psutil.cpu_freq()
-            
-            # Get memory info
             memory = psutil.virtual_memory()
             
-            # Get disk usage for all drives
             disk_usage = {{}}
-            if platform.system() == 'Windows':
-                for partition in psutil.disk_partitions():
-                    if partition.fstype:
-                        try:
-                            usage = psutil.disk_usage(partition.mountpoint)
-                            disk_usage[partition.device.replace('\\\\', '')] = round(usage.percent, 1)
-                        except PermissionError:
-                            continue
-            else:
-                usage = psutil.disk_usage('/')
-                disk_usage['/'] = round(usage.percent, 1)
+            for partition in psutil.disk_partitions():
+                if partition.fstype:
+                    try:
+                        usage = psutil.disk_usage(partition.mountpoint)
+                        disk_usage[partition.device.replace('\\\\', '')] = round(usage.percent, 1)
+                    except PermissionError:
+                        continue
             
             return {{
                 "cpu_usage": cpu_percent,
-                "cpu_percent": cpu_percent,  # Alias for compatibility
+                "cpu_percent": cpu_percent,
                 "memory_usage": memory.percent,
-                "memory_percent": memory.percent,  # Alias for compatibility
+                "memory_percent": memory.percent,
                 "disk_usage": disk_usage,
-                "disk_percent": disk_usage.get('C:', disk_usage.get('/', 0)),  # Compatibility
                 "uptime": time.time() - psutil.boot_time(),
                 "hostname": socket.gethostname(),
                 "platform": platform.platform(),
                 "architecture": platform.architecture()[0],
-                "cpu_count": cpu_count,
-                "cpu_freq": cpu_freq.current if cpu_freq else None,
+                "cpu_count": psutil.cpu_count(),
                 "total_memory": memory.total,
                 "available_memory": memory.available,
-                "used_memory": memory.used
+                "process_count": len(psutil.pids())
             }}
         except Exception as e:
-            logger.error(f"Error getting system info: {{e}}")
+            logger.error(f"Error in fallback system info: {{e}}")
             return {{}}
     
     async def connect(self):
@@ -264,12 +260,17 @@ class DexAgent:
         """Process incoming command from server"""
         message_type = data.get("type")
         
+        logger.info(f"Processing message type: {{message_type}}")
+        
         if message_type == "command":
             await self._execute_command(data.get("data", {{}}))
         elif message_type == "ping":
             await self._send_pong()
         elif message_type == "system_info_request":
             await self._send_system_info_update()
+        elif message_type == "powershell_command":
+            logger.info("Received PowerShell command via WebSocket")
+            await self._execute_powershell_json(data)
         else:
             logger.warning(f"Unknown message type: {{message_type}}")
     
@@ -329,6 +330,8 @@ class DexAgent:
     async def _execute_powershell(self, command: str) -> Dict[str, Any]:
         """Execute PowerShell command"""
         try:
+            logger.info(f"Executing PowerShell command: {{command[:100]}}...")
+            
             process = await asyncio.create_subprocess_exec(
                 "powershell.exe", "-Command", command,
                 stdout=asyncio.subprocess.PIPE,
@@ -337,13 +340,20 @@ class DexAgent:
             
             stdout, stderr = await process.communicate()
             
-            return {{
+            result = {{
                 "success": process.returncode == 0,
                 "output": stdout.decode('utf-8', errors='ignore'),
                 "error": stderr.decode('utf-8', errors='ignore'),
                 "return_code": process.returncode
             }}
+            
+            logger.info(f"PowerShell command finished with return code: {{process.returncode}}")
+            if not result["success"]:
+                logger.error(f"PowerShell error: {{result['error']}}")
+            
+            return result
         except Exception as e:
+            logger.error(f"Exception executing PowerShell: {{str(e)}}")
             return {{
                 "success": False,
                 "output": "",
@@ -390,17 +400,8 @@ class DexAgent:
     async def _send_system_info_update(self):
         """Send current system information to server"""
         try:
-            # Get fresh system information
+            # Get fresh system information via PowerShell
             system_info = self._get_system_info()
-            
-            # Get more detailed system information
-            system_info.update({{
-                "cpu_count": psutil.cpu_count(),
-                "cpu_freq": psutil.cpu_freq().current if psutil.cpu_freq() else None,
-                "boot_time": psutil.boot_time(),
-                "network_info": self._get_network_info(),
-                "process_count": len(psutil.pids())
-            }})
             
             # Send system info update message
             update_msg = {{
@@ -430,6 +431,115 @@ class DexAgent:
             return network_info
         except Exception as e:
             logger.error(f"Error getting network info: {{e}}")
+            return {{}}
+    
+    async def _execute_powershell_json(self, message_data: Dict[str, Any]):
+        """Execute PowerShell command and return JSON response"""
+        try:
+            request_id = message_data.get("request_id")
+            command = message_data.get("command", "")
+            response_type = message_data.get("response_type", "powershell_result")
+            
+            logger.info(f"Executing PowerShell JSON command for request {{request_id}}")
+            
+            # Execute PowerShell command
+            result = await self._execute_powershell(command)
+            
+            if result['success'] and result['output']:
+                try:
+                    # Try to parse JSON output
+                    json_data = json.loads(result['output'])
+                    
+                    # Send response based on response_type
+                    if response_type == "system_info_update":
+                        # Format system info data
+                        formatted_data = self._format_powershell_system_info(json_data)
+                        
+                        # Send system info update
+                        update_msg = {{
+                            "type": "system_info_update",
+                            "data": formatted_data,
+                            "request_id": request_id,
+                            "timestamp": datetime.now().isoformat()
+                        }}
+                        await self.websocket.send(json.dumps(update_msg))
+                        logger.info("PowerShell system info update sent")
+                    else:
+                        # Send generic PowerShell result
+                        response_msg = {{
+                            "type": "powershell_result",
+                            "request_id": request_id,
+                            "data": json_data,
+                            "success": True,
+                            "timestamp": datetime.now().isoformat()
+                        }}
+                        await self.websocket.send(json.dumps(response_msg))
+                        
+                except json.JSONDecodeError:
+                    # If not JSON, send as plain text result
+                    response_msg = {{
+                        "type": "powershell_result",
+                        "request_id": request_id,
+                        "data": {{"output": result['output']}},
+                        "success": True,
+                        "timestamp": datetime.now().isoformat()
+                    }}
+                    await self.websocket.send(json.dumps(response_msg))
+            else:
+                # Send error response
+                response_msg = {{
+                    "type": "powershell_result",
+                    "request_id": request_id,
+                    "data": {{"error": result.get('error', 'Command failed')}},
+                    "success": False,
+                    "timestamp": datetime.now().isoformat()
+                }}
+                await self.websocket.send(json.dumps(response_msg))
+                
+        except Exception as e:
+            logger.error(f"Error executing PowerShell JSON command: {{e}}")
+            # Send error response
+            if self.websocket:
+                error_response = {{
+                    "type": "powershell_result",
+                    "request_id": message_data.get("request_id"),
+                    "data": {{"error": str(e)}},
+                    "success": False,
+                    "timestamp": datetime.now().isoformat()
+                }}
+                await self.websocket.send(json.dumps(error_response))
+    
+    def _format_powershell_system_info(self, ps_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Format PowerShell system info data for compatibility"""
+        try:
+            # Format disk usage
+            disk_usage = {{}}
+            for drive, info in ps_data.get('disk_usage', {{}}).items():
+                disk_usage[drive] = info.get('percent', 0)
+            
+            return {{
+                "cpu_usage": round(ps_data.get('cpu_usage', 0), 1),
+                "cpu_percent": round(ps_data.get('cpu_usage', 0), 1),
+                "cpu_name": ps_data.get('cpu_name', 'Unknown'),
+                "memory_usage": round(ps_data.get('memory', {{}}).get('usage', 0), 1),
+                "memory_percent": round(ps_data.get('memory', {{}}).get('usage', 0), 1),
+                "disk_usage": disk_usage,
+                "disk_percent": disk_usage.get('C:', 0),
+                "uptime": ps_data.get('uptime_seconds', 0),
+                "hostname": ps_data.get('hostname', socket.gethostname()),
+                "platform": ps_data.get('platform', platform.platform()),
+                "architecture": "64bit" if ps_data.get('architecture', True) else "32bit",
+                "cpu_count": ps_data.get('cpu_count', 0),
+                "total_memory": ps_data.get('memory', {{}}).get('total', 0),
+                "available_memory": ps_data.get('memory', {{}}).get('available', 0),
+                "network_adapters": ps_data.get('network_adapters', []),
+                "process_count": ps_data.get('processes', 0),
+                "top_processes": ps_data.get('top_processes', []),
+                "services": ps_data.get('services', {{}}),
+                "raw_powershell_data": ps_data
+            }}
+        except Exception as e:
+            logger.error(f"Error formatting PowerShell system info: {{e}}")
             return {{}}
     
     async def disconnect(self):

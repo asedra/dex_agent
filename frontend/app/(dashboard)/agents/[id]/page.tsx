@@ -103,20 +103,36 @@ export default function AgentDetailPage() {
       setRefreshing(true)
       const result = await apiClient.refreshAgent(agent.id)
       
-      // Wait a bit for agent to send updated system info
+      // Preserve current system_info to prevent UI flickering
+      const currentSystemInfo = agent.system_info
+      
+      // Wait longer for PowerShell command to complete and agent to send updated info
       setTimeout(async () => {
         try {
-          const updatedAgent = await apiClient.getAgent(agent.id)
-          setAgent(updatedAgent)
-          
-          toast({
-            title: "Success",
-            description: "Agent information refreshed successfully",
-          })
+          if (agent?.id) {
+            const updatedAgent = await apiClient.getAgent(agent.id)
+            
+            // If the updated agent doesn't have system_info, preserve the current one
+            if (!updatedAgent.system_info || Object.keys(updatedAgent.system_info).length === 0) {
+              updatedAgent.system_info = currentSystemInfo
+            }
+            
+            setAgent(updatedAgent)
+            
+            toast({
+              title: "Success",
+              description: "Agent information refreshed successfully",
+            })
+          }
         } catch (err) {
           console.error("Error fetching updated agent:", err)
+          toast({
+            title: "Warning",
+            description: "Agent refresh initiated, but updated data may take a moment to appear",
+            variant: "default",
+          })
         }
-      }, 1000) // Wait 1 second for agent to process and send update
+      }, 3000) // Wait 3 seconds for PowerShell command to complete
       
     } catch (err) {
       toast({
@@ -125,7 +141,7 @@ export default function AgentDetailPage() {
         variant: "destructive",
       })
     } finally {
-      setTimeout(() => setRefreshing(false), 1100) // Stop refreshing after update
+      setTimeout(() => setRefreshing(false), 3100) // Stop refreshing after update
     }
   }
 
@@ -623,7 +639,7 @@ export default function AgentDetailPage() {
             </Card>
 
             {/* System Health */}
-            {agent.system_info && Object.keys(agent.system_info).length > 0 && (
+            {agent.system_info && (typeof agent.system_info === 'object') && Object.keys(agent.system_info).length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -687,6 +703,16 @@ export default function AgentDetailPage() {
                     </div>
                     <Progress value={Number(agent.system_info.cpu_usage) || 0} className="h-2" />
                   </div>
+                  {agent.system_info.cpu_name && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Model</span>
+                      <span className="text-sm font-medium text-xs">{agent.system_info.cpu_name}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Cores</span>
+                    <span className="text-sm font-medium">{agent.system_info.cpu_count || 'N/A'}</span>
+                  </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Architecture</span>
                     <span className="text-sm font-medium">{agent.system_info.architecture || 'N/A'}</span>
@@ -709,6 +735,18 @@ export default function AgentDetailPage() {
                     </div>
                     <Progress value={Number(agent.system_info.memory_usage) || 0} className="h-2" />
                   </div>
+                  {agent.system_info.total_memory && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Total</span>
+                      <span className="text-sm font-medium">{(agent.system_info.total_memory / (1024 * 1024 * 1024)).toFixed(1)} GB</span>
+                    </div>
+                  )}
+                  {agent.system_info.available_memory && (
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Available</span>
+                      <span className="text-sm font-medium">{(agent.system_info.available_memory / (1024 * 1024 * 1024)).toFixed(1)} GB</span>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -732,6 +770,16 @@ export default function AgentDetailPage() {
                     <span className="text-sm text-muted-foreground">Platform</span>
                     <span className="text-sm font-medium">{agent.system_info.platform || agent.os || 'N/A'}</span>
                   </div>
+                  {agent.system_info.network_adapters && agent.system_info.network_adapters.length > 0 && (
+                    <div className="border-t pt-2 mt-2">
+                      <span className="text-xs text-muted-foreground block mb-1">Active Adapters</span>
+                      {agent.system_info.network_adapters.slice(0, 2).map((adapter, index) => (
+                        <div key={index} className="text-xs">
+                          <span className="font-medium">{adapter.name}:</span> {adapter.ip}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -752,6 +800,84 @@ export default function AgentDetailPage() {
                             <span className="text-sm font-medium">{usage && typeof usage === 'number' ? usage.toFixed(1) : '0.0'}%</span>
                           </div>
                           <Progress value={Number(usage) || 0} className="h-2" />
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {agent.system_info.services && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      Services
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Total</span>
+                      <span className="text-sm font-medium">{agent.system_info.services.total || 0}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Running</span>
+                      <Badge variant="default" className="bg-green-100 text-green-800">
+                        {agent.system_info.services.running || 0}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Stopped</span>
+                      <Badge variant="secondary">
+                        {agent.system_info.services.stopped || 0}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {agent.system_info.process_count && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Activity className="h-5 w-5" />
+                      Processes
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-muted-foreground">Total Running</span>
+                      <span className="text-sm font-medium">{agent.system_info.process_count}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {agent.system_info.top_processes && agent.system_info.top_processes.length > 0 && (
+                <Card className="md:col-span-2 lg:col-span-3">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5" />
+                      Top Processes by CPU
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {agent.system_info.top_processes.map((proc, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 border rounded">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline">{index + 1}</Badge>
+                            <div>
+                              <div className="font-medium">{proc.name}</div>
+                              <div className="text-xs text-muted-foreground">PID: {proc.id}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right">
+                              <div className="text-sm">CPU: {proc.cpu}s</div>
+                              <div className="text-xs text-muted-foreground">RAM: {proc.memory_mb} MB</div>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
