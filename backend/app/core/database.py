@@ -675,6 +675,115 @@ class DatabaseManager:
                 logs.append(log)
             
             return logs
+    
+    # PowerShell Command methods  
+    def save_powershell_command(self, command_data: Dict[str, Any]) -> bool:
+        """Save a PowerShell command"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute('''
+                    INSERT INTO powershell_commands 
+                    (id, name, description, category, command, parameters, tags, version, author, is_system, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    command_data['id'],
+                    command_data['name'],
+                    command_data.get('description'),
+                    command_data.get('category', 'general'),
+                    command_data['command'],
+                    json.dumps(command_data.get('parameters', [])),
+                    json.dumps(command_data.get('tags', [])),
+                    command_data.get('version', '1.0'),
+                    command_data.get('author', 'Unknown'),
+                    command_data.get('is_system', False),
+                    command_data.get('created_at'),
+                    command_data.get('updated_at')
+                ))
+                
+                conn.commit()
+                return True
+            except sqlite3.Error as e:
+                logger.error(f"Error saving PowerShell command: {str(e)}")
+                return False
+    
+    def get_all_saved_commands(self) -> List[Dict[str, Any]]:
+        """Get all saved PowerShell commands"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT * FROM powershell_commands 
+                ORDER BY created_at DESC
+            ''')
+            
+            rows = cursor.fetchall()
+            commands = []
+            for row in rows:
+                command = dict(row)
+                command['parameters'] = json.loads(command['parameters']) if command['parameters'] else []
+                command['tags'] = json.loads(command['tags']) if command['tags'] else []
+                commands.append(command)
+            
+            return commands
+    
+    def get_saved_command(self, command_id: str) -> Optional[Dict[str, Any]]:
+        """Get a saved PowerShell command by ID"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM powershell_commands WHERE id = ?', (command_id,))
+            row = cursor.fetchone()
+            
+            if row:
+                command = dict(row)
+                command['parameters'] = json.loads(command['parameters']) if command['parameters'] else []
+                command['tags'] = json.loads(command['tags']) if command['tags'] else []
+                return command
+            return None
+    
+    def update_saved_command(self, command_id: str, command_data: Dict[str, Any]) -> bool:
+        """Update a saved PowerShell command"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute('''
+                    UPDATE powershell_commands 
+                    SET name = ?, description = ?, category = ?, command = ?, 
+                        parameters = ?, tags = ?, version = ?, author = ?, 
+                        updated_at = ?
+                    WHERE id = ?
+                ''', (
+                    command_data['name'],
+                    command_data.get('description'),
+                    command_data.get('category', 'general'),
+                    command_data['command'],
+                    json.dumps(command_data.get('parameters', [])),
+                    json.dumps(command_data.get('tags', [])),
+                    command_data.get('version', '1.0'),
+                    command_data.get('author', 'Unknown'),
+                    command_data.get('updated_at'),
+                    command_id
+                ))
+                
+                conn.commit()
+                return cursor.rowcount > 0
+            except sqlite3.Error as e:
+                logger.error(f"Error updating PowerShell command: {str(e)}")
+                return False
+    
+    def delete_saved_command(self, command_id: str) -> bool:
+        """Delete a saved PowerShell command"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute('DELETE FROM powershell_commands WHERE id = ?', (command_id,))
+                conn.commit()
+                return cursor.rowcount > 0
+            except sqlite3.Error as e:
+                logger.error(f"Error deleting PowerShell command: {str(e)}")
+                return False
 
 # Lazy loading wrapper for database manager
 class LazyDatabaseManager:

@@ -188,6 +188,30 @@ async def handle_agent_message(agent_id: str, message: Dict[str, Any]):
             logger.info(f"Command response stored for command_id: {command_id}")
         else:
             logger.warning(f"No command_id in command result from agent {agent_id}")
+            
+    elif message_type == "powershell_result":
+        # Handle PowerShell command result
+        request_id = message.get("request_id")
+        data = message.get("data", {})
+        success = message.get("success", False)
+        
+        logger.info(f"PowerShell result received from agent {agent_id}, request_id: {request_id}")
+        logger.info(f"PowerShell result data: {data}")
+        
+        if request_id:
+            # Format response data for PowerShell results
+            response_data = {
+                "status": "completed",
+                "success": success,
+                "output": data,
+                "error": data.get("error") if not success else "",
+                "execution_time": data.get("execution_time", 0.0),
+                "timestamp": message.get("timestamp", datetime.now().isoformat())
+            }
+            websocket_manager.store_command_response(request_id, response_data)
+            logger.info(f"PowerShell response stored for request_id: {request_id}")
+        else:
+            logger.warning(f"No request_id in PowerShell result from agent {agent_id}")
         
         # Also store in database (ignore database errors for now)
         try:

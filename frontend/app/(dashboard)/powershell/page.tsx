@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,8 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
+  Trash2,
+  Users,
 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
@@ -34,100 +36,80 @@ import {
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { apiClient, PowerShellCommand, CommandResponse } from "@/lib/api"
+import { Checkbox } from "@/components/ui/checkbox"
+import { 
+  apiClient, 
+  SavedPowerShellCommand, 
+  PowerShellCommandExecution,
+  CommandParameter,
+  Agent 
+} from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
+import CreateCommandForm from "@/components/CreateCommandForm"
 
-const categories = [
-  { id: "all", name: "All Commands", icon: Terminal, count: 24 },
-  { id: "network", name: "Network", icon: Network, count: 8 },
-  { id: "disk", name: "Disk & Storage", icon: HardDrive, count: 6 },
-  { id: "security", name: "Security", icon: Shield, count: 5 },
-  { id: "system", name: "System Info", icon: Settings, count: 3 },
-  { id: "monitoring", name: "Monitoring", icon: Activity, count: 2 },
-]
+const getCategoriesWithCounts = (commands: SavedPowerShellCommand[]) => {
+  const categoryCounts = commands.reduce((acc, cmd) => {
+    acc[cmd.category] = (acc[cmd.category] || 0) + 1
+    return acc
+  }, {} as Record<string, number>)
 
-const mockCommands = [
-  {
-    id: "1",
-    name: "Get System Information",
-    description: "Retrieves comprehensive system information including OS, hardware, and network details",
-    category: "system",
-    command: "Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors",
-    parameters: [],
-    version: "1.2",
-    author: "Admin",
-    lastModified: "2024-01-15",
-    tags: ["system", "hardware", "info"],
-  },
-  {
-    id: "2",
-    name: "Check Disk Space",
-    description: "Monitors disk space usage across all drives",
-    category: "disk",
-    command:
-      "Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name='Size(GB)';Expression={[math]::Round($_.Size/1GB,2)}}, @{Name='FreeSpace(GB)';Expression={[math]::Round($_.FreeSpace/1GB,2)}}",
-    parameters: [],
-    version: "1.0",
-    author: "Admin",
-    lastModified: "2024-01-14",
-    tags: ["disk", "storage", "monitoring"],
-  },
-  {
-    id: "3",
-    name: "Get Network Configuration",
-    description: "Retrieves network adapter configuration and IP settings",
-    category: "network",
-    command: "Get-NetIPConfiguration | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway",
-    parameters: [],
-    version: "1.1",
-    author: "Network Admin",
-    lastModified: "2024-01-13",
-    tags: ["network", "ip", "configuration"],
-  },
-  {
-    id: "4",
-    name: "Get Event Logs",
-    description: "Retrieves system event logs with customizable parameters",
-    category: "monitoring",
-    command: "Get-EventLog -LogName $LogName -Newest $Count | Where-Object {$_.EntryType -eq '$Level'}",
-    parameters: [
-      { name: "LogName", type: "string", default: "System", description: "Log name to query" },
-      { name: "Count", type: "number", default: "100", description: "Number of entries to retrieve" },
-      { name: "Level", type: "string", default: "Error", description: "Event level filter" },
-    ],
-    version: "2.0",
-    author: "SOC Team",
-    lastModified: "2024-01-12",
-    tags: ["logs", "events", "monitoring", "troubleshooting"],
-  },
-  {
-    id: "5",
-    name: "Security Audit",
-    description: "Performs basic security audit checks",
-    category: "security",
-    command:
-      "Get-LocalUser | Select-Object Name, Enabled, LastLogon; Get-Service | Where-Object {$_.Status -eq 'Running' -and $_.Name -like '*Remote*'}",
-    parameters: [],
-    version: "1.3",
-    author: "Security Team",
-    lastModified: "2024-01-11",
-    tags: ["security", "audit", "users", "services"],
-  },
-]
+  const baseCategories = [
+    { id: "all", name: "All Commands", icon: Terminal, count: commands.length },
+    { id: "system", name: "System Info", icon: Settings, count: categoryCounts.system || 0 },
+    { id: "network", name: "Network", icon: Network, count: categoryCounts.network || 0 },
+    { id: "disk", name: "Disk & Storage", icon: HardDrive, count: categoryCounts.disk || 0 },
+    { id: "security", name: "Security", icon: Shield, count: categoryCounts.security || 0 },
+    { id: "monitoring", name: "Monitoring", icon: Activity, count: categoryCounts.monitoring || 0 },
+    { id: "general", name: "General", icon: Terminal, count: categoryCounts.general || 0 },
+  ]
+
+  return baseCategories.filter(cat => cat.id === "all" || cat.count > 0)
+}
 
 export default function PowerShellLibraryPage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCommand, setSelectedCommand] = useState<any>(null)
+  const [selectedCommand, setSelectedCommand] = useState<SavedPowerShellCommand | null>(null)
   const [executing, setExecuting] = useState(false)
-  const [executionResult, setExecutionResult] = useState<CommandResponse | null>(null)
+  const [executionResult, setExecutionResult] = useState<any>(null)
+  const [commands, setCommands] = useState<SavedPowerShellCommand[]>([])
+  const [agents, setAgents] = useState<Agent[]>([])
+  const [selectedAgents, setSelectedAgents] = useState<string[]>([])
+  const [loading, setLoading] = useState(true)
+  const [parameterValues, setParameterValues] = useState<Record<string, any>>({})
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const { toast } = useToast()
 
-  const filteredCommands = mockCommands.filter((command) => {
+  const categories = getCategoriesWithCounts(commands)
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true)
+        const [commandsData, agentsData] = await Promise.all([
+          apiClient.getSavedCommands(),
+          apiClient.getAgents()
+        ])
+        setCommands(commandsData)
+        setAgents(agentsData)
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load data",
+          variant: "destructive",
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadData()
+  }, [toast])
+
+  const filteredCommands = commands.filter((command) => {
     const matchesCategory = selectedCategory === "all" || command.category === selectedCategory
     const matchesSearch =
       command.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      command.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (command.description && command.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
       command.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()))
     return matchesCategory && matchesSearch
   })
@@ -137,27 +119,110 @@ export default function PowerShellLibraryPage() {
     return category ? category.icon : Terminal
   }
 
-  const executeCommand = async (command: PowerShellCommand) => {
+  const pollCommandResult = async (agentId: string, commandId: string, maxAttempts = 10): Promise<any> => {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        const result = await apiClient.getCommandResult(agentId, commandId)
+        
+        if (result.status === 'pending') {
+          // Wait 2 seconds before next attempt
+          await new Promise(resolve => setTimeout(resolve, 2000))
+          continue
+        }
+        
+        return result
+      } catch (error) {
+        if (attempt === maxAttempts - 1) {
+          throw error
+        }
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      }
+    }
+    
+    throw new Error('Command execution timeout')
+  }
+
+  const executeCommand = async (command: SavedPowerShellCommand) => {
+    if (selectedAgents.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please select at least one agent",
+        variant: "destructive",
+      })
+      return
+    }
+
     try {
       setExecuting(true)
       setExecutionResult(null)
       
-      const result = await apiClient.executeCommand(command)
-      setExecutionResult(result)
-      
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: "Command executed successfully",
-        })
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Command execution failed",
-          variant: "destructive",
-        })
+      const execution: PowerShellCommandExecution = {
+        command_id: command.id!,
+        parameters: parameterValues,
+        agent_ids: selectedAgents,
+        timeout: 30
       }
+      
+      const result = await apiClient.executeSavedCommand(command.id!, execution)
+      
+      toast({
+        title: "Success", 
+        description: `Command sent to ${selectedAgents.length} agent(s). Waiting for results...`,
+      })
+
+      // Poll for command execution results
+      const agentResults: Record<string, any> = {}
+      
+      await Promise.all(selectedAgents.map(async (agentId, index) => {
+        try {
+          const commandId = result.results[index]?.command_id
+          if (!commandId) {
+            throw new Error('No command ID received')
+          }
+          
+          const commandResult = await pollCommandResult(agentId, commandId)
+          
+          if (commandResult.status === 'completed' && commandResult.result) {
+            // Handle successful execution
+            if (commandResult.result.success) {
+              agentResults[agentId] = {
+                success: true,
+                output: typeof commandResult.result.output === 'string' 
+                  ? JSON.parse(commandResult.result.output) 
+                  : commandResult.result.output,
+                execution_time: commandResult.result.execution_time || 0,
+                timestamp: commandResult.result.timestamp || new Date().toISOString()
+              }
+            } else {
+              // Command completed but failed
+              throw new Error(commandResult.result.error || 'Command execution failed')
+            }
+          } else {
+            // Command not completed or no result
+            const errorMessage = commandResult.result?.error || commandResult.error || 'Command execution failed or timed out'
+            throw new Error(errorMessage)
+          }
+        } catch (error) {
+          console.error(`Error getting result for agent ${agentId}:`, error)
+          
+          agentResults[agentId] = {
+            success: false,
+            error: error instanceof Error ? error.message : "Failed to get command result",
+            execution_time: 0,
+            timestamp: new Date().toISOString()
+          }
+        }
+      }))
+      
+      setExecutionResult(agentResults)
+      
+      toast({
+        title: "Completed",
+        description: `Results received from ${Object.keys(agentResults).length} agent(s)`,
+      })
+      
     } catch (error) {
+      console.error('Execute command error:', error)
       toast({
         title: "Error",
         description: "Failed to execute command",
@@ -165,6 +230,23 @@ export default function PowerShellLibraryPage() {
       })
     } finally {
       setExecuting(false)
+    }
+  }
+
+  const deleteCommand = async (commandId: string) => {
+    try {
+      await apiClient.deleteSavedCommand(commandId)
+      setCommands(commands.filter(cmd => cmd.id !== commandId))
+      toast({
+        title: "Success",
+        description: "Command deleted successfully",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete command",
+        variant: "destructive",
+      })
     }
   }
 
@@ -178,14 +260,45 @@ export default function PowerShellLibraryPage() {
             <p className="text-muted-foreground">Manage and execute PowerShell commands across your agents</p>
           </div>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Command
-        </Button>
+        <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Command
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Create New PowerShell Command</DialogTitle>
+              <DialogDescription>
+                Create a reusable PowerShell command template with parameters
+              </DialogDescription>
+            </DialogHeader>
+            <CreateCommandForm 
+              onSubmit={async (command) => {
+                try {
+                  const newCommand = await apiClient.createSavedCommand(command)
+                  setCommands([newCommand, ...commands])
+                  setCreateDialogOpen(false)
+                  toast({
+                    title: "Success",
+                    description: "Command created successfully",
+                  })
+                } catch (error) {
+                  toast({
+                    title: "Error",
+                    description: "Failed to create command",
+                    variant: "destructive",
+                  })
+                }
+              }}
+              onCancel={() => setCreateDialogOpen(false)}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-4">
-        {/* Categories Sidebar */}
         <Card className="lg:col-span-1">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -214,9 +327,7 @@ export default function PowerShellLibraryPage() {
           </CardContent>
         </Card>
 
-        {/* Commands List */}
         <div className="lg:col-span-3 space-y-4">
-          {/* Search */}
           <Card>
             <CardContent className="pt-6">
               <div className="relative">
@@ -231,67 +342,128 @@ export default function PowerShellLibraryPage() {
             </CardContent>
           </Card>
 
-          {/* Commands Grid */}
-          <div className="grid gap-4 md:grid-cols-2">
-            {filteredCommands.map((command) => {
-              const CategoryIcon = getCategoryIcon(command.category)
-              return (
-                <Card key={command.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-2">
-                        <CategoryIcon className="h-5 w-5 text-muted-foreground" />
-                        <CardTitle className="text-lg">{command.name}</CardTitle>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin" />
+              <span className="ml-2">Loading commands...</span>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {filteredCommands.map((command) => {
+                const CategoryIcon = getCategoryIcon(command.category)
+                return (
+                  <Card key={command.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <CategoryIcon className="h-5 w-5 text-muted-foreground" />
+                          <CardTitle className="text-lg">{command.name}</CardTitle>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">v{command.version}</Badge>
+                          {command.is_system && (
+                            <Badge variant="secondary" className="text-xs">System</Badge>
+                          )}
+                        </div>
                       </div>
-                      <Badge variant="outline">v{command.version}</Badge>
-                    </div>
-                    <CardDescription className="line-clamp-2">{command.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex flex-wrap gap-1">
-                      {command.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
+                      <CardDescription className="line-clamp-2">{command.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex flex-wrap gap-1">
+                        {command.tags.map((tag) => (
+                          <Badge key={tag} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
 
-                    <div className="text-xs text-muted-foreground">
-                      <p>
-                        By {command.author} • Modified {command.lastModified}
-                      </p>
-                      {command.parameters.length > 0 && <p>{command.parameters.length} parameter(s)</p>}
-                    </div>
+                      <div className="text-xs text-muted-foreground">
+                        <p>
+                          By {command.author} • {command.updated_at ? new Date(command.updated_at).toLocaleDateString() : 'Unknown'}
+                        </p>
+                        {command.parameters.length > 0 && <p>{command.parameters.length} parameter(s)</p>}
+                      </div>
 
                     <div className="flex gap-2">
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button size="sm" onClick={() => setSelectedCommand(command)}>
+                          <Button size="sm" onClick={() => {
+                            setSelectedCommand(command)
+                            setParameterValues({})
+                            setSelectedAgents([])
+                            setExecutionResult(null)
+                          }}>
                             <Play className="mr-2 h-4 w-4" />
                             Run
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Run Command: {command.name}</DialogTitle>
-                            <DialogDescription>Configure parameters and execute the command</DialogDescription>
+                            <DialogDescription>Configure parameters, select agents and execute the command</DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4">
                             <div>
                               <Label>Command</Label>
                               <Textarea value={command.command} readOnly className="font-mono text-sm" rows={3} />
                             </div>
+                            
                             {command.parameters.length > 0 && (
                               <div className="space-y-2">
                                 <Label>Parameters</Label>
                                 {command.parameters.map((param) => (
                                   <div key={param.name} className="grid grid-cols-3 gap-2 items-center">
-                                    <Label className="text-sm">{param.name}</Label>
-                                    <Input placeholder={param.default} className="col-span-2" />
+                                    <Label className="text-sm font-medium">
+                                      ${param.name}
+                                      {param.required && <span className="text-red-500 ml-1">*</span>}
+                                    </Label>
+                                    <div className="col-span-2">
+                                      <Input 
+                                        placeholder={param.default || `Enter ${param.name}`}
+                                        value={parameterValues[param.name] || ''}
+                                        onChange={(e) => setParameterValues(prev => ({
+                                          ...prev,
+                                          [param.name]: e.target.value
+                                        }))}
+                                      />
+                                      {param.description && (
+                                        <p className="text-xs text-muted-foreground mt-1">{param.description}</p>
+                                      )}
+                                    </div>
                                   </div>
                                 ))}
                               </div>
                             )}
+
+                            <div className="space-y-2">
+                              <Label>Select Agents</Label>
+                              <div className="border rounded-lg p-3 space-y-2 max-h-32 overflow-y-auto">
+                                {agents.filter(agent => agent.status === 'online' && agent.id).map((agent) => (
+                                  <div key={agent.id} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={agent.id!}
+                                      checked={selectedAgents.includes(agent.id!)}
+                                      onCheckedChange={(checked) => {
+                                        if (checked) {
+                                          setSelectedAgents(prev => [...prev, agent.id!])
+                                        } else {
+                                          setSelectedAgents(prev => prev.filter(id => id !== agent.id))
+                                        }
+                                      }}
+                                    />
+                                    <Label htmlFor={agent.id!} className="flex items-center gap-2 cursor-pointer">
+                                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                                      <span>{agent.hostname}</span>
+                                      <Badge variant="outline" className="text-xs">{agent.os}</Badge>
+                                    </Label>
+                                  </div>
+                                ))}
+                                {agents.filter(agent => agent.status === 'online' && agent.id).length === 0 && (
+                                  <p className="text-sm text-muted-foreground">No connected agents available</p>
+                                )}
+                              </div>
+                            </div>
+
                             <div className="flex justify-end gap-2">
                               <Button 
                                 variant="outline" 
@@ -300,66 +472,76 @@ export default function PowerShellLibraryPage() {
                                 Cancel
                               </Button>
                               <Button 
-                                onClick={() => {
-                                  executeCommand({
-                                    command: command.command,
-                                    timeout: 30
-                                  })
-                                }}
-                                disabled={executing}
+                                onClick={() => executeCommand(command)}
+                                disabled={executing || selectedAgents.length === 0}
                               >
                                 {executing ? (
                                   <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    Executing...
+                                    Executing & Polling Results...
                                   </>
                                 ) : (
                                   <>
                                     <Play className="mr-2 h-4 w-4" />
-                                    Execute Command
+                                    Execute on {selectedAgents.length} agent(s)
                                   </>
                                 )}
                               </Button>
                             </div>
                             
-                            {/* Execution Result */}
                             {executionResult && (
-                              <div className="mt-4 p-4 border rounded-lg">
-                                <div className="flex items-center gap-2 mb-2">
-                                  {executionResult.success ? (
-                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                  ) : (
-                                    <XCircle className="h-4 w-4 text-red-600" />
-                                  )}
-                                  <span className="font-medium">
-                                    {executionResult.success ? "Success" : "Failed"}
-                                  </span>
-                                  <span className="text-sm text-muted-foreground">
-                                    ({executionResult.execution_time?.toFixed(2) || '0.00'}s)
-                                  </span>
-                                </div>
-                                {executionResult.output && (
-                                  <div className="mt-2">
-                                    <Label className="text-sm">Output:</Label>
-                                    <Textarea 
-                                      value={executionResult.output} 
-                                      readOnly 
-                                      className="font-mono text-sm mt-1" 
-                                      rows={4}
-                                    />
-                                  </div>
-                                )}
-                                {executionResult.error && (
-                                  <div className="mt-2">
-                                    <Label className="text-sm text-red-600">Error:</Label>
-                                    <Textarea 
-                                      value={executionResult.error} 
-                                      readOnly 
-                                      className="font-mono text-sm mt-1 text-red-600" 
-                                      rows={2}
-                                    />
-                                  </div>
-                                )}
+                              <div className="mt-4 space-y-4">
+                                <Label className="text-lg font-medium">Execution Results</Label>
+                                {Object.entries(executionResult).map(([agentId, result]: [string, any]) => {
+                                  const agent = agents.find(a => a.id === agentId)
+                                  return (
+                                    <div key={agentId} className="p-4 border rounded-lg">
+                                      <div className="flex items-center gap-2 mb-2">
+                                        <Users className="h-4 w-4" />
+                                        <span className="font-medium">{agent?.hostname || agentId}</span>
+                                        {result.success ? (
+                                          <CheckCircle className="h-4 w-4 text-green-600" />
+                                        ) : (
+                                          <XCircle className="h-4 w-4 text-red-600" />
+                                        )}
+                                        <Badge variant={result.success ? "default" : "destructive"} className="text-xs">
+                                          {result.success ? "Success" : "Failed"}
+                                        </Badge>
+                                        <span className="text-sm text-muted-foreground ml-auto">
+                                          {result.execution_time?.toFixed(2) || '0.00'}s
+                                        </span>
+                                      </div>
+                                      {result.note && (
+                                        <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded">
+                                          <Label className="text-sm text-blue-700">Note:</Label>
+                                          <p className="text-xs text-blue-600 mt-1">{result.note}</p>
+                                        </div>
+                                      )}
+                                      {result.output && (
+                                        <div className="mt-2">
+                                          <Label className="text-sm">Output (JSON):</Label>
+                                          <Textarea 
+                                            value={typeof result.output === 'string' ? result.output : JSON.stringify(result.output, null, 2)} 
+                                            readOnly 
+                                            className="font-mono text-sm mt-1" 
+                                            rows={6}
+                                          />
+                                        </div>
+                                      )}
+                                      {result.error && (
+                                        <div className="mt-2">
+                                          <Label className="text-sm text-red-600">Error:</Label>
+                                          <Textarea 
+                                            value={result.error} 
+                                            readOnly 
+                                            className="font-mono text-sm mt-1 text-red-600" 
+                                            rows={2}
+                                          />
+                                        </div>
+                                      )}
+                                    </div>
+                                  )
+                                })}
                               </div>
                             )}
                           </div>
@@ -375,20 +557,33 @@ export default function PowerShellLibraryPage() {
                         <Copy className="mr-2 h-4 w-4" />
                         Clone
                       </Button>
+                      
+                      {!command.is_system && (
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          onClick={() => deleteCommand(command.id!)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
-              )
-            })}
-          </div>
+                )
+              })}
+            </div>
+          )}
 
-          {filteredCommands.length === 0 && (
+          {filteredCommands.length === 0 && !loading && (
             <Card>
               <CardContent className="text-center py-8">
                 <Terminal className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">No commands found</h3>
                 <p className="text-muted-foreground mb-4">No PowerShell commands match your current filters.</p>
-                <Button>
+                <Button onClick={() => setCreateDialogOpen(true)}>
                   <Plus className="mr-2 h-4 w-4" />
                   Create New Command
                 </Button>

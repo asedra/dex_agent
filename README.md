@@ -95,21 +95,28 @@ dexagents/
 └── scripts/                   # 🆕 Deployment scriptleri
 ```
 
-## 🆕 Yeni Özellikler (v3.1)
+## 🆕 Yeni Özellikler (v3.2)
 
-### ⚡ PowerShell WebSocket Integration
-- **Real-time PowerShell Execution**: WebSocket üzerinden anlık PowerShell komut çalıştırma
-- **Comprehensive System Monitoring**: CPU name, services count, network adapters, top processes
-- **JSON Response Handling**: PowerShell çıktılarının JSON formatında işlenmesi
-- **Advanced System Info**: Disk usage, memory details, process monitoring
-- **Non-blocking Commands**: Asenkron komut çalıştırma ve yanıt alma
+### ⚡ PowerShell Library & Execution System
+- **PowerShell Command Library**: Kayıtlı PowerShell komutlarının yönetimi ve çalıştırılması
+- **Real-time Command Execution**: WebSocket üzerinden PowerShell komutlarının anlık çalıştırılması
+- **Agent Selection**: Çoklu agent seçimi ve paralel komut çalıştırma
+- **JSON Response Display**: PowerShell komut sonuçlarının JSON formatında görüntülenmesi
+- **Parameter Support**: Dinamik parametre girişi ve template sistemi
+- **System Commands**: Get System Information, Check Disk Space, Get Network Configuration
 
-### 🔄 Enhanced Agent System
-- **Updated Agent Template**: PowerShell command support ile güncellenmiş agent kodu
-- **Improved Error Handling**: Gelişmiş hata yakalama ve raporlama sistemi
-- **Smart Refresh Logic**: System Health kaybolma sorunu çözüldü
-- **Data Preservation**: UI refresh sırasında veri korunması
-- **Extended Wait Times**: PowerShell komutları için optimize edilmiş bekleme süreleri
+### 🔧 PowerShell Page Features
+- **Interactive Command Management**: Komut oluşturma, düzenleme ve silme arayüzü
+- **Category Filtering**: System, Network, Disk, Security, Monitoring kategorileri
+- **Real-time Agent Status**: Online agent'ların anlık görüntülenmesi
+- **Execution Results**: Detaylı komut sonuçları ve hata raporlama
+- **Polling System**: Asenkron komut sonuçlarının otomatik takibi
+
+### 🔄 Enhanced Error Handling
+- **Robust Result Processing**: Gelişmiş komut sonucu işleme ve hata yakalama
+- **Safe Property Access**: Undefined değerler için güvenli erişim
+- **Detailed Error Messages**: Kullanıcı dostu hata mesajları
+- **Timeout Management**: Komut zaman aşımı ve yeniden deneme mantığı
 
 ### 🗄️ Enhanced Database Schema
 - **10 Tablo**: agents, users, groups, metrics, alerts, audit_logs, sessions, scheduled_tasks, command_history
@@ -286,6 +293,10 @@ WS     /api/v1/ws/dashboard              # Dashboard real-time updates
 
 ### ⚡ PowerShell Integration
 ```http
+GET    /api/v1/commands/saved            # Kayıtlı PowerShell komutları
+POST   /api/v1/commands/saved            # Yeni PowerShell komutu oluştur
+POST   /api/v1/commands/saved/{id}/execute # Kayıtlı komutu çalıştır
+GET    /api/v1/agents/{id}/result/{cmd_id} # Komut sonucunu al
 POST   /api/v1/agents/{id}/refresh       # System info PowerShell refresh
 POST   /api/v1/installer/create-python   # Updated Python agent download
 GET    /api/v1/installer/config          # Agent configuration
@@ -333,25 +344,39 @@ GET    /api/v1/installer/config          # Agent configuration
 ```json
 {
   "type": "powershell_command",
-  "request_id": "sysinfo_123456789_abc123",
-  "command": "$systemInfo = @{ ... }; $systemInfo | ConvertTo-Json",
-  "response_type": "system_info_update"
+  "request_id": "ps_123456789_abc123",
+  "command": "Get-ComputerInfo | ConvertTo-Json",
+  "timeout": 30
 }
 ```
 
 #### Agent → Backend PowerShell Response
 ```json
 {
-  "type": "system_info_update",
-  "request_id": "sysinfo_123456789_abc123",
+  "type": "powershell_result",
+  "request_id": "ps_123456789_abc123",
   "data": {
-    "cpu_usage": 15.2,
-    "cpu_name": "Intel Core i7-10700K",
-    "memory": { "total": 17179869184, "usage": 45.6 },
-    "services": { "total": 245, "running": 89, "stopped": 156 },
-    "network_adapters": [/* adapter info */],
-    "top_processes": [/* process info */]
-  }
+    "TotalPhysicalMemory": 17179869184,
+    "CsProcessors": ["Intel(R) Core(TM) i7-10700K CPU @ 3.80GHz"],
+    "WindowsVersion": "10.0.19042"
+  },
+  "success": true,
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
+
+#### PowerShell Library Command Execution
+```json
+{
+  "command_id": "189b3c17-8eee-478b-8729-745d83c4cc35",
+  "executed_command": "Get-WmiObject Win32_LogicalDisk | ConvertTo-Json",
+  "results": [
+    {
+      "agent_id": "desktop-pc-agent",
+      "command_id": "ps_1234567890_xyz789",
+      "status": "sent"
+    }
+  ]
 }
 ```
 
@@ -424,16 +449,21 @@ npm run test:e2e
 ### PowerShell WebSocket Issues
 ```bash
 # Backend loglarında PowerShell komut durumunu kontrol et
-docker-compose logs backend | grep "powershell_command\|PowerShell"
+docker-compose logs backend | grep "powershell_command\|PowerShell\|powershell_result"
+
+# PowerShell Library sayfasında komut çalıştırma
+# - Agent seçin ve Run butonuna tıklayın
+# - Polling sistem otomatik olarak sonuçları getirir
+# - JSON formatında sonuçları görüntüler
 
 # Agent bağlantı durumunu kontrol et
 curl -H "Authorization: Bearer your-secret-key-here" "http://localhost:8080/api/v1/agents/"
 
+# Kayıtlı PowerShell komutlarını kontrol et
+curl -H "Authorization: Bearer your-secret-key-here" "http://localhost:8080/api/v1/commands/saved"
+
 # System Health kayboluyorsa - frontend refresh logic
 # Frontend refresh butonuna 3 saniye bekleyin (PowerShell command completion için)
-
-# Agent'ın PowerShell desteği var mı kontrol edin:
-# Yeni agent indirin: POST /api/v1/installer/create-python
 ```
 
 ### Agent Connection Issues
@@ -570,6 +600,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**DexAgents** - Modern Windows Endpoint Management Platform v3.1
+**DexAgents** - Modern Windows Endpoint Management Platform v3.2
 
 🚀 **Ready for Production** | ⭐ **Star this repo** | 🐛 **Report issues**

@@ -131,6 +131,10 @@ class MigrationManager:
         from .v002_add_indexes import migration as v002
         migrations.append(v002)
         
+        # Add PowerShell commands migration
+        from .v003_powershell_commands import MIGRATION as v003
+        migrations.append(v003)
+        
         # Sort by version
         migrations.sort(key=lambda x: x['version'])
         
