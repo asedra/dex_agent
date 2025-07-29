@@ -31,8 +31,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY --chown=app:app . .
 
 # Create necessary directories
-RUN mkdir -p /app/logs /app/temp /app/agent_installers \
-    && chown -R app:app /app/logs /app/temp /app/agent_installers
+RUN mkdir -p /app/logs /app/temp /app/agent_installers /app/data \
+    && chown -R app:app /app/logs /app/temp /app/agent_installers /app/data
 
 # Switch to app user
 USER app

@@ -11,6 +11,10 @@ logger = logging.getLogger(__name__)
 class DatabaseManager:
     def __init__(self, db_path: str = None):
         self.db_path = db_path or settings.DATABASE_URL
+        # Ensure database directory exists
+        import os
+        db_dir = os.path.dirname(os.path.abspath(self.db_path))
+        os.makedirs(db_dir, exist_ok=True)
         self.init_database()
     
     @contextmanager
@@ -635,5 +639,15 @@ class DatabaseManager:
             
             return logs
 
+# Lazy loading wrapper for database manager
+class LazyDatabaseManager:
+    def __init__(self):
+        self._instance = None
+    
+    def __getattr__(self, name):
+        if self._instance is None:
+            self._instance = DatabaseManager()
+        return getattr(self._instance, name)
+
 # Global database manager instance
-db_manager = DatabaseManager()
+db_manager = LazyDatabaseManager()

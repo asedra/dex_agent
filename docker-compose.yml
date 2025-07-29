@@ -45,12 +45,12 @@ services:
       - backend_installers:/app/agent_installers
     networks:
       - dexagents-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/system/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/system/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
     restart: unless-stopped
 
   # Frontend Service
@@ -87,8 +87,7 @@ services:
     networks:
       - dexagents-network
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
       interval: 30s
