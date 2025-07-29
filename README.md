@@ -1,6 +1,6 @@
 # DexAgents - Windows Endpoint Management Platform
 
-Modern Windows sistemleri için kapsamlı uzak yönetim ve PowerShell komut çalıştırma platformu. Docker desteği, gelişmiş veritabanı yönetimi ve real-time monitoring ile güçlendirilmiştir.
+Modern Windows sistemleri için kapsamlı uzak yönetim ve PowerShell komut çalıştırma platformu. Real-time WebSocket tabanlı PowerShell execution, gelişmiş sistem monitoring ve Docker desteği ile güçlendirilmiştir.
 
 ![DexAgents Dashboard](https://img.shields.io/badge/Platform-Windows-blue) ![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green) ![Next.js](https://img.shields.io/badge/Frontend-Next.js-black) ![Docker](https://img.shields.io/badge/Deploy-Docker-blue)
 
@@ -95,7 +95,21 @@ dexagents/
 └── scripts/                   # 🆕 Deployment scriptleri
 ```
 
-## 🆕 Yeni Özellikler (v3.0)
+## 🆕 Yeni Özellikler (v3.1)
+
+### ⚡ PowerShell WebSocket Integration
+- **Real-time PowerShell Execution**: WebSocket üzerinden anlık PowerShell komut çalıştırma
+- **Comprehensive System Monitoring**: CPU name, services count, network adapters, top processes
+- **JSON Response Handling**: PowerShell çıktılarının JSON formatında işlenmesi
+- **Advanced System Info**: Disk usage, memory details, process monitoring
+- **Non-blocking Commands**: Asenkron komut çalıştırma ve yanıt alma
+
+### 🔄 Enhanced Agent System
+- **Updated Agent Template**: PowerShell command support ile güncellenmiş agent kodu
+- **Improved Error Handling**: Gelişmiş hata yakalama ve raporlama sistemi
+- **Smart Refresh Logic**: System Health kaybolma sorunu çözüldü
+- **Data Preservation**: UI refresh sırasında veri korunması
+- **Extended Wait Times**: PowerShell komutları için optimize edilmiş bekleme süreleri
 
 ### 🗄️ Enhanced Database Schema
 - **10 Tablo**: agents, users, groups, metrics, alerts, audit_logs, sessions, scheduled_tasks, command_history
@@ -113,9 +127,10 @@ dexagents/
 - **Production Ready**: Nginx reverse proxy ile production deployment
 
 ### 📊 Advanced Monitoring
-- **Agent Metrics**: CPU, memory, disk kullanımı izleme
+- **Real-time System Health**: CPU, memory, disk, network monitoring
 - **Alert System**: Sistem uyarıları ve bildirimler
-- **Performance Tracking**: Gerçek zamanlı performans takibi
+- **Service Monitoring**: Windows services durumu izleme
+- **Process Tracking**: Top processes ve kaynak kullanımı
 - **Historical Data**: Geçmiş metrik verileri
 
 ### 🔐 Enhanced Security
@@ -265,13 +280,28 @@ GET    /api/v1/audit                     # Audit logları
 
 ### 🔌 WebSocket Endpoints
 ```http
-WS     /api/v1/ws/{agent_id}             # Agent WebSocket
-WS     /api/v1/ws/dashboard              # Dashboard WebSocket
+WS     /api/v1/ws/agent                  # Agent registration ve command WebSocket
+WS     /api/v1/ws/dashboard              # Dashboard real-time updates
+```
+
+### ⚡ PowerShell Integration
+```http
+POST   /api/v1/agents/{id}/refresh       # System info PowerShell refresh
+POST   /api/v1/installer/create-python   # Updated Python agent download
+GET    /api/v1/installer/config          # Agent configuration
 ```
 
 ## 🛠️ Agent Features
 
-### 🖥️ Modern GUI Agent
+### ⚡ PowerShell-Enabled Python Agent (v2.1)
+- **WebSocket PowerShell Integration**: Real-time PowerShell komut çalıştırma
+- **Comprehensive System Monitoring**: CPU name, services, processes, network adapters
+- **JSON Response Handling**: PowerShell çıktılarının structured data olarak işlenmesi
+- **Smart Error Handling**: Gelişmiş hata yakalama ve raporlama
+- **Fallback System**: PowerShell hatası durumunda psutil fallback
+- **Auto-reconnection**: Bağlantı kopması durumunda otomatik yeniden bağlanma
+
+### 🖥️ Modern GUI Agent (Legacy)
 - **Tkinter tabanlı modern arayüz**
 - **Real-time sistem monitoring**
 - **WebSocket bağlantısı**
@@ -280,9 +310,50 @@ WS     /api/v1/ws/dashboard              # Dashboard WebSocket
 - **Log viewer entegrasyonu**
 
 ### 📱 Multiple Agent Versions
+- **PowerShell Python Agent**: En güncel, PowerShell desteği ile (Önerilen)
+- **Modern GUI Agent**: Gelişmiş GUI ve özellikler
 - **Simple Agent**: Temel özellikler
-- **Modern Agent**: Gelişmiş GUI ve özellikler
 - **Headless Agent**: GUI olmadan çalışan versiyon
+
+### 🔄 PowerShell WebSocket Protocol
+
+#### Agent → Backend Communication
+```json
+{
+  "type": "register",
+  "data": {
+    "id": "agent-hostname-agentname",
+    "hostname": "DESKTOP-PC",
+    "system_info": { /* psutil data */ }
+  }
+}
+```
+
+#### Backend → Agent PowerShell Commands
+```json
+{
+  "type": "powershell_command",
+  "request_id": "sysinfo_123456789_abc123",
+  "command": "$systemInfo = @{ ... }; $systemInfo | ConvertTo-Json",
+  "response_type": "system_info_update"
+}
+```
+
+#### Agent → Backend PowerShell Response
+```json
+{
+  "type": "system_info_update",
+  "request_id": "sysinfo_123456789_abc123",
+  "data": {
+    "cpu_usage": 15.2,
+    "cpu_name": "Intel Core i7-10700K",
+    "memory": { "total": 17179869184, "usage": 45.6 },
+    "services": { "total": 245, "running": 89, "stopped": 156 },
+    "network_adapters": [/* adapter info */],
+    "top_processes": [/* process info */]
+  }
+}
+```
 
 ## 🔐 Security Features
 
@@ -349,6 +420,35 @@ npm run test:e2e
 ```
 
 ## 🐛 Troubleshooting
+
+### PowerShell WebSocket Issues
+```bash
+# Backend loglarında PowerShell komut durumunu kontrol et
+docker-compose logs backend | grep "powershell_command\|PowerShell"
+
+# Agent bağlantı durumunu kontrol et
+curl -H "Authorization: Bearer your-secret-key-here" "http://localhost:8080/api/v1/agents/"
+
+# System Health kayboluyorsa - frontend refresh logic
+# Frontend refresh butonuna 3 saniye bekleyin (PowerShell command completion için)
+
+# Agent'ın PowerShell desteği var mı kontrol edin:
+# Yeni agent indirin: POST /api/v1/installer/create-python
+```
+
+### Agent Connection Issues
+```bash
+# Agent log dosyasını kontrol edin (agent.log)
+# - "Processing message type: powershell_command" mesajı görüyor musunuz?
+# - "Unknown message type: powershell_command" görüyorsanız agent güncel değil
+
+# Yeni PowerShell-enabled agent indirin
+curl -X POST -H "Authorization: Bearer your-secret-key-here" \
+     -H "Content-Type: application/json" \
+     -d '{"server_url":"http://localhost:8080","api_token":"your-secret-key-here","agent_name":"UpdatedAgent","tags":["v2.1"],"auto_start":true,"run_as_service":false}' \
+     "http://localhost:8080/api/v1/installer/create-python" \
+     --output updated_agent.zip
+```
 
 ### Docker Issues
 ```bash
@@ -470,6 +570,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**DexAgents** - Modern Windows Endpoint Management Platform v3.0
+**DexAgents** - Modern Windows Endpoint Management Platform v3.1
 
 🚀 **Ready for Production** | ⭐ **Star this repo** | 🐛 **Report issues**
