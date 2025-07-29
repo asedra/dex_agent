@@ -1,6 +1,6 @@
 "use client"
 
-import { Activity, Calendar, Home, Monitor, Settings, Shield, Terminal } from "lucide-react"
+import { Activity, Calendar, Home, Monitor, Settings, Shield, Terminal, LogOut } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -15,6 +15,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/AuthContext"
 import Link from "next/link"
 
 const menuItems = [
@@ -51,6 +53,12 @@ const menuItems = [
 ]
 
 export function AppSidebar() {
+  const { user, logout } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+  }
+
   return (
     <Sidebar>
       <SidebarHeader className="border-b p-4">
@@ -84,15 +92,32 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="border-t p-4">
-        <div className="flex items-center gap-2">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder.svg?height=32&width=32" />
-            <AvatarFallback>AD</AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">Admin User</p>
-            <p className="text-xs text-muted-foreground truncate">admin@company.com</p>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src="/placeholder.svg?height=32&width=32" />
+              <AvatarFallback>
+                {user?.full_name ? user.full_name.split(' ').map(n => n[0]).join('').toUpperCase() : 'AD'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">
+                {user?.full_name || user?.username || 'Admin User'}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.email || 'admin@company.com'}
+              </p>
+            </div>
           </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full justify-start"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
         </div>
       </SidebarFooter>
 

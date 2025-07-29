@@ -74,8 +74,10 @@ class DatabaseManager:
                     username TEXT UNIQUE NOT NULL,
                     email TEXT UNIQUE NOT NULL,
                     password_hash TEXT NOT NULL,
+                    full_name TEXT,
                     is_active BOOLEAN DEFAULT TRUE,
                     is_admin BOOLEAN DEFAULT FALSE,
+                    last_login TIMESTAMP,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -198,6 +200,9 @@ class DatabaseManager:
             
             conn.commit()
             logger.info("Database initialized successfully")
+            
+            # Ensure default user exists
+            self.ensure_default_user()
     
     # Agent methods
     def add_agent(self, agent_data: Dict[str, Any]) -> str:
@@ -403,16 +408,16 @@ class DatabaseManager:
             return [dict(row) for row in rows]
     
     # User methods
-    def create_user(self, username: str, email: str, password_hash: str, is_admin: bool = False) -> Optional[int]:
+    def create_user(self, username: str, email: str, password_hash: str, full_name: str = None, is_admin: bool = False) -> Optional[int]:
         """Create a new user"""
         with self.get_connection() as conn:
             cursor = conn.cursor()
             
             try:
                 cursor.execute('''
-                    INSERT INTO users (username, email, password_hash, is_admin)
-                    VALUES (?, ?, ?, ?)
-                ''', (username, email, password_hash, is_admin))
+                    INSERT INTO users (username, email, password_hash, full_name, is_admin)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (username, email, password_hash, full_name, is_admin))
                 
                 conn.commit()
                 return cursor.lastrowid
@@ -441,6 +446,38 @@ class DatabaseManager:
             if row:
                 return dict(row)
             return None
+    
+    def update_user_last_login(self, user_id: int):
+        """Update user's last login timestamp"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                UPDATE users 
+                SET last_login = ?, updated_at = ?
+                WHERE id = ?
+            ''', (datetime.now().isoformat(), datetime.now().isoformat(), user_id))
+            conn.commit()
+    
+    def ensure_default_user(self):
+        """Ensure default admin user exists"""
+        from .jwt_utils import get_password_hash
+        
+        # Check if admin user exists
+        admin_user = self.get_user_by_username("admin")
+        if not admin_user:
+            # Create default admin user
+            password_hash = get_password_hash("admin123")
+            user_id = self.create_user(
+                username="admin",
+                email="admin@dexagents.local",
+                password_hash=password_hash,
+                full_name="System Administrator",
+                is_admin=True
+            )
+            if user_id:
+                logger.info("Default admin user created successfully")
+            else:
+                logger.error("Failed to create default admin user")
     
     # Group methods
     def create_agent_group(self, name: str, description: str = None) -> Optional[int]:

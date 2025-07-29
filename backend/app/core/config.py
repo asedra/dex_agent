@@ -12,11 +12,14 @@ class Settings:
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8  # 8 days
     
+    # JWT Algorithm
+    ALGORITHM: str = "HS256"
+    
     # CORS - Allow all origins for development
     BACKEND_CORS_ORIGINS: List[str] = ["*"]
     
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "dexagents.db")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "data/dexagents.db")
     
     # PowerShell Settings
     DEFAULT_TIMEOUT: int = int(os.getenv("DEFAULT_TIMEOUT", "30"))

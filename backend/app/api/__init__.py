@@ -1,9 +1,10 @@
 from fastapi import APIRouter
-from .v1 import agents, commands, system, installer, websocket
+from .v1 import agents, commands, system, installer, websocket, auth
 
 api_router = APIRouter()
 
 # Include all API routers
+api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
 api_router.include_router(agents.router, prefix="/agents", tags=["agents"])
 api_router.include_router(commands.router, prefix="/commands", tags=["commands"])
 api_router.include_router(system.router, prefix="/system", tags=["system"])

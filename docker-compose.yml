@@ -19,7 +19,7 @@ services:
       - SECRET_KEY=dev-secret-key-change-in-production
       
       # Database
-      - DATABASE_URL=dexagents.db
+      - DATABASE_URL=data/dexagents.db
       
       # CORS Origins
       - BACKEND_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://frontend:3000
@@ -57,11 +57,13 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-      target: runner
+      dockerfile: Dockerfile.dev
     container_name: dexagents-frontend-dev
     ports:
       - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     environment:
       # Next.js settings
       - NODE_ENV=development
@@ -69,7 +71,7 @@ services:
       
       # API Configuration
       - NEXT_PUBLIC_API_URL=http://localhost:8080
-      - NEXT_PUBLIC_API_TOKEN=default_token
+      - NEXT_PUBLIC_API_TOKEN=your-secret-key-here
       - BACKEND_URL=http://backend:8000
       
       # WebSocket Configuration

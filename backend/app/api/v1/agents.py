@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.get("/", response_model=List[Agent])
-async def get_agents():
+async def get_agents(token: str = Depends(verify_token)):
     """Get all agents"""
     try:
         agents_data = db_manager.get_agents()

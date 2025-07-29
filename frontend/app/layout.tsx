@@ -3,10 +3,10 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
 import { Toaster } from "@/components/ui/toaster"
 import { ErrorBoundary } from "@/components/error-boundary"
+import { AuthProvider } from "@/contexts/AuthContext"
+import ConditionalLayout from "@/components/ConditionalLayout"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,13 +25,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <ErrorBoundary>
-            <SidebarProvider>
-              <AppSidebar />
-              <main className="flex-1">{children}</main>
-            </SidebarProvider>
-            <Toaster />
-          </ErrorBoundary>
+          <AuthProvider>
+            <ErrorBoundary>
+              {children}
+              <Toaster />
+            </ErrorBoundary>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

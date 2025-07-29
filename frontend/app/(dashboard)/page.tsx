@@ -11,7 +11,7 @@ import Link from "next/link"
 import { apiClient, SystemInfo, Agent } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 
-export default function Dashboard() {
+function Dashboard() {
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null)
   const [agents, setAgents] = useState<Agent[]>([])
   const [loading, setLoading] = useState(true)
@@ -289,3 +289,6 @@ export default function Dashboard() {
     </div>
   )
 }
+
+// Export dashboard directly - protection handled by layout
+export default Dashboard
