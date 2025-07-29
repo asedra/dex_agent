@@ -216,9 +216,9 @@ function Dashboard() {
             </CardHeader>
             <CardContent className="space-y-2">
               <Button asChild className="w-full justify-start">
-                <Link href="/powershell/new">
+                <Link href="/commands/new">
                   <Terminal className="mr-2 h-4 w-4" />
-                  Add PowerShell Command
+                  Add Command
                 </Link>
               </Button>
               <Button asChild variant="outline" className="w-full justify-start bg-transparent">

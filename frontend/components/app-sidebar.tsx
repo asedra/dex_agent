@@ -32,7 +32,7 @@ const menuItems = [
   },
   {
     title: "Command Library",
-    url: "/powershell",
+    url: "/commands",
     icon: Terminal,
   },
   {
