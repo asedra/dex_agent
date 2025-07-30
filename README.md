@@ -4,27 +4,136 @@ Modern Windows sistemleri için kapsamlı uzak yönetim ve PowerShell komut çal
 
 ![DexAgents Dashboard](https://img.shields.io/badge/Platform-Windows-blue) ![FastAPI](https://img.shields.io/badge/Backend-FastAPI-green) ![Next.js](https://img.shields.io/badge/Frontend-Next.js-black) ![Docker](https://img.shields.io/badge/Deploy-Docker-blue)
 
-## 🚀 Hızlı Başlangıç (Docker)
+## 📋 Sistem Gereksinimleri
 
-### Gereksinimler
-- **Docker** ve **Docker Compose**
-- **Git**
+### 🐳 Docker ile Kurulum (Önerilen)
+- **Docker**: 20.10+ ve **Docker Compose**: 2.0+
+- **Git**: 2.20+
+- **Port Erişimi**: 3000 (Frontend), 8080 (Backend)
+- **RAM**: Minimum 2GB, Önerilen 4GB+
+- **Depolama**: Minimum 10GB boş alan
 
-### 1. Projeyi Klonla
+### 💻 Manuel Kurulum Gereksinimleri
+#### Backend Gereksinimleri
+- **Python**: 3.9+ (3.11 önerilen)
+- **pip**: 21.0+
+- **SQLite**: 3.35+ (veritabanı için)
+
+#### Frontend Gereksinimleri  
+- **Node.js**: 18.0+ (20.x önerilen)
+- **npm**: 8.0+ veya **pnpm**: 7.0+
+
+#### Agent Gereksinimleri (Windows)
+- **Windows**: 10/11 veya Windows Server 2019+
+- **PowerShell**: 5.1+ (PowerShell 7+ önerilen)
+- **.NET Framework**: 4.7.2+ (GUI agent için)
+- **Python**: 3.9+ (Python agent için)
+
+## 🚀 Hızlı Başlangıç
+
+### 🐳 Docker ile Kurulum (Önerilen)
+
+#### 1. Gerekli Araçları Kontrol Edin
+```bash
+# Docker versiyonunu kontrol et
+docker --version
+docker-compose --version
+
+# Git versiyonunu kontrol et
+git --version
+```
+
+#### 2. Projeyi Klonlayın
 ```bash
 git clone https://github.com/asedra/dex_agent.git
 cd dex_agent
 ```
 
-### 2. Docker ile Başlat
+#### 3. Docker Servisleri Başlatın
 ```bash
+# Tüm servisleri arka planda başlat
 docker-compose up -d --build
+
+# Servislerin durumunu kontrol et
+docker-compose ps
+
+# Logları takip et (isteğe bağlı)
+docker-compose logs -f
 ```
 
-### 3. Servislere Erişim
+#### 4. Servislere Erişim
 - **🌐 Web Dashboard**: http://localhost:3000
 - **🔧 Backend API**: http://localhost:8080
+- **📚 API Dokumentasyonu**: http://localhost:8080/docs
 - **📊 Health Check**: http://localhost:8080/api/v1/system/health
+
+#### 5. Servis Durumunu Doğrulayın
+```bash
+# Backend health check
+curl http://localhost:8080/api/v1/system/health
+
+# Frontend health check  
+curl http://localhost:3000/api/health
+
+# Container durumları
+docker-compose ps
+```
+
+### 💻 Manuel Kurulum
+
+#### Backend Kurulumu
+```bash
+# Backend dizinine geçin
+cd backend
+
+# Python sanal ortam oluşturun
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# Linux/macOS  
+source venv/bin/activate
+
+# Bağımlılıkları yükleyin
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Veritabanını başlatın
+python -c "from app.core.database import db_manager; db_manager.create_tables()"
+
+# Sunucuyu başlatın
+python run.py
+```
+
+#### Frontend Kurulumu
+```bash
+# Frontend dizinine geçin (yeni terminal)
+cd frontend
+
+# Node bağımlılıklarını yükleyin
+npm install
+# veya pnpm kullanıyorsanız
+pnpm install
+
+# Development sunucusunu başlatın
+npm run dev
+# veya
+pnpm dev
+```
+
+#### Production Kurulumu
+```bash
+# Backend için Gunicorn kullanın
+cd backend
+pip install gunicorn
+gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+
+# Frontend build ve başlatma
+cd frontend
+npm run build
+npm start
+```
 
 ## 🏗️ Proje Mimarisi
 
@@ -447,32 +556,318 @@ cd frontend
 npm run test:e2e
 ```
 
-## 🐛 Troubleshooting
+## 🐛 Troubleshooting & Yaygın Problemler
 
-### PowerShell WebSocket Issues
+### 🚀 Kurulum Problemleri
+
+#### Docker Kurulum Sorunları
 ```bash
-# Backend loglarında PowerShell komut durumunu kontrol et
+# Docker servisini kontrol et
+sudo systemctl status docker
+
+# Docker daemon çalışmıyor ise
+sudo systemctl start docker
+
+# Docker Compose eksik ise
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Docker compose versiyonu kontrol et
+docker-compose --version
+```
+
+#### Port Çakışması Problemleri
+```bash
+# Portları kontrol et
+netstat -tulpn | grep ":3000\|:8080"
+
+# Port kullanan processleri sonlandır
+sudo lsof -ti:3000 | xargs kill -9
+sudo lsof -ti:8080 | xargs kill -9
+
+# Alternatif portlarla başlat
+# docker-compose.yml'de port mapping'i değiştirin:
+# ports: ["3001:3000", "8081:8000"]
+```
+
+#### Yetki ve İzin Problemleri
+```bash
+# Docker grubuna kullanıcı ekle
+sudo usermod -aG docker $USER
+newgrp docker
+
+# Proje dizini izinleri
+sudo chown -R $USER:$USER /path/to/dex_agent
+chmod -R 755 /path/to/dex_agent
+```
+
+### 🔄 Servis Çalışma Problemleri
+
+#### Backend Başlamıyor
+```bash
+# Backend container loglarını kontrol et
+docker-compose logs backend
+
+# Container'ı yeniden başlat  
+docker-compose restart backend
+
+# Dependencies problemi varsa
+docker-compose down
+docker-compose up -d --build --force-recreate
+
+# Manuel test için
+cd backend
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+pip install -r requirements.txt
+python run.py
+```
+
+#### Frontend Başlamıyor
+```bash
+# Frontend container loglarını kontrol et
+docker-compose logs frontend
+
+# Node modules problemi
+docker exec -it dexagents-frontend-dev rm -rf node_modules
+docker exec -it dexagents-frontend-dev npm install
+
+# Manuel test için
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+#### Database Bağlantı Problemleri
+```bash
+# SQLite database dosyasını kontrol et
+ls -la backend/data/
+
+# Database migration çalıştır
+docker exec -it dexagents-backend-dev python -c "
+from app.core.database import db_manager
+db_manager.create_tables()
+print('Database tables created successfully')
+"
+
+# Database'i sıfırla
+docker-compose down -v
+rm -rf backend/data/dexagents.db
+docker-compose up -d --build
+```
+
+### 🔌 Agent Bağlantı Problemleri
+
+#### Agent Bağlanamıyor
+```bash
+# Agent log dosyasını kontrol et (Windows agent dizininde)
+type agent.log
+
+# WebSocket bağlantısını test et
+# Browser developer tools > Network > WS sekmesi
+
+# Firewall kontrolü (Windows)
+netsh advfirewall firewall show rule name="DexAgent"
+
+# Firewall kuralı ekle
+netsh advfirewall firewall add rule name="DexAgent" dir=in action=allow protocol=TCP localport=8080
+```
+
+#### PowerShell Komutları Çalışmıyor
+```bash
+# PowerShell execution policy kontrol et (Windows)
+Get-ExecutionPolicy -List
+
+# Execution policy değiştir
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Agent PowerShell versiyonu
+$PSVersionTable.PSVersion
+
+# Backend loglarında PowerShell komutlarını takip et
 docker-compose logs backend | grep "powershell_command\|PowerShell\|powershell_result"
+```
 
-# Command Library sayfasında komut çalıştırma
-# - Agent seçin ve Run butonuna tıklayın
-# - Polling sistem otomatik olarak sonuçları getirir
-# - JSON formatında sonuçları görüntüler (Array ve Object desteği)
+#### Agent Registration Problemleri
+```bash
+# API token kontrolü
+curl -H "Authorization: Bearer your-secret-key-here" \
+     "http://localhost:8080/api/v1/agents/"
 
-# Agent bağlantı durumunu kontrol et
-curl -H "Authorization: Bearer your-secret-key-here" "http://localhost:8080/api/v1/agents/"
+# Agent konfigürasyon dosyası (agent/config.json)
+{
+  "server_url": "http://localhost:8080",
+  "api_token": "your-secret-key-here",
+  "agent_name": "MyAgent",
+  "auto_reconnect": true
+}
+```
 
-# Kayıtlı PowerShell komutlarını kontrol et
-curl -H "Authorization: Bearer your-secret-key-here" "http://localhost:8080/api/v1/commands/saved"
+### 🌐 Network ve API Problemleri
 
-# PowerShell Array Command Test
-curl -X POST -H "Authorization: Bearer your-secret-key-here" \
-     -H "Content-Type: application/json" \
-     -d '{"name":"Test Array","command":"Get-Process | Select-Object -First 5 Name, CPU | ConvertTo-Json","category":"system"}' \
-     "http://localhost:8080/api/v1/commands/saved"
+#### API Erişim Problemleri
+```bash
+# API health check
+curl http://localhost:8080/api/v1/system/health
 
-# System Health kayboluyorsa - frontend refresh logic
-# Frontend refresh butonuna 3 saniye bekleyin (PowerShell command completion için)
+# CORS hatası varsa backend loglarını kontrol et
+docker-compose logs backend | grep "CORS"
+
+# API dokumentasyonuna erişim
+curl http://localhost:8080/docs
+```
+
+#### WebSocket Bağlantı Problemleri
+```bash
+# WebSocket endpoint test
+wscat -c ws://localhost:8080/api/v1/ws/agent
+
+# Proxy arkasında çalışma
+# nginx.conf'ta WebSocket upgrade ayarları:
+proxy_http_version 1.1;
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection "upgrade";
+```
+
+### 🐳 Docker Özel Problemleri
+
+#### Container Build Hataları
+```bash
+# Build cache temizle
+docker system prune -a
+
+# Specific container rebuild
+docker-compose build --no-cache backend
+docker-compose build --no-cache frontend
+
+# Build log detayları
+docker-compose build --progress=plain
+```
+
+#### Volume ve Data Problemleri
+```bash
+# Volume'ları listele
+docker volume ls
+
+# Volume'ları temizle
+docker-compose down -v
+docker volume prune
+
+# Data persist problemleri
+ls -la backend/data/
+sudo chown -R 1000:1000 backend/data/
+```
+
+#### Memory ve Resource Problemleri
+```bash
+# Container resource kullanımı
+docker stats
+
+# Memory limit ayarla (docker-compose.yml)
+mem_limit: 1g
+memswap_limit: 2g
+
+# Disk space kontrolü
+df -h
+docker system df
+```
+
+### 🔧 Development Ortamı Problemleri
+
+#### Hot Reload Çalışmıyor
+```bash
+# Frontend hot reload
+# Volume mapping kontrol et:
+# volumes: ["./frontend:/app", "/app/node_modules"]
+
+# Backend hot reload için
+# uvicorn --reload kullanıldığından emin ol
+
+# File watching limitlerini artır (Linux)
+echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+```
+
+#### IDE ve Debug Problemleri
+```bash
+# VSCode container attach
+# Remote-Containers extension kullan
+
+# Debug port açma (docker-compose.yml)
+ports:
+  - "5678:5678"  # Python debugger
+  - "9229:9229"  # Node.js debugger
+```
+
+### 📊 Performance Problemleri
+
+#### Yavaş API Response
+```bash
+# Backend performans logları
+docker-compose logs backend | grep -E "INFO|ERROR|WARNING"
+
+# Database query optimizasyonu
+# SQLite ANALYZE komutunu çalıştır
+
+# Resource monitoring
+docker stats dexagents-backend-dev
+docker stats dexagents-frontend-dev
+```
+
+#### High Memory/CPU Usage
+```bash
+# Resource limits ayarla
+deploy:
+  resources:
+    limits:
+      cpus: '2.0'
+      memory: 2G
+    reservations:
+      memory: 1G
+```
+
+### 🆘 Acil Durum Çözümleri
+
+#### Tamamen Temiz Başlangıç
+```bash
+# Her şeyi temizle ve yeniden başlat
+docker-compose down -v --remove-orphans
+docker system prune -a
+rm -rf backend/data/
+git pull origin main
+docker-compose up -d --build --force-recreate
+```
+
+#### Log Collection Script
+```bash
+#!/bin/bash
+# debug-collect.sh
+echo "=== DexAgents Debug Information ===" > debug.log
+date >> debug.log
+echo "" >> debug.log
+
+echo "=== Docker Info ===" >> debug.log
+docker --version >> debug.log
+docker-compose --version >> debug.log
+echo "" >> debug.log
+
+echo "=== Container Status ===" >> debug.log
+docker-compose ps >> debug.log
+echo "" >> debug.log
+
+echo "=== Backend Logs ===" >> debug.log
+docker-compose logs --tail=100 backend >> debug.log
+echo "" >> debug.log
+
+echo "=== Frontend Logs ===" >> debug.log
+docker-compose logs --tail=100 frontend >> debug.log
+echo "" >> debug.log
+
+echo "=== System Resources ===" >> debug.log
+docker stats --no-stream >> debug.log
+
+echo "Debug bilgileri debug.log dosyasına kaydedildi"
 ```
 
 ### Agent Connection Issues
