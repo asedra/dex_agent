@@ -11,6 +11,7 @@ services:
     rootDir: backend
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: python start.py
+    dockerfilePath: ""  # Force buildpack usage, ignore Dockerfile
     healthCheckPath: /api/v1/system/health
     autoDeploy: true
     envVars:
@@ -53,6 +54,7 @@ services:
     rootDir: frontend
     buildCommand: npm ci && npm run build
     startCommand: npm run start:render
+    dockerfilePath: ""  # Force buildpack usage, ignore Dockerfile
     healthCheckPath: /api/health
     autoDeploy: true
     envVars:
