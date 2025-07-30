@@ -1,0 +1,88 @@
+# DigitalOcean App Platform Specification
+# KESIN ÇÖZÜM: Source directories açıkça belirtilmiş
+name: dexagents
+region: nyc1
+
+services:
+  # Backend API (Python/FastAPI)
+  - name: backend
+    source_dir: backend  # ÖNEMLİ: / ile başlamıyor
+    github:
+      repo: asedra/dex_agent
+      branch: main
+      deploy_on_push: true
+    build_command: pip install --no-cache-dir -r requirements.txt
+    run_command: python run.py
+    environment_slug: python  # Açıkça Python belirt
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb
+    http_port: 8000
+    health_check:
+      http_path: /api/v1/system/health
+      initial_delay_seconds: 60
+      period_seconds: 10
+      timeout_seconds: 5
+      failure_threshold: 3
+      success_threshold: 1
+    routes:
+      - path: /api
+      - path: /ws
+    envs:
+      - key: PORT
+        value: "8000"
+      - key: API_V1_STR
+        value: "/api/v1"
+      - key: PROJECT_NAME
+        value: "DexAgents - Windows PowerShell Agent"
+      - key: VERSION
+        value: "1.0.0"
+      - key: DATABASE_URL
+        value: "dexagents.db"
+      - key: BACKEND_CORS_ORIGINS
+        value: "${frontend.PUBLIC_URL}"
+      - key: DEFAULT_TIMEOUT
+        value: "30"
+      - key: MAX_TIMEOUT
+        value: "300"
+      - key: AGENT_INSTALLER_PATH
+        value: "agent_installers"
+      - key: TEMP_DIR
+        value: "temp"
+      - key: PYTHONPATH
+        value: "/app"
+      - key: ENVIRONMENT
+        value: "production"
+      - key: SECRET_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "your-secret-key-here-change-in-production"
+
+  # Frontend Dashboard (Next.js)
+  - name: frontend
+    source_dir: frontend  # ÖNEMLİ: / ile başlamıyor
+    github:
+      repo: asedra/dex_agent
+      branch: main
+      deploy_on_push: true
+    build_command: npm ci && npm run build
+    run_command: npm start
+    environment_slug: node-js  # Açıkça Node.js belirt
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb
+    http_port: 3000
+    health_check:
+      http_path: /api/health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      failure_threshold: 3
+      success_threshold: 1
+    routes:
+      - path: /
+    envs:
+      - key: NEXT_PUBLIC_API_URL
+        value: "${backend.PUBLIC_URL}/api"
+      - key: NODE_ENV
+        value: "production"
+      - key: PORT
+        value: "3000"

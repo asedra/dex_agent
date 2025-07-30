@@ -6,6 +6,7 @@ FastAPI application for Windows PowerShell agent management
 
 import uvicorn
 import logging
+import os
 from app.main import app
 
 # Configure logging
@@ -15,10 +16,16 @@ logging.basicConfig(
 )
 
 if __name__ == "__main__":
+    # Get port from environment variable or default to 8000
+    port = int(os.getenv("PORT", 8000))
+    
+    # Disable reload in production
+    reload = os.getenv("ENVIRONMENT", "development") != "production"
+    
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
-        port=8000,
-        reload=True,
+        port=port,
+        reload=reload,
         log_level="info"
     ) 

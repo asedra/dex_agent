@@ -3,7 +3,7 @@ const nextConfig = {
   // Image optimization
   images: {
     unoptimized: false,
-    domains: ['localhost'],
+    domains: ['localhost', 'dexagents-backend.onrender.com'],
     formats: ['image/webp', 'image/avif'],
   },
   

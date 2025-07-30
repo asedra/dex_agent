@@ -5,6 +5,7 @@ from typing import List, Optional, Dict, Any
 from contextlib import contextmanager
 import logging
 from .config import settings
+from ..migrations.migration_manager import MigrationManager
 
 logger = logging.getLogger(__name__)
 
@@ -200,6 +201,14 @@ class DatabaseManager:
             
             conn.commit()
             logger.info("Database initialized successfully")
+            
+            # Run migrations to ensure all tables and default data exist
+            migration_manager = MigrationManager(self.db_path)
+            migration_manager.run_migrations()
+            logger.info("Database migrations completed")
+            
+            # Ensure default PowerShell commands exist
+            self.ensure_default_commands()
             
             # Ensure default user exists
             self.ensure_default_user()
@@ -457,6 +466,56 @@ class DatabaseManager:
                 WHERE id = ?
             ''', (datetime.now().isoformat(), datetime.now().isoformat(), user_id))
             conn.commit()
+    
+    def ensure_default_commands(self):
+        """Ensure default PowerShell commands exist"""
+        from .default_commands import DEFAULT_COMMANDS
+        
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Check if any system commands exist
+            cursor.execute('SELECT COUNT(*) FROM powershell_commands WHERE is_system = 1')
+            count = cursor.fetchone()[0]
+            
+            if count == 0:
+                logger.info("No default commands found, inserting default commands...")
+                for cmd in DEFAULT_COMMANDS:
+                    try:
+                        # Convert lists to JSON strings
+                        cmd_copy = cmd.copy()
+                        cmd_copy['parameters'] = json.dumps(cmd_copy.get('parameters', []))
+                        cmd_copy['tags'] = json.dumps(cmd_copy.get('tags', []))
+                        cmd_copy['created_at'] = datetime.now().isoformat()
+                        cmd_copy['updated_at'] = datetime.now().isoformat()
+                        
+                        # Insert command
+                        cursor.execute('''
+                            INSERT OR IGNORE INTO powershell_commands 
+                            (id, name, description, category, command, parameters, tags, version, author, is_system, created_at, updated_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ''', (
+                            cmd_copy['id'],
+                            cmd_copy['name'],
+                            cmd_copy.get('description'),
+                            cmd_copy.get('category', 'general'),
+                            cmd_copy['command'],
+                            cmd_copy['parameters'],
+                            cmd_copy['tags'],
+                            cmd_copy.get('version', '1.0'),
+                            cmd_copy.get('author', 'System'),
+                            cmd_copy.get('is_system', True),
+                            cmd_copy['created_at'],
+                            cmd_copy['updated_at']
+                        ))
+                        logger.info(f"Inserted default command: {cmd_copy['name']}")
+                    except Exception as e:
+                        logger.error(f"Error inserting default command {cmd.get('id')}: {str(e)}")
+                
+                conn.commit()
+                logger.info("Default commands inserted successfully")
+            else:
+                logger.info(f"Found {count} system commands, skipping default command insertion")
     
     def ensure_default_user(self):
         """Ensure default admin user exists"""
