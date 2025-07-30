@@ -1,1 +1,2 @@
 web: python run.py
+release: python -c "from app.core.database import DatabaseManager; DatabaseManager().init_database()"

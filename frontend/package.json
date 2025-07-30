@@ -5,11 +5,13 @@
   "scripts": {
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
+    "build:render": "npm ci && next build",
     "dev": "next dev",
     "dev:turbo": "next dev --turbo",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "start": "next start",
+    "start": "next start -p ${PORT:-3000}",
+    "start:render": "next start -p ${PORT:-10000}",
     "type-check": "tsc --noEmit",
     "export": "next export",
     "clean": "rm -rf .next out node_modules/.cache"
