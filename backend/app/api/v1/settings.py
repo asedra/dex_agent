@@ -170,8 +170,9 @@ async def save_chatgpt_config(config: ChatGPTConfig, token: str = Depends(verify
             ("chatgpt_temperature", str(config.temperature), "Temperature for responses", False),
         ]
         
-        if config.system_prompt:
-            settings_to_save.append(("chatgpt_system_prompt", config.system_prompt, "System prompt for ChatGPT", False))
+        # Always save system_prompt, even if empty
+        system_prompt_value = config.system_prompt or ""
+        settings_to_save.append(("chatgpt_system_prompt", system_prompt_value, "System prompt for ChatGPT", False))
         
         for key, value, desc, encrypted in settings_to_save:
             encrypted_value = encrypt_value(value) if encrypted else value
@@ -250,15 +251,43 @@ async def test_chatgpt_api(token: str = Depends(verify_token)):
         if not api_key.startswith('sk-'):
             raise HTTPException(status_code=400, detail="Invalid API key format")
         
-        # In a real implementation, you would make a test API call here
-        # For now, just return success if key format is valid
+        # Get model setting
+        model_setting = db_manager.get_setting("chatgpt_model")
+        model = model_setting['value'] if model_setting else "gpt-3.5-turbo"
         
-        return {
-            "success": True,
-            "message": "ChatGPT API key format is valid. Full API test not implemented yet."
-        }
+        # Make a real API test call to OpenAI using official client
+        from openai import AsyncOpenAI
+        
+        client = AsyncOpenAI(api_key=api_key)
+        
+        try:
+            # Test with a simple completion request
+            response = await client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": "Test"}],
+                max_tokens=10
+            )
+            
+            return {
+                "success": True,
+                "message": f"ChatGPT API connection successful! Model: {model}, Response: {response.choices[0].message.content.strip()}"
+            }
+            
+        except Exception as openai_error:
+            error_msg = str(openai_error)
+            if "incorrect api key" in error_msg.lower() or "invalid api key" in error_msg.lower():
+                raise HTTPException(status_code=400, detail="Invalid API key - authentication failed")
+            elif "rate limit" in error_msg.lower():
+                raise HTTPException(status_code=400, detail="API rate limit exceeded")
+            elif "insufficient_quota" in error_msg.lower():
+                raise HTTPException(status_code=400, detail="API quota exceeded - check your billing")
+            elif "model" in error_msg.lower() and "does not exist" in error_msg.lower():
+                raise HTTPException(status_code=400, detail=f"Model '{model}' is not available with your API key")
+            else:
+                raise HTTPException(status_code=400, detail=f"OpenAI API error: {error_msg}")
+        
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error testing ChatGPT API: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to test ChatGPT API")
+        raise HTTPException(status_code=500, detail=f"Failed to test ChatGPT API: {str(e)}")

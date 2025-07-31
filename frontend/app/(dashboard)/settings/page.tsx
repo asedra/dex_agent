@@ -64,12 +64,21 @@ export default function SettingsPage() {
     try {
       const response = await fetch('/api/v1/settings/chatgpt/config', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         }
       })
       if (response.ok) {
         const config = await response.json()
-        setChatgptConfig(prev => ({ ...prev, ...config }))
+        // Ensure all values are strings to prevent controlled/uncontrolled input issues
+        setChatgptConfig(prev => ({ 
+          ...prev, 
+          ...config,
+          api_key: config.api_key || '',
+          model: config.model || 'gpt-3.5-turbo',
+          max_tokens: config.max_tokens || 1000,
+          temperature: config.temperature || 0.7,
+          system_prompt: config.system_prompt || ''
+        }))
       }
     } catch (error) {
       console.error('Failed to load ChatGPT config:', error)
@@ -83,7 +92,7 @@ export default function SettingsPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         },
         body: JSON.stringify(chatgptConfig)
       })
@@ -94,7 +103,9 @@ export default function SettingsPage() {
           description: "ChatGPT configuration saved successfully!"
         })
       } else {
-        throw new Error('Failed to save configuration')
+        const errorText = await response.text()
+        console.error('API Error:', response.status, errorText)
+        throw new Error(`Failed to save configuration: ${response.status} - ${errorText}`)
       }
     } catch (error) {
       console.error('Failed to save ChatGPT config:', error)
@@ -111,14 +122,17 @@ export default function SettingsPage() {
   const testChatGPTAPI = async () => {
     try {
       setLoading(true)
+      console.log('Testing ChatGPT API...')
       const response = await fetch('/api/v1/settings/chatgpt/test', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         }
       })
       
+      console.log('Test API Response status:', response.status)
       const result = await response.json()
+      console.log('Test API Result:', result)
       
       if (response.ok && result.success) {
         toast({
@@ -126,7 +140,8 @@ export default function SettingsPage() {
           description: result.message || "ChatGPT API test successful!"
         })
       } else {
-        throw new Error(result.detail || 'API test failed')
+        console.error('Test API Error:', response.status, result)
+        throw new Error(result.detail || result.message || 'API test failed')
       }
     } catch (error) {
       console.error('ChatGPT API test failed:', error)

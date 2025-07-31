@@ -63,6 +63,16 @@ const nextConfig = {
     ]
   },
   
+  // API proxy rewrites
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://backend:8000/api/:path*',
+      },
+    ]
+  },
+
   // Redirects for better SEO
   async redirects() {
     return [
