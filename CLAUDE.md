@@ -293,6 +293,106 @@ git push origin main
 docker-compose down
 ```
 
+### Available Test Scripts
+
+#### 1. **AI Features Test Suite** (`test_ai_features.py`)
+Comprehensive testing for AI-powered command generation:
+```bash
+python3 test_ai_features.py
+```
+**Tests:**
+- Health endpoint and user authentication
+- AI service status and availability check
+- AI command generation with ChatGPT API
+- Saved commands CRUD operations
+- Agent connectivity and command testing
+- Complete AI workflow integration
+
+**Expected Results:** 7/7 tests should pass
+
+#### 2. **Dark Mode UI Compatibility** (`test_dark_mode_ui.py`)
+Tests dark mode compatibility of the AI chat interface:
+```bash
+python3 test_dark_mode_ui.py
+```
+**Tests:**
+- Frontend accessibility and page loading
+- Commands page functionality
+- AI functionality backend integration
+- Dark mode CSS classes detection
+- UI component compatibility
+
+**Expected Results:** 5/5 tests should pass with dark mode support
+
+#### 3. **Comprehensive Test Suite** (`comprehensive_test.py`)
+Full system testing covering AI features and dark mode:
+```bash
+python3 comprehensive_test.py
+```
+**Tests:**
+- Frontend accessibility with dark mode support
+- User authentication and JWT tokens
+- Multiple AI command generation scenarios
+- Complete AI testing workflow
+- System integration verification
+
+**Expected Results:** 4/4 tests should pass
+
+#### 4. **Command Output Display Test** (`test_command_output_display.py`)
+Tests command execution result display in chat:
+```bash
+python3 test_command_output_display.py
+```
+**Tests:**
+- Command output retrieval from agents
+- JSON formatting and display
+- Frontend integration with AI interface
+- Chat interface output rendering
+
+**Expected Results:** 3/3 tests should pass
+
+### Test Execution Workflow
+
+When implementing new features or fixing issues:
+
+1. **Start with specific tests:**
+   ```bash
+   # For AI features
+   python3 test_ai_features.py
+   
+   # For UI/dark mode
+   python3 test_dark_mode_ui.py
+   
+   # For command output
+   python3 test_command_output_display.py
+   ```
+
+2. **Run comprehensive test:**
+   ```bash
+   python3 comprehensive_test.py
+   ```
+
+3. **Manual verification:**
+   - Visit `http://localhost:3000/commands`
+   - Test "Create Command with AI" button
+   - Verify dark mode compatibility
+   - Test command generation and execution
+
+### Test Results Interpretation
+
+**✅ All Tests Pass:** Ready for commit and production
+**⚠️ Warnings Only:** Acceptable, proceed with caution
+**❌ Test Failures:** Fix issues before committing
+
+### AI Features Test Coverage
+
+The test suites cover:
+- **ChatGPT API Integration:** Key reading, client initialization
+- **Command Generation:** JSON parsing, PowerShell extraction
+- **Agent Communication:** WebSocket testing, command execution
+- **Error Handling:** Retry logic, timeout management
+- **UI Integration:** Dark mode, chat interface, output display
+
 ### Important Container Management Rules:
 - **During Development**: Keep containers running for user testing
 - **Before Commit**: Allow user to test the running system

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-07-31T13:40:26.168384",
+  "timestamp": "2025-07-31T14:43:29.523599",
   "total_tests": 11,
   "passed_tests": 11,
   "failed_tests": 0,
@@ -9,77 +9,77 @@
       "success": true,
       "message": "System is healthy",
       "details": null,
-      "timestamp": "2025-07-31T13:40:25.905563"
+      "timestamp": "2025-07-31T14:43:29.281455"
     },
     {
       "test": "Unauthorized Access",
       "success": true,
       "message": "Protected endpoint correctly requires authentication",
       "details": null,
-      "timestamp": "2025-07-31T13:40:25.906689"
+      "timestamp": "2025-07-31T14:43:29.283018"
     },
     {
       "test": "Login",
       "success": true,
       "message": "Successfully logged in as admin",
       "details": null,
-      "timestamp": "2025-07-31T13:40:26.096150"
+      "timestamp": "2025-07-31T14:43:29.465848"
     },
     {
       "test": "Token Format",
       "success": true,
       "message": "JWT token format is valid",
       "details": null,
-      "timestamp": "2025-07-31T13:40:26.096162"
+      "timestamp": "2025-07-31T14:43:29.465861"
     },
     {
       "test": "Token Validation",
       "success": true,
       "message": "Token valid for user: admin",
       "details": null,
-      "timestamp": "2025-07-31T13:40:26.100069"
+      "timestamp": "2025-07-31T14:43:29.469870"
     },
     {
       "test": "Agents List",
       "success": true,
       "message": "Retrieved 1 agents",
       "details": null,
-      "timestamp": "2025-07-31T13:40:26.105974"
+      "timestamp": "2025-07-31T14:43:29.477071"
     },
     {
       "test": "Commands Library",
       "success": true,
       "message": "Retrieved 6 saved commands",
       "details": null,
-      "timestamp": "2025-07-31T13:40:26.111822"
+      "timestamp": "2025-07-31T14:43:29.484272"
     },
     {
       "test": "Agent Registration",
       "success": true,
-      "message": "Registered agent: agent_20250731_104026_118",
+      "message": "Registered agent: agent_20250731_114329_491",
       "details": null,
-      "timestamp": "2025-07-31T13:40:26.126830"
+      "timestamp": "2025-07-31T14:43:29.495052"
     },
     {
       "test": "Agent Refresh",
       "success": true,
       "message": "Agent refreshed: Agent refreshed successfully",
       "details": null,
-      "timestamp": "2025-07-31T13:40:26.143066"
+      "timestamp": "2025-07-31T14:43:29.508483"
     },
     {
       "test": "Agent Command",
       "success": true,
       "message": "Agent not connected (expected in testing)",
       "details": "No WebSocket agent running",
-      "timestamp": "2025-07-31T13:40:26.150267"
+      "timestamp": "2025-07-31T14:43:29.514569"
     },
     {
       "test": "Agent Cleanup",
       "success": true,
-      "message": "Test agent agent_20250731_104026_118 deleted",
+      "message": "Test agent agent_20250731_114329_491 deleted",
       "details": null,
-      "timestamp": "2025-07-31T13:40:26.168205"
+      "timestamp": "2025-07-31T14:43:29.523495"
     }
   ]
 }
