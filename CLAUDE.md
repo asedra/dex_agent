@@ -227,6 +227,32 @@ Key variables for development:
 
 Copy `.env.example` to `.env` and update values for your environment.
 
+## Git Configuration
+
+### GitHub Authentication
+- GitHub token is stored in `/home/ali/gitkey.md`
+- Before any git operations (commit, push, pull), always read this file and configure the remote URL
+- Use the format: `https://TOKEN@github.com/asedra/dex_agent.git`
+
+### Essential Git Commands
+```bash
+# Configure git remote with token (run before git operations)
+GITHUB_TOKEN=$(cat /home/ali/gitkey.md | head -n1 | tr -d '\n')
+git remote set-url origin "https://${GITHUB_TOKEN}@github.com/asedra/dex_agent.git"
+
+# Standard git workflow
+git add .
+git commit -m "your commit message"
+git push origin main
+```
+
+### Git Workflow Integration
+When making changes to the codebase:
+1. Read the GitHub token from `/home/ali/gitkey.md`
+2. Configure the remote URL with the token
+3. Perform git operations (add, commit, push)
+4. Always include proper commit messages with Claude Code signature
+
 ## File Structure Notes
 
 - Database files stored in `backend/data/`
@@ -234,3 +260,4 @@ Copy `.env.example` to `.env` and update values for your environment.
 - Frontend static assets in `frontend/public/`
 - Docker volumes for persistent data
 - Logs in `backend/logs/` directory
+- GitHub token stored in `/home/ali/gitkey.md` (for git operations)
