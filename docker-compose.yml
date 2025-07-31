@@ -53,6 +53,9 @@ services:
       - AGENT_INSTALLER_PATH=agent_installers
       - TEMP_DIR=temp
       
+      # Settings Encryption (Base64 Fernet key)
+      - SETTINGS_ENCRYPTION_KEY=dGVzdC1rZXktZm9yLWRldmVsb3BtZW50LXB1cnBvc2VzLW9ubHk=
+      
       # Development
       - PYTHONPATH=/app
       - ENVIRONMENT=development

@@ -180,6 +180,13 @@ async def save_chatgpt_config(config: ChatGPTConfig, token: str = Depends(verify
             if not success:
                 raise HTTPException(status_code=500, detail=f"Failed to save {key}")
         
+        # Reload AI service to use new API key
+        try:
+            from ...services.ai_service import ai_service
+            ai_service.reload_api_key()
+        except Exception as reload_error:
+            logger.warning(f"Failed to reload AI service: {str(reload_error)}")
+        
         return {"message": "ChatGPT configuration saved successfully"}
     except HTTPException:
         raise
@@ -291,3 +298,20 @@ async def test_chatgpt_api(token: str = Depends(verify_token)):
     except Exception as e:
         logger.error(f"Error testing ChatGPT API: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to test ChatGPT API: {str(e)}")
+
+@router.post("/reload-ai-service")
+async def reload_ai_service(token: str = Depends(verify_token)):
+    """Reload AI service configuration from database"""
+    try:
+        from ...services.ai_service import ai_service
+        ai_service.reload_api_key()
+        
+        is_available = ai_service.is_available()
+        return {
+            "success": True,
+            "available": is_available,
+            "message": "AI service reloaded successfully" if is_available else "AI service reloaded but API key not configured"
+        }
+    except Exception as e:
+        logger.error(f"Error reloading AI service: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to reload AI service: {str(e)}")

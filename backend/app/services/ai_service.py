@@ -3,35 +3,88 @@ import json
 import logging
 from typing import Dict, List, Optional, Any
 from pathlib import Path
+import base64
+from cryptography.fernet import Fernet
+import os
 
 logger = logging.getLogger(__name__)
 
 class AIService:
     def __init__(self):
         self.client = None
+        self._cipher_suite = None
+        self._init_encryption()
         self._load_api_key()
     
-    def _load_api_key(self):
-        """Load OpenAI API key from container path or host path"""
-        key_paths = [
-            Path("/app/chatgpt.key"),  # Container path (for Docker)
-            Path("/home/ali/chatgpt.key")  # Host path (for local development)
-        ]
-        
+    def _init_encryption(self):
+        """Initialize encryption for decrypting settings"""
         try:
+            encryption_key = os.getenv("SETTINGS_ENCRYPTION_KEY", Fernet.generate_key())
+            if isinstance(encryption_key, str):
+                encryption_key = encryption_key.encode()
+            self._cipher_suite = Fernet(encryption_key)
+        except Exception as e:
+            logger.error(f"Failed to initialize encryption: {str(e)}")
+    
+    def _decrypt_value(self, encrypted_value: str) -> str:
+        """Decrypt a sensitive value"""
+        if not self._cipher_suite:
+            return encrypted_value
+        try:
+            encrypted_bytes = base64.b64decode(encrypted_value.encode())
+            decrypted = self._cipher_suite.decrypt(encrypted_bytes)
+            return decrypted.decode()
+        except Exception as e:
+            logger.error(f"Error decrypting value: {e}")
+            return encrypted_value
+    
+    def _load_api_key(self):
+        """Load OpenAI API key from database settings or fallback to file"""
+        try:
+            # First try to load from database settings
+            from ..core.database import db_manager
+            
+            try:
+                api_key_setting = db_manager.get_setting("chatgpt_api_key")
+                if api_key_setting and api_key_setting.get('value'):
+                    encrypted_api_key = api_key_setting['value']
+                    # Decrypt if encrypted
+                    if api_key_setting.get('is_encrypted'):
+                        api_key = self._decrypt_value(encrypted_api_key)
+                    else:
+                        api_key = encrypted_api_key
+                    
+                    if api_key and api_key.strip():
+                        self.client = openai.OpenAI(api_key=api_key.strip())
+                        logger.info("OpenAI API client initialized successfully from database settings")
+                        return
+                        
+            except Exception as db_error:
+                logger.warning(f"Failed to load API key from database: {str(db_error)}")
+            
+            # Fallback to file-based loading (for backward compatibility)
+            key_paths = [
+                Path("/app/chatgpt.key"),  # Container path (for Docker)
+                Path("/home/ali/chatgpt.key")  # Host path (for local development)
+            ]
+            
             for key_file in key_paths:
                 if key_file.exists():
                     api_key = key_file.read_text().strip()
                     if api_key:
                         self.client = openai.OpenAI(api_key=api_key)
-                        logger.info(f"OpenAI API client initialized successfully from {key_file}")
+                        logger.info(f"OpenAI API client initialized successfully from {key_file} (fallback)")
                         return
                     else:
                         logger.warning(f"API key file {key_file} is empty")
             
-            logger.error("ChatGPT API key file not found in any expected location")
+            logger.error("ChatGPT API key not found in database settings or file")
         except Exception as e:
             logger.error(f"Failed to load ChatGPT API key: {str(e)}")
+    
+    def reload_api_key(self):
+        """Reload API key from database (useful when settings are updated)"""
+        self._load_api_key()
     
     def is_available(self) -> bool:
         """Check if AI service is available"""
