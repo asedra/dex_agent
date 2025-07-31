@@ -181,6 +181,17 @@ class MigrationManager:
             
             from .v003_powershell_commands_postgresql import MIGRATION as v003
             migrations.append(v003)
+            
+            try:
+                from .v004_settings_table_postgresql import upgrade_postgresql
+                v004 = {
+                    'version': 'v004',
+                    'description': 'Create settings table',
+                    'up': lambda cursor: upgrade_postgresql(cursor)
+                }
+                migrations.append(v004)
+            except ImportError:
+                pass
         else:
             # SQLite migrations
             from .v001_initial_schema import migration as v001

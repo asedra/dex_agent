@@ -7,10 +7,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
-import { Settings, Save, RefreshCw, Server, Key, Globe } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Textarea } from '@/components/ui/textarea'
+import { Settings, Save, RefreshCw, Server, Key, Globe, Bot, TestTube } from 'lucide-react'
 import { apiClient } from '@/lib/api'
+import { useToast } from '@/hooks/use-toast'
 
 export default function SettingsPage() {
+  const { toast } = useToast()
   const [config, setConfig] = useState({
     server_url: 'http://localhost:8080',
     api_token: 'default_token',
@@ -19,12 +23,20 @@ export default function SettingsPage() {
     auto_start: true,
     run_as_service: false
   })
+  const [chatgptConfig, setChatgptConfig] = useState({
+    api_key: '',
+    model: 'gpt-3.5-turbo',
+    max_tokens: 1000,
+    temperature: 0.7,
+    system_prompt: ''
+  })
   const [loading, setLoading] = useState(false)
   const [systemInfo, setSystemInfo] = useState<any>(null)
 
   useEffect(() => {
     loadInstallerConfig()
     loadSystemInfo()
+    loadChatGPTConfig()
   }, [])
 
   const loadInstallerConfig = async () => {
@@ -45,6 +57,86 @@ export default function SettingsPage() {
       setSystemInfo(info)
     } catch (error) {
       console.error('Failed to load system info:', error)
+    }
+  }
+
+  const loadChatGPTConfig = async () => {
+    try {
+      const response = await fetch('/api/v1/settings/chatgpt/config', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      if (response.ok) {
+        const config = await response.json()
+        setChatgptConfig(prev => ({ ...prev, ...config }))
+      }
+    } catch (error) {
+      console.error('Failed to load ChatGPT config:', error)
+    }
+  }
+
+  const saveChatGPTConfig = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/v1/settings/chatgpt/config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(chatgptConfig)
+      })
+      
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "ChatGPT configuration saved successfully!"
+        })
+      } else {
+        throw new Error('Failed to save configuration')
+      }
+    } catch (error) {
+      console.error('Failed to save ChatGPT config:', error)
+      toast({
+        title: "Error",
+        description: "Failed to save ChatGPT configuration",
+        variant: "destructive"
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const testChatGPTAPI = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/v1/settings/chatgpt/test', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      
+      const result = await response.json()
+      
+      if (response.ok && result.success) {
+        toast({
+          title: "Success",
+          description: result.message || "ChatGPT API test successful!"
+        })
+      } else {
+        throw new Error(result.detail || 'API test failed')
+      }
+    } catch (error) {
+      console.error('ChatGPT API test failed:', error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "ChatGPT API test failed",
+        variant: "destructive"
+      })
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -183,6 +275,99 @@ export default function SettingsPage() {
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Bot className="h-5 w-5" />
+              <span>ChatGPT API Configuration</span>
+            </CardTitle>
+            <CardDescription>
+              Configure OpenAI ChatGPT API for AI-powered features
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="chatgpt-api-key">OpenAI API Key</Label>
+                <Input
+                  id="chatgpt-api-key"
+                  type="password"
+                  value={chatgptConfig.api_key}
+                  onChange={(e) => setChatgptConfig(prev => ({ ...prev, api_key: e.target.value }))}
+                  placeholder="sk-..."
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="chatgpt-model">Model</Label>
+                <Select 
+                  value={chatgptConfig.model} 
+                  onValueChange={(value) => setChatgptConfig(prev => ({ ...prev, model: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                    <SelectItem value="gpt-4">GPT-4</SelectItem>
+                    <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                    <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="max-tokens">Max Tokens</Label>
+                <Input
+                  id="max-tokens"
+                  type="number"
+                  value={chatgptConfig.max_tokens}
+                  onChange={(e) => setChatgptConfig(prev => ({ ...prev, max_tokens: parseInt(e.target.value) || 1000 }))}
+                  placeholder="1000"
+                  min="1"
+                  max="4000"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="temperature">Temperature</Label>
+                <Input
+                  id="temperature"
+                  type="number"
+                  value={chatgptConfig.temperature}
+                  onChange={(e) => setChatgptConfig(prev => ({ ...prev, temperature: parseFloat(e.target.value) || 0.7 }))}
+                  placeholder="0.7"
+                  min="0"
+                  max="2"
+                  step="0.1"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="system-prompt">System Prompt (Optional)</Label>
+              <Textarea
+                id="system-prompt"
+                value={chatgptConfig.system_prompt}
+                onChange={(e) => setChatgptConfig(prev => ({ ...prev, system_prompt: e.target.value }))}
+                placeholder="You are a helpful assistant that helps with PowerShell commands..."
+                rows={3}
+              />
+            </div>
+
+            <div className="flex space-x-2">
+              <Button onClick={testChatGPTAPI} variant="outline" disabled={loading || !chatgptConfig.api_key}>
+                <TestTube className="mr-2 h-4 w-4" />
+                Test API
+              </Button>
+              <Button onClick={saveChatGPTConfig} disabled={loading}>
+                <Save className="mr-2 h-4 w-4" />
+                Save ChatGPT Config
+              </Button>
+            </div>
           </CardContent>
         </Card>
 

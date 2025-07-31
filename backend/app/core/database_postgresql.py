@@ -661,3 +661,60 @@ class PostgreSQLDatabaseManager:
                 logger.error(f"Error deleting PowerShell command: {str(e)}")
                 conn.rollback()
                 return False
+
+    # Settings Management
+    def get_setting(self, key: str) -> Optional[Dict[str, Any]]:
+        """Get a setting by key"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cursor.execute('SELECT * FROM settings WHERE key = %s', (key,))
+            result = cursor.fetchone()
+            if result:
+                return dict(result)
+            return None
+    
+    def get_all_settings(self) -> List[Dict[str, Any]]:
+        """Get all settings"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cursor.execute('SELECT * FROM settings ORDER BY key')
+            return [dict(row) for row in cursor.fetchall()]
+    
+    def save_setting(self, key: str, value: str, description: str = None, is_encrypted: bool = False) -> bool:
+        """Save or update a setting"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute('''
+                    INSERT INTO settings (key, value, description, is_encrypted)
+                    VALUES (%s, %s, %s, %s)
+                    ON CONFLICT (key) 
+                    DO UPDATE SET 
+                        value = EXCLUDED.value,
+                        description = EXCLUDED.description,
+                        is_encrypted = EXCLUDED.is_encrypted,
+                        updated_at = CURRENT_TIMESTAMP
+                ''', (key, value, description, is_encrypted))
+                
+                conn.commit()
+                logger.info(f"Setting '{key}' saved successfully")
+                return True
+            except Exception as e:
+                logger.error(f"Error saving setting '{key}': {str(e)}")
+                conn.rollback()
+                return False
+    
+    def delete_setting(self, key: str) -> bool:
+        """Delete a setting"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            try:
+                cursor.execute('DELETE FROM settings WHERE key = %s', (key,))
+                conn.commit()
+                return cursor.rowcount > 0
+            except Exception as e:
+                logger.error(f"Error deleting setting '{key}': {str(e)}")
+                conn.rollback()
+                return False
