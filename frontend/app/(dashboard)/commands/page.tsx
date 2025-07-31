@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -73,6 +74,7 @@ const getCategoriesWithCounts = (commands: SavedPowerShellCommand[]) => {
 }
 
 export default function CommandLibraryPage() {
+  const router = useRouter()
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCommand, setSelectedCommand] = useState<SavedPowerShellCommand | null>(null)
@@ -476,6 +478,23 @@ export default function CommandLibraryPage() {
     }
   }
 
+  const handleAiButtonClick = () => {
+    // Check if AI is available (ChatGPT configured)
+    if (!aiStatus?.available) {
+      // Redirect to settings page if ChatGPT is not configured
+      toast({
+        title: "ChatGPT Not Configured",
+        description: "Please configure your ChatGPT API key in settings first.",
+        variant: "destructive",
+      })
+      router.push('/settings')
+      return
+    }
+    
+    // If AI is available, open the AI dialog
+    setAiDialogOpen(true)
+  }
+
   const createCommandFromAI = () => {
     if (!generatedCommand?.command_data) return
 
@@ -510,16 +529,14 @@ export default function CommandLibraryPage() {
             </DialogTrigger>
           </Dialog>
           
-          {aiStatus?.available && (
-            <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline">
-                  <Wand2 className="mr-2 h-4 w-4" />
-                  Create Command with AI
-                </Button>
-              </DialogTrigger>
-            </Dialog>
-          )}
+          <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" onClick={handleAiButtonClick}>
+                <Wand2 className="mr-2 h-4 w-4" />
+                Create Command with AI
+              </Button>
+            </DialogTrigger>
+          </Dialog>
         </div>
         
         {/* AI Chat Dialog */}
