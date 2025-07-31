@@ -16,6 +16,7 @@ class WebSocketManager:
         self.connection_info: Dict[str, Dict[str, Any]] = {}
         self.pending_commands: Dict[str, Dict[str, Any]] = {}  # command_id -> command_info
         self.command_responses: Dict[str, Dict[str, Any]] = {}  # command_id -> response
+        self.response_events: Dict[str, asyncio.Event] = {}  # command_id -> event for waiting responses
     
     async def connect(self, websocket: WebSocket, agent_id: Optional[str] = None, accept: bool = True) -> str:
         """Accept WebSocket connection and return connection ID"""
@@ -122,6 +123,10 @@ class WebSocketManager:
             self.pending_commands[command_id]["status"] = "completed"
             self.pending_commands[command_id]["response"] = response
         
+        # Signal waiting threads that response is ready
+        if command_id in self.response_events:
+            self.response_events[command_id].set()
+        
         logger.info(f"Command response stored for {command_id}")
     
     def get_command_response(self, command_id: str) -> Optional[Dict[str, Any]]:
@@ -136,6 +141,41 @@ class WebSocketManager:
     def get_pending_command(self, command_id: str) -> Optional[Dict[str, Any]]:
         """Get pending command info"""
         return self.pending_commands.get(command_id)
+    
+    async def wait_for_command_response(self, command_id: str, timeout: int = 30) -> Optional[Dict[str, Any]]:
+        """Wait for command response with timeout"""
+        try:
+            # Check if response already exists
+            if command_id in self.command_responses:
+                return self.command_responses[command_id]
+            
+            # Create event if not exists
+            if command_id not in self.response_events:
+                self.response_events[command_id] = asyncio.Event()
+            
+            # Wait for response with timeout
+            await asyncio.wait_for(self.response_events[command_id].wait(), timeout=timeout)
+            
+            # Cleanup event
+            if command_id in self.response_events:
+                del self.response_events[command_id]
+            
+            return self.command_responses.get(command_id)
+        
+        except asyncio.TimeoutError:
+            logger.warning(f"Command {command_id} timed out after {timeout} seconds")
+            # Cleanup
+            if command_id in self.response_events:
+                del self.response_events[command_id]
+            if command_id in self.pending_commands:
+                self.pending_commands[command_id]["status"] = "timeout"
+            return None
+        except Exception as e:
+            logger.error(f"Error waiting for command response {command_id}: {str(e)}")
+            # Cleanup
+            if command_id in self.response_events:
+                del self.response_events[command_id]
+            return None
     
     async def broadcast(self, message: Dict[str, Any], exclude_connection: Optional[str] = None):
         """Broadcast message to all connections"""

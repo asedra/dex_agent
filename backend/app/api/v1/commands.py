@@ -53,7 +53,57 @@ async def execute_batch_commands(
 
 @router.post("/agent/{agent_id}/execute")
 async def execute_command_on_agent(agent_id: str, command: AgentCommand):
-    """Execute command on specific agent via WebSocket"""
+    """Execute command on specific agent via WebSocket and wait for response"""
+    try:
+        # Check if agent is connected
+        if not websocket_manager.is_agent_connected(agent_id):
+            raise HTTPException(status_code=404, detail="Agent not connected")
+        
+        # Send command to agent
+        command_data = {
+            "command": command.command,
+            "timeout": command.timeout or 30,
+            "working_directory": command.working_directory
+        }
+        
+        command_id = await websocket_manager.execute_command_on_agent(agent_id, command_data)
+        
+        # Wait for response
+        timeout = command.timeout or 30
+        response = await websocket_manager.wait_for_command_response(command_id, timeout)
+        
+        if response is None:
+            # Command timed out or failed
+            return {
+                "success": False,
+                "command_id": command_id,
+                "agent_id": agent_id,
+                "message": f"Command timed out after {timeout} seconds",
+                "status": "timeout"
+            }
+        
+        # Return the response from agent
+        return {
+            "success": response.get("success", False),
+            "command_id": command_id,
+            "agent_id": agent_id,
+            "output": response.get("output", ""),
+            "error": response.get("error", ""),
+            "exit_code": response.get("exit_code", None),
+            "execution_time": response.get("execution_time", None),
+            "status": "completed"
+        }
+        
+    except ValueError as e:
+        logger.error(f"Error sending command to agent {agent_id}: {str(e)}")
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error(f"Unexpected error sending command to agent {agent_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to send command to agent")
+
+@router.post("/agent/{agent_id}/execute/async")
+async def execute_command_on_agent_async(agent_id: str, command: AgentCommand):
+    """Execute command on specific agent via WebSocket (async - don't wait for response)"""
     try:
         # Check if agent is connected
         if not websocket_manager.is_agent_connected(agent_id):
@@ -71,7 +121,8 @@ async def execute_command_on_agent(agent_id: str, command: AgentCommand):
         return {
             "message": "Command sent to agent successfully",
             "command_id": command_id,
-            "agent_id": agent_id
+            "agent_id": agent_id,
+            "status": "sent"
         }
         
     except ValueError as e:
