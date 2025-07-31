@@ -77,44 +77,44 @@ class WebSocketManager:
         return False
     
     async def execute_command_on_agent(self, agent_id: str, command: Dict[str, Any]) -> str:
-        """Execute command on agent and return command ID"""
-        logger.info(f"Attempting to execute command on agent {agent_id}")
+        """Execute PowerShell command on agent and return command ID"""
+        logger.info(f"Attempting to execute PowerShell command on agent {agent_id}")
         logger.info(f"Connected agents: {list(self.agent_connections.keys())}")
         
         if agent_id not in self.agent_connections:
             logger.error(f"Agent {agent_id} is not connected. Available agents: {list(self.agent_connections.keys())}")
             raise ValueError(f"Agent {agent_id} is not connected")
         
-        command_id = f"cmd_{datetime.now().timestamp()}_{uuid.uuid4().hex[:8]}"
+        # Use PowerShell-specific request ID format to match agent expectations
+        request_id = f"ps_{datetime.now().timestamp()}_{uuid.uuid4().hex[:8]}"
         
         # Store command info
-        self.pending_commands[command_id] = {
+        self.pending_commands[request_id] = {
             "agent_id": agent_id,
             "command": command.get("command", ""),
             "timestamp": datetime.now(),
             "status": "pending"
         }
         
-        # Send command to agent
-        command_message = {
-            "type": "command",
-            "command_id": command_id,
-            "data": {
-                **command,
-                "command_id": command_id  # Also include command_id in data for agent
-            },
+        # Send PowerShell command to agent in the format it expects
+        powershell_message = {
+            "type": "powershell_command",
+            "request_id": request_id,
+            "command": command.get("command", ""),
+            "timeout": command.get("timeout", 30),
+            "working_directory": command.get("working_directory"),
             "timestamp": datetime.now().isoformat()
         }
         
-        logger.info(f"Sending command {command_id} to agent {agent_id}: {command_message}")
-        success = await self.send_to_agent(agent_id, command_message)
+        logger.info(f"Sending PowerShell command {request_id} to agent {agent_id}: {powershell_message}")
+        success = await self.send_to_agent(agent_id, powershell_message)
         if not success:
-            del self.pending_commands[command_id]
-            logger.error(f"Failed to send command to agent {agent_id}")
-            raise ValueError(f"Failed to send command to agent {agent_id}")
+            del self.pending_commands[request_id]
+            logger.error(f"Failed to send PowerShell command to agent {agent_id}")
+            raise ValueError(f"Failed to send PowerShell command to agent {agent_id}")
         
-        logger.info(f"Command {command_id} sent to agent {agent_id}")
-        return command_id
+        logger.info(f"PowerShell command {request_id} sent to agent {agent_id}")
+        return request_id
     
     def store_command_response(self, command_id: str, response: Dict[str, Any]):
         """Store command response from agent"""
