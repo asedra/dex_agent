@@ -1,0 +1,128 @@
+import sqlite3
+import json
+import os
+from datetime import datetime
+
+def insert_default_commands(db_path):
+    """Insert default PowerShell commands into the database"""
+    
+    default_commands = [
+        {
+            'id': 'sys-get-computer-info',
+            'name': 'Get System Information',
+            'description': 'Retrieves comprehensive system information including OS, hardware, and network details',
+            'category': 'system',
+            'command': 'Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors | ConvertTo-Json',
+            'parameters': '[]',
+            'tags': json.dumps(["system", "hardware", "info"]),
+            'version': '1.0',
+            'author': 'System',
+            'is_system': 1
+        },
+        {
+            'id': 'sys-check-disk-space',
+            'name': 'Check Disk Space',
+            'description': 'Monitors disk space usage across all drives with JSON output',
+            'category': 'disk',
+            'command': 'Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name="Size_GB";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name="FreeSpace_GB";Expression={[math]::Round($_.FreeSpace/1GB,2)}}, @{Name="UsedPercent";Expression={[math]::Round((($_.Size-$_.FreeSpace)/$_.Size)*100,1)}} | ConvertTo-Json',
+            'parameters': '[]',
+            'tags': json.dumps(["disk", "storage", "monitoring"]),
+            'version': '1.0',
+            'author': 'System',
+            'is_system': 1
+        },
+        {
+            'id': 'sys-network-config',
+            'name': 'Get Network Configuration',
+            'description': 'Retrieves network adapter configuration and IP settings',
+            'category': 'network',
+            'command': 'Get-NetIPConfiguration | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway | ConvertTo-Json',
+            'parameters': '[]',
+            'tags': json.dumps(["network", "ip", "configuration"]),
+            'version': '1.0',
+            'author': 'System',
+            'is_system': 1
+        },
+        {
+            'id': 'sys-event-logs',
+            'name': 'Get Event Logs',
+            'description': 'Retrieves system event logs with customizable parameters',
+            'category': 'monitoring',
+            'command': 'Get-EventLog -LogName $LogName -Newest $Count | Where-Object {$_.EntryType -eq "$Level"} | Select-Object TimeGenerated, EntryType, Source, Message | ConvertTo-Json',
+            'parameters': json.dumps([
+                {"name":"LogName","type":"string","default":"System","description":"Log name to query","required":True},
+                {"name":"Count","type":"number","default":"10","description":"Number of entries to retrieve","required":False},
+                {"name":"Level","type":"string","default":"Error","description":"Event level filter (Error, Warning, Information)","required":False}
+            ]),
+            'tags': json.dumps(["logs", "events", "monitoring", "troubleshooting"]),
+            'version': '1.0',
+            'author': 'System',
+            'is_system': 1
+        },
+        {
+            'id': 'sys-security-audit',
+            'name': 'Security Audit',
+            'description': 'Performs basic security audit checks with JSON output',
+            'category': 'security',
+            'command': '$users = Get-LocalUser | Select-Object Name, Enabled, LastLogon; $services = Get-Service | Where-Object {$_.Status -eq "Running" -and $_.Name -like "*Remote*"} | Select-Object Name, Status; @{Users=$users; RemoteServices=$services} | ConvertTo-Json -Depth 3',
+            'parameters': '[]',
+            'tags': json.dumps(["security", "audit", "users", "services"]),
+            'version': '1.0',
+            'author': 'System',
+            'is_system': 1
+        },
+        {
+            'id': 'sys-process-list',
+            'name': 'Get Running Processes',
+            'description': 'Lists all running processes with resource usage',
+            'category': 'system',
+            'command': 'Get-Process | Select-Object Name, Id, CPU, WorkingSet, @{Name="Memory_MB";Expression={[math]::Round($_.WorkingSet/1MB,2)}} | Sort-Object CPU -Descending | Select-Object -First $Count | ConvertTo-Json',
+            'parameters': json.dumps([
+                {"name":"Count","type":"number","default":"20","description":"Number of top processes to show","required":False}
+            ]),
+            'tags': json.dumps(["processes", "performance", "monitoring"]),
+            'version': '1.0',
+            'author': 'System',
+            'is_system': 1
+        },
+        {
+            'id': 'sys-service-status',
+            'name': 'Get Service Status',
+            'description': 'Check status of Windows services',
+            'category': 'system',
+            'command': 'Get-Service | Group-Object Status | Select-Object Name, Count | ConvertTo-Json',
+            'parameters': '[]',
+            'tags': json.dumps(["services", "status", "monitoring"]),
+            'version': '1.0',
+            'author': 'System',
+            'is_system': 1
+        }
+    ]
+    
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    
+    # Insert commands
+    for cmd in default_commands:
+        try:
+            cursor.execute('''
+                INSERT OR REPLACE INTO powershell_commands 
+                (id, name, description, category, command, parameters, tags, version, author, is_system, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ''', (
+                cmd['id'], cmd['name'], cmd['description'], cmd['category'],
+                cmd['command'], cmd['parameters'], cmd['tags'], cmd['version'],
+                cmd['author'], cmd['is_system']
+            ))
+            print(f"Inserted command: {cmd['name']}")
+        except Exception as e:
+            print(f"Error inserting {cmd['name']}: {e}")
+    
+    conn.commit()
+    conn.close()
+    print("Default commands insertion completed!")
+
+if __name__ == "__main__":
+    # Get database path from environment or use default
+    db_path = os.environ.get('DATABASE_PATH', '/app/data/dexagents.db')
+    insert_default_commands(db_path)

@@ -30,6 +30,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY --chown=app:app . .
 
+# Copy and set permissions for entrypoint script
+COPY --chown=app:app entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 # Create necessary directories
 RUN mkdir -p /app/logs /app/temp /app/agent_installers /app/data \
     && chown -R app:app /app/logs /app/temp /app/agent_installers /app/data
@@ -44,5 +48,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/api/v1/system/health || exit 1
 
-# Run the application
-CMD ["python", "run.py"]
+# Run the entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
