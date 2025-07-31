@@ -24,6 +24,8 @@ import {
   XCircle,
   Trash2,
   Users,
+  Bot,
+  Wand2,
 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
@@ -42,7 +44,11 @@ import {
   SavedPowerShellCommand, 
   PowerShellCommandExecution,
   CommandParameter,
-  Agent 
+  Agent,
+  AICommandRequest,
+  AICommandResponse,
+  AITestRequest,
+  AIStatusResponse
 } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import CreateCommandForm from "@/components/CreateCommandForm"
@@ -80,6 +86,15 @@ export default function CommandLibraryPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [editingCommand, setEditingCommand] = useState<SavedPowerShellCommand | null>(null)
+  const [aiDialogOpen, setAiDialogOpen] = useState(false)
+  const [aiStatus, setAiStatus] = useState<AIStatusResponse | null>(null)
+  const [chatMessages, setChatMessages] = useState<Array<{role: string, content: string}>>([])
+  const [currentMessage, setCurrentMessage] = useState("")
+  const [aiGenerating, setAiGenerating] = useState(false)
+  const [generatedCommand, setGeneratedCommand] = useState<AICommandResponse | null>(null)
+  const [testingCommand, setTestingCommand] = useState(false)
+  const [selectedTestAgent, setSelectedTestAgent] = useState<string>("")
+  const [retryCount, setRetryCount] = useState(0)
   const { toast } = useToast()
 
   const categories = getCategoriesWithCounts(commands)
@@ -88,12 +103,14 @@ export default function CommandLibraryPage() {
     const loadData = async () => {
       try {
         setLoading(true)
-        const [commandsData, agentsData] = await Promise.all([
+        const [commandsData, agentsData, aiStatusData] = await Promise.all([
           apiClient.getSavedCommands(),
-          apiClient.getAgents()
+          apiClient.getAgents(),
+          apiClient.getAIStatus()
         ])
         setCommands(commandsData)
         setAgents(agentsData)
+        setAiStatus(aiStatusData)
       } catch (error) {
         toast({
           title: "Error",
@@ -342,6 +359,137 @@ export default function CommandLibraryPage() {
     }
   }
 
+  const sendAIMessage = async () => {
+    if (!currentMessage.trim() || aiGenerating) return
+
+    const userMessage = currentMessage.trim()
+    setCurrentMessage("")
+    
+    const newMessages = [...chatMessages, { role: "user", content: userMessage }]
+    setChatMessages(newMessages)
+    setAiGenerating(true)
+
+    try {
+      const response = await apiClient.generateCommandWithAI({
+        message: userMessage,
+        conversation_history: newMessages.slice(-10) // Keep last 10 messages for context
+      })
+
+      if (response.success && response.command_data) {
+        setGeneratedCommand(response)
+        setChatMessages([...newMessages, { 
+          role: "assistant", 
+          content: `I've generated a PowerShell command for you:\n\n**${response.command_data.name}**\n\n${response.command_data.explanation}\n\n\`\`\`powershell\n${response.command_data.command}\n\`\`\``
+        }])
+        setRetryCount(0)
+      } else {
+        throw new Error(response.error || "Failed to generate command")
+      }
+    } catch (error) {
+      setChatMessages([...newMessages, { 
+        role: "assistant", 
+        content: `Sorry, I encountered an error: ${error instanceof Error ? error.message : "Unknown error"}`
+      }])
+      
+      if (retryCount < 2) {
+        setRetryCount(retryCount + 1)
+        toast({
+          title: "Error",
+          description: `Generation failed. Retry ${retryCount + 1}/3`,
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to generate command after 3 attempts. Please try a different request.",
+          variant: "destructive",
+        })
+        setRetryCount(0)
+      }
+    } finally {
+      setAiGenerating(false)
+    }
+  }
+
+  const testGeneratedCommand = async () => {
+    if (!generatedCommand?.command_data?.command || !selectedTestAgent || testingCommand) return
+
+    setTestingCommand(true)
+    try {
+      const response = await apiClient.testAICommand({
+        command: generatedCommand.command_data.command,
+        agent_id: selectedTestAgent,
+        timeout: 30
+      })
+
+      if (response.success && response.result) {
+        const result = response.result
+        if (result.success) {
+          let outputDisplay = ""
+          if (result.output) {
+            try {
+              // Try to format JSON output nicely
+              const parsedOutput = typeof result.output === 'string' ? JSON.parse(result.output) : result.output
+              outputDisplay = JSON.stringify(parsedOutput, null, 2)
+            } catch {
+              // If not JSON, display as is
+              outputDisplay = typeof result.output === 'string' ? result.output : JSON.stringify(result.output, null, 2)
+            }
+          }
+
+          toast({
+            title: "Test Successful",
+            description: "Command executed successfully on agent",
+          })
+          
+          setChatMessages(prev => [...prev, {
+            role: "assistant",
+            content: `✅ **Test Result: Success**\n\nThe command ran successfully on the agent${result.execution_time ? ` in ${result.execution_time.toFixed(2)}s` : ''}.\n\n**Command Output:**\n\`\`\`json\n${outputDisplay}\n\`\`\`\n\nYou can now create this command using the "Create Command" button below.`
+          }])
+        } else {
+          throw new Error(result.error || "Command execution failed")
+        }
+      } else {
+        throw new Error(response.error || "Test failed")
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error"
+      toast({
+        title: "Test Failed",
+        description: errorMessage,
+        variant: "destructive",
+      })
+      setChatMessages(prev => [...prev, {
+        role: "assistant",
+        content: `❌ **Test Result: Failed**\n\nError: ${errorMessage}\n\nLet me try to generate a different command for you.`
+      }])
+      
+      // Auto-retry with error feedback if under retry limit
+      if (retryCount < 2) {
+        setTimeout(() => {
+          setCurrentMessage(`The previous command failed with error: ${errorMessage}. Please generate a different approach.`)
+          sendAIMessage()
+        }, 1000)
+      }
+    } finally {
+      setTestingCommand(false)
+    }
+  }
+
+  const createCommandFromAI = () => {
+    if (!generatedCommand?.command_data) return
+
+    const commandData = generatedCommand.command_data
+    setGeneratedCommand(null)
+    setAiDialogOpen(false)
+    setChatMessages([])
+    setCurrentMessage("")
+    setRetryCount(0)
+    
+    // Open the create command dialog with pre-filled data
+    setCreateDialogOpen(true)
+  }
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
@@ -352,13 +500,155 @@ export default function CommandLibraryPage() {
             <p className="text-muted-foreground">Manage and execute commands across your agents</p>
           </div>
         </div>
+        <div className="flex gap-2">
+          <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Command
+              </Button>
+            </DialogTrigger>
+          </Dialog>
+          
+          {aiStatus?.available && (
+            <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  Create Command with AI
+                </Button>
+              </DialogTrigger>
+            </Dialog>
+          )}
+        </div>
+        
+        {/* AI Chat Dialog */}
+        <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5" />
+                Create Command with AI
+              </DialogTitle>
+              <DialogDescription>
+                Describe what you want to do and AI will generate a PowerShell command for you
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="flex-1 flex flex-col space-y-4 min-h-0">
+              {/* Chat Messages */}
+              <div className="flex-1 border rounded-lg p-4 overflow-y-auto bg-muted/30 dark:bg-muted/10 min-h-[300px]">
+                {chatMessages.length === 0 ? (
+                  <div className="text-center text-muted-foreground">
+                    <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Start by describing what you want to accomplish...</p>
+                    <p className="text-sm mt-2">Example: "Show me system information" or "List all running services"</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {chatMessages.map((msg, index) => (
+                      <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] rounded-lg p-3 ${
+                          msg.role === 'user' 
+                            ? 'bg-primary text-primary-foreground shadow-sm' 
+                            : 'bg-card dark:bg-card border shadow-sm'
+                        }`}>
+                          <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
+                        </div>
+                      </div>
+                    ))}
+                    {aiGenerating && (
+                      <div className="flex justify-start">
+                        <div className="max-w-[80%] bg-card dark:bg-card border rounded-lg p-3 shadow-sm">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span className="text-sm">Generating command...</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Command Generation Results */}
+              {generatedCommand?.command_data && (
+                <div className="border rounded-lg p-4 bg-green-50 dark:bg-green-950/30 dark:border-green-800/50">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-medium text-green-800 dark:text-green-200">Generated Command</h4>
+                    <div className="flex gap-2">
+                      <Select value={selectedTestAgent} onValueChange={setSelectedTestAgent}>
+                        <SelectTrigger className="w-40">
+                          <SelectValue placeholder="Select agent to test" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {agents.filter(agent => agent.status === 'online' && agent.id).map((agent) => (
+                            <SelectItem key={agent.id} value={agent.id!}>
+                              {agent.hostname}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={testGeneratedCommand}
+                        disabled={!selectedTestAgent || testingCommand}
+                      >
+                        {testingCommand ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Testing...
+                          </>
+                        ) : (
+                          <>
+                            <Play className="mr-2 h-4 w-4" />
+                            Test Command
+                          </>
+                        )}
+                      </Button>
+                      <Button size="sm" onClick={createCommandFromAI}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create Command
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="text-sm text-green-700 dark:text-green-300 mb-2">{generatedCommand.command_data.description}</div>
+                  <Textarea 
+                    value={generatedCommand.command_data.command} 
+                    readOnly 
+                    className="font-mono text-sm bg-background border-input" 
+                    rows={3}
+                  />
+                </div>
+              )}
+
+              {/* Message Input */}
+              <div className="flex gap-2">
+                <Input 
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  placeholder="Describe what you want to do..."
+                  onKeyPress={(e) => e.key === 'Enter' && sendAIMessage()}
+                  disabled={aiGenerating}
+                />
+                <Button 
+                  onClick={sendAIMessage}
+                  disabled={!currentMessage.trim() || aiGenerating}
+                >
+                  {aiGenerating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <span className="font-bold">→</span>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Command Dialog */}
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Create Command
-            </Button>
-          </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Create New Command</DialogTitle>

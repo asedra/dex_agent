@@ -13,6 +13,7 @@ from ...services.powershell_service import PowerShellService
 from ...core.websocket_manager import websocket_manager
 from ...core.database import db_manager
 from ...core.auth import verify_token
+from ...services.ai_service import ai_service
 import logging
 import asyncio
 import uuid
@@ -421,4 +422,70 @@ async def execute_saved_command(
         
     except Exception as e:
         logger.error(f"Error executing saved command {command_id}: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to execute saved command") 
+        raise HTTPException(status_code=500, detail="Failed to execute saved command")
+
+# AI-Powered Command Generation
+
+class AICommandRequest(BaseModel):
+    message: str = Field(..., description="User request for command generation")
+    conversation_history: Optional[List[dict]] = Field(default=None, description="Previous conversation messages")
+
+class AITestRequest(BaseModel):
+    command: str = Field(..., description="Command to test")
+    agent_id: str = Field(..., description="Target agent ID for testing")
+    timeout: Optional[int] = Field(30, description="Test timeout in seconds")
+
+@router.post("/ai/generate")
+async def generate_command_with_ai(
+    request: AICommandRequest,
+    token: str = Depends(verify_token)
+):
+    """Generate PowerShell command using AI based on user request"""
+    try:
+        if not ai_service.is_available():
+            raise HTTPException(
+                status_code=503, 
+                detail="AI service not available - ChatGPT API key not configured"
+            )
+        
+        result = await ai_service.generate_powershell_command(
+            user_request=request.message,
+            conversation_history=request.conversation_history
+        )
+        
+        if not result["success"]:
+            raise HTTPException(status_code=500, detail=result["error"])
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error generating command with AI: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to generate command")
+
+@router.post("/ai/test")
+async def test_ai_command(
+    request: AITestRequest,
+    token: str = Depends(verify_token)
+):
+    """Test AI-generated command on specified agent"""
+    try:
+        result = await ai_service.test_command_on_agent(
+            command=request.command,
+            agent_id=request.agent_id,
+            websocket_manager=websocket_manager,
+            timeout=request.timeout or 30
+        )
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error testing AI command: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to test command")
+
+@router.get("/ai/status")
+async def get_ai_status(token: str = Depends(verify_token)):
+    """Get AI service status"""
+    return {
+        "available": ai_service.is_available(),
+        "message": "AI service is available" if ai_service.is_available() else "ChatGPT API key not configured"
+    }

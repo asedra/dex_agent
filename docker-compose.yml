@@ -64,6 +64,8 @@ services:
       - backend_logs:/app/logs
       - backend_temp:/app/temp
       - backend_installers:/app/agent_installers
+      # ChatGPT API key
+      - /home/ali/chatgpt.key:/app/chatgpt.key:ro
     networks:
       - dexagents-network
     depends_on:

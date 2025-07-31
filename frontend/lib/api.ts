@@ -171,6 +171,45 @@ export interface PowerShellCommandExecution {
   }>
 }
 
+export interface AICommandRequest {
+  message: string
+  conversation_history?: Array<{role: string, content: string}>
+}
+
+export interface AICommandResponse {
+  success: boolean
+  command_data?: {
+    command: string
+    name: string
+    description: string
+    category: string
+    parameters: CommandParameter[]
+    tags: string[]
+    explanation: string
+  }
+  raw_response?: string
+  error?: string
+  note?: string
+}
+
+export interface AITestRequest {
+  command: string
+  agent_id: string
+  timeout?: number
+}
+
+export interface AITestResponse {
+  success: boolean
+  command_id?: string
+  result?: any
+  error?: string
+}
+
+export interface AIStatusResponse {
+  available: boolean
+  message: string
+}
+
 class ApiClient {
   private baseUrl: string
   private token: string | null = null
@@ -407,6 +446,25 @@ class ApiClient {
     }
 
     return response.blob()
+  }
+
+  // AI-Powered Command Generation
+  async generateCommandWithAI(request: AICommandRequest): Promise<AICommandResponse> {
+    return this.request<AICommandResponse>('/api/v1/commands/ai/generate', {
+      method: 'POST',
+      body: JSON.stringify(request)
+    })
+  }
+
+  async testAICommand(request: AITestRequest): Promise<AITestResponse> {
+    return this.request<AITestResponse>('/api/v1/commands/ai/test', {
+      method: 'POST',
+      body: JSON.stringify(request)
+    })
+  }
+
+  async getAIStatus(): Promise<AIStatusResponse> {
+    return this.request<AIStatusResponse>('/api/v1/commands/ai/status')
   }
 }
 
