@@ -14,8 +14,10 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 # Simple encryption for sensitive settings
-ENCRYPTION_KEY = os.getenv("SETTINGS_ENCRYPTION_KEY", Fernet.generate_key())
-if isinstance(ENCRYPTION_KEY, str):
+ENCRYPTION_KEY = os.getenv("SETTINGS_ENCRYPTION_KEY")
+if ENCRYPTION_KEY is None:
+    ENCRYPTION_KEY = Fernet.generate_key()
+elif isinstance(ENCRYPTION_KEY, str):
     ENCRYPTION_KEY = ENCRYPTION_KEY.encode()
 cipher_suite = Fernet(ENCRYPTION_KEY)
 

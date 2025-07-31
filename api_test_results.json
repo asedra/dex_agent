@@ -1,85 +1,71 @@
 {
-  "timestamp": "2025-07-31T14:43:29.523599",
-  "total_tests": 11,
-  "passed_tests": 11,
-  "failed_tests": 0,
-  "results": [
+  "timestamp": "2025-07-31T15:25:44.689156",
+  "tests": [
     {
       "test": "Health Check",
-      "success": true,
+      "status": "PASSED",
       "message": "System is healthy",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.281455"
+      "timestamp": "2025-07-31T15:25:44.690864"
     },
     {
-      "test": "Unauthorized Access",
-      "success": true,
-      "message": "Protected endpoint correctly requires authentication",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.283018"
+      "test": "Authorization Control",
+      "status": "PASSED",
+      "message": "Unauthorized access properly denied",
+      "timestamp": "2025-07-31T15:25:45.193386"
     },
     {
-      "test": "Login",
-      "success": true,
-      "message": "Successfully logged in as admin",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.465848"
-    },
-    {
-      "test": "Token Format",
-      "success": true,
-      "message": "JWT token format is valid",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.465861"
+      "test": "User Login",
+      "status": "PASSED",
+      "message": "Login successful for user: admin",
+      "timestamp": "2025-07-31T15:25:45.862320"
     },
     {
       "test": "Token Validation",
-      "success": true,
+      "status": "PASSED",
       "message": "Token valid for user: admin",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.469870"
+      "timestamp": "2025-07-31T15:25:46.366946"
     },
     {
-      "test": "Agents List",
-      "success": true,
+      "test": "Agents Listing",
+      "status": "PASSED",
       "message": "Retrieved 1 agents",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.477071"
+      "timestamp": "2025-07-31T15:25:46.874640"
     },
     {
-      "test": "Commands Library",
-      "success": true,
-      "message": "Retrieved 6 saved commands",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.484272"
+      "test": "Agent Data Structure",
+      "status": "PASSED",
+      "message": "Agent data structure is valid",
+      "timestamp": "2025-07-31T15:25:46.874655"
     },
     {
-      "test": "Agent Registration",
-      "success": true,
-      "message": "Registered agent: agent_20250731_114329_491",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.495052"
+      "test": "Commands Listing",
+      "status": "PASSED",
+      "message": "Retrieved 6 commands",
+      "timestamp": "2025-07-31T15:25:47.383689"
     },
     {
-      "test": "Agent Refresh",
-      "success": true,
-      "message": "Agent refreshed: Agent refreshed successfully",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.508483"
+      "test": "Command Data Structure",
+      "status": "PASSED",
+      "message": "Command data structure is valid",
+      "timestamp": "2025-07-31T15:25:47.383709"
     },
     {
-      "test": "Agent Command",
-      "success": true,
-      "message": "Agent not connected (expected in testing)",
-      "details": "No WebSocket agent running",
-      "timestamp": "2025-07-31T14:43:29.514569"
+      "test": "Command Execution",
+      "status": "PASSED",
+      "message": "Command sent to agent desktop-jk5g34l-dexagent",
+      "timestamp": "2025-07-31T15:25:48.018055"
     },
     {
-      "test": "Agent Cleanup",
-      "success": true,
-      "message": "Test agent agent_20250731_114329_491 deleted",
-      "details": null,
-      "timestamp": "2025-07-31T14:43:29.523495"
+      "test": "Settings Retrieval",
+      "status": "PASSED",
+      "message": "Retrieved 5 settings",
+      "timestamp": "2025-07-31T15:25:48.525700"
     }
-  ]
+  ],
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  }
 }
