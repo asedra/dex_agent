@@ -358,6 +358,23 @@ class ApiClient {
 
     return response.blob()
   }
+
+  async createPythonAgent(config: AgentInstallerConfig): Promise<Blob> {
+    const response = await fetch(`${this.baseUrl}/api/v1/installer/create-python`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { 'Authorization': `Bearer ${this.token}` } : {})
+      },
+      body: JSON.stringify(config)
+    })
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+
+    return response.blob()
+  }
 }
 
 export const apiClient = new ApiClient()
