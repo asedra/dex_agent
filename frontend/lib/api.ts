@@ -117,6 +117,44 @@ export interface Command {
   updated_at: string
 }
 
+export interface SavedPowerShellCommand {
+  id: string
+  name: string
+  description?: string
+  command: string
+  category: string
+  parameters?: CommandParameter[]
+  tags?: string[]
+  version?: string
+  author?: string
+  is_system: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CommandParameter {
+  name: string
+  type: string
+  required: boolean
+  default_value?: any
+  description?: string
+  validation?: string
+}
+
+export interface PowerShellCommandExecution {
+  command_id: string
+  command_name: string
+  executed_command: string
+  results: Array<{
+    agent_id: string
+    command_id?: string
+    status: string
+    message?: string
+    success?: boolean
+    error?: string
+  }>
+}
+
 class ApiClient {
   private baseUrl: string
   private token: string | null = null
@@ -248,6 +286,55 @@ class ApiClient {
     await this.request(`/api/v1/commands/${id}`, {
       method: 'DELETE'
     })
+  }
+
+  // Saved PowerShell Commands endpoints
+  async getSavedCommands(): Promise<SavedPowerShellCommand[]> {
+    return this.request<SavedPowerShellCommand[]>('/api/v1/commands/saved')
+  }
+
+  async getSavedCommand(id: string): Promise<SavedPowerShellCommand> {
+    return this.request<SavedPowerShellCommand>(`/api/v1/commands/saved/${id}`)
+  }
+
+  async createSavedCommand(data: Partial<SavedPowerShellCommand>): Promise<SavedPowerShellCommand> {
+    return this.request<SavedPowerShellCommand>('/api/v1/commands/saved', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+  }
+
+  async updateSavedCommand(id: string, data: Partial<SavedPowerShellCommand>): Promise<SavedPowerShellCommand> {
+    return this.request<SavedPowerShellCommand>(`/api/v1/commands/saved/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+  }
+
+  async deleteSavedCommand(id: string): Promise<void> {
+    await this.request(`/api/v1/commands/saved/${id}`, {
+      method: 'DELETE'
+    })
+  }
+
+  async executeSavedCommand(
+    commandId: string, 
+    agentIds: string[], 
+    parameters: Record<string, any> = {},
+    timeout: number = 30
+  ): Promise<PowerShellCommandExecution> {
+    return this.request<PowerShellCommandExecution>(`/api/v1/commands/saved/${commandId}/execute`, {
+      method: 'POST',
+      body: JSON.stringify({
+        agent_ids: agentIds,
+        parameters,
+        timeout
+      })
+    })
+  }
+
+  async getCommandResult(agentId: string, commandId: string): Promise<any> {
+    return this.request(`/api/v1/commands/agent/${agentId}/result/${commandId}`)
   }
 
   // Installer endpoints

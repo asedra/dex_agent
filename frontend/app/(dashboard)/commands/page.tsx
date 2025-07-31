@@ -158,14 +158,12 @@ export default function CommandLibraryPage() {
       setExecuting(true)
       setExecutionResult(null)
       
-      const execution: PowerShellCommandExecution = {
-        command_id: command.id!,
-        parameters: parameterValues,
-        agent_ids: selectedAgents,
-        timeout: 30
-      }
-      
-      const result = await apiClient.executeSavedCommand(command.id!, execution)
+      const result = await apiClient.executeSavedCommand(
+        command.id!, 
+        selectedAgents, 
+        parameterValues, 
+        30
+      )
       
       toast({
         title: "Success", 
