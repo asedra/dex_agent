@@ -129,7 +129,7 @@ class ApiClient {
     } else {
       // Client-side: use public URL
       this.baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
-      this.token = localStorage.getItem('token')
+      this.token = localStorage.getItem('auth_token')
     }
   }
 
@@ -137,9 +137,9 @@ class ApiClient {
     this.token = token
     if (typeof window !== 'undefined') {
       if (token) {
-        localStorage.setItem('token', token)
+        localStorage.setItem('auth_token', token)
       } else {
-        localStorage.removeItem('token')
+        localStorage.removeItem('auth_token')
       }
     }
   }
@@ -154,8 +154,10 @@ class ApiClient {
       ...options.headers as Record<string, string>
     }
 
-    if (this.token) {
-      headers['Authorization'] = `Bearer ${this.token}`
+    // Always get fresh token from localStorage to ensure sync with AuthContext
+    const currentToken = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : this.token
+    if (currentToken) {
+      headers['Authorization'] = `Bearer ${currentToken}`
     }
 
     const response = await fetch(url, {
