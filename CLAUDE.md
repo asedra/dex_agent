@@ -227,6 +227,36 @@ Key variables for development:
 
 Copy `.env.example` to `.env` and update values for your environment.
 
+## Test Report Workflow
+
+### Test Report Command
+When user says "test raporunu oku" (read test report):
+1. Read test report from Windows path: `C:\test_report.md` (accessible from WSL as `/mnt/c/test_report.md`)
+2. Analyze findings and issues in the report
+3. Implement fixes for identified problems in the project
+4. Start Docker containers: `docker-compose up -d --build`  
+5. Perform own testing to verify fixes work
+6. Ask user for approval before committing changes
+7. After user approval, commit changes with descriptive message
+8. Stop Docker containers: `docker-compose down`
+
+### Test Report Processing Steps
+```bash
+# Read test report (WSL path conversion)
+cat /mnt/c/test_report.md
+
+# Start project for testing fixes
+docker-compose up -d --build
+
+# After implementing fixes and testing
+# Ask user: "Değişiklikleri commit etmemi onaylıyor musunuz?" 
+# Wait for user approval before:
+git add .
+git commit -m "fix: resolve issues from test report - [brief description]"
+git push origin main
+docker-compose down
+```
+
 ## Git Configuration
 
 ### GitHub Authentication
