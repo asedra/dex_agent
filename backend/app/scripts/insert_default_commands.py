@@ -1,9 +1,14 @@
-import sqlite3
 import json
 import os
+import sys
 from datetime import datetime
 
-def insert_default_commands(db_path):
+# Add the app directory to Python path
+sys.path.insert(0, '/app')
+
+from app.core.database import db_manager
+
+def insert_default_commands():
     """Insert default PowerShell commands into the database"""
     
     default_commands = [
@@ -13,11 +18,13 @@ def insert_default_commands(db_path):
             'description': 'Retrieves comprehensive system information including OS, hardware, and network details',
             'category': 'system',
             'command': 'Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors | ConvertTo-Json',
-            'parameters': '[]',
-            'tags': json.dumps(["system", "hardware", "info"]),
+            'parameters': [],
+            'tags': ["system", "hardware", "info"],
             'version': '1.0',
             'author': 'System',
-            'is_system': 1
+            'is_system': True,
+            'created_at': datetime.now().isoformat(),
+            'updated_at': datetime.now().isoformat()
         },
         {
             'id': 'sys-check-disk-space',
@@ -99,30 +106,34 @@ def insert_default_commands(db_path):
         }
     ]
     
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-    
-    # Insert commands
+    # Insert commands using database manager
     for cmd in default_commands:
         try:
-            cursor.execute('''
-                INSERT OR REPLACE INTO powershell_commands 
-                (id, name, description, category, command, parameters, tags, version, author, is_system, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-            ''', (
-                cmd['id'], cmd['name'], cmd['description'], cmd['category'],
-                cmd['command'], cmd['parameters'], cmd['tags'], cmd['version'],
-                cmd['author'], cmd['is_system']
-            ))
-            print(f"Inserted command: {cmd['name']}")
+            # Convert legacy format to new format if needed
+            command_data = {
+                'id': cmd['id'],
+                'name': cmd['name'],
+                'description': cmd['description'],
+                'category': cmd['category'],
+                'command': cmd['command'],
+                'parameters': cmd.get('parameters', []) if isinstance(cmd.get('parameters'), list) else [],
+                'tags': cmd.get('tags', []) if isinstance(cmd.get('tags'), list) else json.loads(cmd.get('tags', '[]')),
+                'version': cmd['version'],
+                'author': cmd['author'],
+                'is_system': cmd['is_system'] if isinstance(cmd['is_system'], bool) else bool(cmd['is_system']),
+                'created_at': datetime.now().isoformat(),
+                'updated_at': datetime.now().isoformat()
+            }
+            
+            success = db_manager.save_powershell_command(command_data)
+            if success:
+                print(f"Inserted command: {cmd['name']}")
+            else:
+                print(f"Failed to insert command: {cmd['name']}")
         except Exception as e:
             print(f"Error inserting {cmd['name']}: {e}")
     
-    conn.commit()
-    conn.close()
     print("Default commands insertion completed!")
 
 if __name__ == "__main__":
-    # Get database path from environment or use default
-    db_path = os.environ.get('DATABASE_PATH', '/app/data/dexagents.db')
-    insert_default_commands(db_path)
+    insert_default_commands()

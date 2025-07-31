@@ -9,15 +9,16 @@ Modern Windows sistemleri için kapsamlı uzak yönetim ve PowerShell komut çal
 ### 🐳 Docker ile Kurulum (Önerilen)
 - **Docker**: 20.10+ ve **Docker Compose**: 2.0+
 - **Git**: 2.20+
-- **Port Erişimi**: 3000 (Frontend), 8080 (Backend)
-- **RAM**: Minimum 2GB, Önerilen 4GB+
-- **Depolama**: Minimum 10GB boş alan
+- **Port Erişimi**: 3000 (Frontend), 8080 (Backend), 5433 (PostgreSQL)
+- **RAM**: Minimum 4GB, Önerilen 8GB+
+- **Depolama**: Minimum 20GB boş alan
 
 ### 💻 Manuel Kurulum Gereksinimleri
 #### Backend Gereksinimleri
 - **Python**: 3.9+ (3.11 önerilen)
 - **pip**: 21.0+
-- **SQLite**: 3.35+ (veritabanı için)
+- **PostgreSQL**: 15+ (Docker ile otomatik kurulur)
+- **psycopg2**: PostgreSQL adapter (requirements.txt'de dahil)
 
 #### Frontend Gereksinimleri  
 - **Node.js**: 18.0+ (20.x önerilen)
@@ -51,11 +52,14 @@ cd dex_agent
 
 #### 3. Docker Servisleri Başlatın
 ```bash
-# Tüm servisleri arka planda başlat
+# Tüm servisleri arka planda başlat (PostgreSQL, Backend, Frontend)
 docker-compose up -d --build
 
 # Servislerin durumunu kontrol et
 docker-compose ps
+
+# PostgreSQL'in hazır olmasını bekleyin
+docker-compose logs postgres
 
 # Logları takip et (isteğe bağlı)
 docker-compose logs -f
@@ -64,6 +68,7 @@ docker-compose logs -f
 #### 4. Servislere Erişim
 - **🌐 Web Dashboard**: http://localhost:3000
 - **🔧 Backend API**: http://localhost:8080
+- **🗄️ PostgreSQL**: localhost:5433 (dexagents/dexagents_dev_password)
 - **📚 API Dokumentasyonu**: http://localhost:8080/docs
 - **📊 Health Check**: http://localhost:8080/api/v1/system/health
 
@@ -99,8 +104,16 @@ source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# Veritabanını başlatın
-python -c "from app.core.database import db_manager; db_manager.create_tables()"
+# PostgreSQL veritabanını başlatın (Docker ile)
+docker run -d --name postgres-dev -e POSTGRES_DB=dexagents -e POSTGRES_USER=dexagents -e POSTGRES_PASSWORD=dexagents_dev_password -p 5433:5432 postgres:15-alpine
+
+# Veritabanı migration'larını çalıştırın
+python -c "
+from app.migrations.migration_manager import MigrationManager
+from app.core.config import settings
+mm = MigrationManager(settings.DATABASE_URL)
+mm.run_migrations()
+"
 
 # Sunucuyu başlatın
 python run.py
@@ -149,7 +162,8 @@ dexagents/
 │   │   │   └── websocket.py   # WebSocket endpoints
 │   │   ├── core/              # Çekirdek modüller
 │   │   │   ├── config.py      # Konfigürasyon
-│   │   │   ├── database.py    # SQLite veritabanı (Enhanced)
+│   │   │   ├── database.py         # Database abstraction layer
+│   │   │   ├── database_postgresql.py # PostgreSQL implementation
 │   │   │   ├── auth.py        # Authentication
 │   │   │   └── websocket_manager.py # WebSocket yönetimi
 │   │   ├── models/            # 🆕 Database modelleri
@@ -230,20 +244,24 @@ dexagents/
 - **Detailed Error Messages**: Kullanıcı dostu hata mesajları
 - **Timeout Management**: Komut zaman aşımı ve yeniden deneme mantığı
 
-### 🗄️ Enhanced Database Schema
-- **10 Tablo**: agents, users, groups, metrics, alerts, audit_logs, sessions, scheduled_tasks, command_history
-- **Migration Sistemi**: Version kontrolü ile database şeması yönetimi
-- **Model Sınıfları**: Tam ORM benzeri veri modelleri
-- **Index Optimizasyonu**: Performans için optimize edilmiş indexler
+### 🗄️ PostgreSQL Database Schema
+- **PostgreSQL 15**: Production-ready PostgreSQL database
+- **10 Tablo**: agents, users, groups, metrics, alerts, audit_logs, sessions, scheduled_tasks, command_history, powershell_commands
+- **Migration Sistemi**: Version kontrolü ile database şeması yönetimi  
+- **JSONB Support**: Advanced JSON data types with indexing
+- **Full-text Search**: PostgreSQL advanced search capabilities
+- **Index Optimizasyonu**: PostgreSQL-specific performance indexes
 - **Audit Logging**: Tüm sistem aktivitelerinin kaydı
 - **Session Management**: Güvenli kullanıcı oturum yönetimi
+- **Docker Integration**: Automated PostgreSQL container setup
 
 ### 🐳 Docker Support
-- **Multi-stage Builds**: Optimize edilmiş Docker imajları
-- **Health Checks**: Container sağlık kontrolü
-- **Volume Management**: Persistent data depolama
-- **Network Isolation**: Güvenli container iletişimi
-- **Production Ready**: Nginx reverse proxy ile production deployment
+- **Multi-container Setup**: PostgreSQL + Backend + Frontend
+- **PostgreSQL Container**: Automated database setup with health checks
+- **Volume Management**: Persistent PostgreSQL data and application data
+- **Network Isolation**: Secure inter-container communication
+- **Health Checks**: Container durumu monitoring
+- **Production Ready**: Full production deployment with Nginx reverse proxy
 
 ### 📊 Advanced Monitoring
 - **Real-time System Health**: CPU, memory, disk, network monitoring
@@ -295,46 +313,60 @@ docker-compose ps
 #### **agents** - Agent bilgileri
 ```sql
 - id (TEXT PRIMARY KEY)
-- hostname (TEXT NOT NULL)
+- hostname (TEXT NOT NULL) 
 - ip, os, version, status
-- last_seen, tags, system_info
-- connection_id, is_connected
-- created_at, updated_at
+- last_seen (TIMESTAMP), tags (JSONB), system_info (JSONB)
+- connection_id, is_connected (BOOLEAN)
+- created_at, updated_at (TIMESTAMP)
 ```
 
 #### **users** - Kullanıcı yönetimi
 ```sql
-- id (INTEGER PRIMARY KEY)
-- username, email (UNIQUE)
-- password_hash, is_active, is_admin
-- created_at, updated_at
+- id (SERIAL PRIMARY KEY)
+- username, email (UNIQUE NOT NULL)
+- password_hash (TEXT NOT NULL), full_name
+- is_active, is_admin (BOOLEAN)
+- last_login (TIMESTAMP)
+- created_at, updated_at (TIMESTAMP)
 ```
 
 #### **agent_metrics** - Performans metrikleri
 ```sql
-- id (INTEGER PRIMARY KEY)
-- agent_id (FOREIGN KEY)
-- cpu_usage, memory_usage, disk_usage
-- network_in, network_out, process_count
-- timestamp
+- id (SERIAL PRIMARY KEY)
+- agent_id (TEXT FOREIGN KEY)
+- cpu_usage, memory_usage, disk_usage (REAL)
+- network_in, network_out (REAL)
+- process_count (INTEGER)
+- timestamp (TIMESTAMP)
 ```
 
 #### **alerts** - Sistem uyarıları
 ```sql
-- id (INTEGER PRIMARY KEY)
-- agent_id (FOREIGN KEY)
-- alert_type, severity, message
-- details, is_resolved, resolved_at
-- created_at
+- id (SERIAL PRIMARY KEY)
+- agent_id (TEXT FOREIGN KEY)
+- alert_type, severity, message (TEXT NOT NULL)
+- details (JSONB), is_resolved (BOOLEAN)
+- resolved_at, created_at (TIMESTAMP)
 ```
 
 #### **audit_logs** - Sistem audit kayıtları
 ```sql
-- id (INTEGER PRIMARY KEY)
-- user_id (FOREIGN KEY)
-- action, resource_type, resource_id
-- details, ip_address, user_agent
-- timestamp
+- id (SERIAL PRIMARY KEY)
+- user_id (INTEGER FOREIGN KEY)
+- action, resource_type, resource_id (TEXT NOT NULL)
+- details (JSONB), ip_address, user_agent (TEXT)
+- timestamp (TIMESTAMP)
+```
+
+#### **powershell_commands** - Saved PowerShell Commands
+```sql
+- id (TEXT PRIMARY KEY)
+- name, description, category (TEXT NOT NULL)
+- command (TEXT NOT NULL)
+- parameters, tags (JSONB)
+- version, author (TEXT)
+- is_system (BOOLEAN)
+- created_at, updated_at (TIMESTAMP)
 ```
 
 ## 🚀 Deployment
@@ -639,21 +671,30 @@ npm install
 npm run dev
 ```
 
-#### Database Bağlantı Problemleri
+#### PostgreSQL Database Bağlantı Problemleri
 ```bash
-# SQLite database dosyasını kontrol et
-ls -la backend/data/
+# PostgreSQL container durumunu kontrol et
+docker-compose ps postgres
+docker-compose logs postgres
+
+# PostgreSQL bağlantı testi
+docker exec -it dexagents-postgres-dev pg_isready -U dexagents -d dexagents
+
+# PostgreSQL içine bağlan
+docker exec -it dexagents-postgres-dev psql -U dexagents -d dexagents
 
 # Database migration çalıştır
 docker exec -it dexagents-backend-dev python -c "
-from app.core.database import db_manager
-db_manager.create_tables()
-print('Database tables created successfully')
+from app.migrations.migration_manager import MigrationManager
+from app.core.config import settings
+mm = MigrationManager(settings.DATABASE_URL)
+mm.run_migrations()
+print('Database migrations completed successfully')
 "
 
-# Database'i sıfırla
+# PostgreSQL'i tamamen sıfırla
 docker-compose down -v
-rm -rf backend/data/dexagents.db
+docker volume rm dex_agent_postgres_data
 docker-compose up -d --build
 ```
 

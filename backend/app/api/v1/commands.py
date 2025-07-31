@@ -1,5 +1,6 @@
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel, Field
 from ...schemas.command import (
     PowerShellCommand, 
     CommandResponse, 
@@ -204,10 +205,15 @@ async def delete_saved_command(command_id: str, token: str = Depends(verify_toke
         logger.error(f"Error deleting saved command {command_id}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to delete saved command")
 
+class CommandExecutionRequest(BaseModel):
+    agent_ids: List[str] = Field(..., description="Target agent IDs")  
+    parameters: dict = Field(default_factory=dict, description="Parameter values")
+    timeout: Optional[int] = Field(30, description="Execution timeout")
+
 @router.post("/saved/{command_id}/execute")
 async def execute_saved_command(
     command_id: str, 
-    execution: PowerShellCommandExecution, 
+    execution: CommandExecutionRequest, 
     token: str = Depends(verify_token)
 ):
     """Execute a saved PowerShell command on specified agents"""

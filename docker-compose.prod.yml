@@ -1,6 +1,37 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database Service - Production
+  postgres:
+    image: postgres:15-alpine
+    container_name: dexagents-postgres-prod
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-dexagents}
+      - POSTGRES_USER=${POSTGRES_USER:-dexagents}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-secure_production_password}
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+      - ./backend/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - dexagents-prod-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dexagents} -d ${POSTGRES_DB:-dexagents}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
   # Backend Service - Production
   backend:
     build:
@@ -19,7 +50,7 @@ services:
       - SECRET_KEY=${SECRET_KEY:-please-change-this-secret-key-in-production}
       
       # Database
-      - DATABASE_URL=dexagents.db
+      - DATABASE_URL=${DATABASE_URL:-postgresql://dexagents:secure_production_password@postgres:5432/dexagents}
       
       # CORS Origins - Restrict in production
       - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS:-http://localhost:3000}
@@ -47,6 +78,9 @@ services:
       - backend_db_prod:/app
     networks:
       - dexagents-prod-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/system/health"]
       interval: 30s
@@ -141,6 +175,8 @@ networks:
     driver: bridge
 
 volumes:
+  postgres_data_prod:
+    driver: local
   backend_data_prod:
     driver: local
   backend_logs_prod:

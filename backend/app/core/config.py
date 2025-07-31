@@ -1,5 +1,6 @@
 from typing import List
 import os
+from urllib.parse import urlparse
 
 class Settings:
     # API Settings
@@ -20,6 +21,16 @@ class Settings:
     
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "data/dexagents.db")
+    
+    @property
+    def is_postgresql(self) -> bool:
+        """Check if database is PostgreSQL"""
+        return self.DATABASE_URL.startswith("postgresql://")
+    
+    @property
+    def is_sqlite(self) -> bool:
+        """Check if database is SQLite"""
+        return not self.is_postgresql
     
     # PowerShell Settings
     DEFAULT_TIMEOUT: int = int(os.getenv("DEFAULT_TIMEOUT", "30"))

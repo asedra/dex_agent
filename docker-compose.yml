@@ -1,6 +1,27 @@
-version: '3.8'
-
 services:
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: dexagents-postgres-dev
+    environment:
+      - POSTGRES_DB=dexagents
+      - POSTGRES_USER=dexagents
+      - POSTGRES_PASSWORD=dexagents_dev_password
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - dexagents-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dexagents -d dexagents"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   # Backend Service
   backend:
     build:
@@ -19,7 +40,7 @@ services:
       - SECRET_KEY=dev-secret-key-change-in-production
       
       # Database
-      - DATABASE_URL=data/dexagents.db
+      - DATABASE_URL=postgresql://dexagents:dexagents_dev_password@postgres:5432/dexagents
       
       # CORS Origins
       - BACKEND_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://frontend:3000
@@ -45,6 +66,9 @@ services:
       - backend_installers:/app/agent_installers
     networks:
       - dexagents-network
+    depends_on:
+      postgres:
+        condition: service_healthy
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/system/health"]
     #   interval: 30s
@@ -73,6 +97,7 @@ services:
       - NEXT_PUBLIC_API_URL=http://localhost:8080
       - NEXT_PUBLIC_API_TOKEN=your-secret-key-here
       - BACKEND_URL=http://backend:8000
+      - NEXT_PUBLIC_INTERNAL_API_URL=http://backend:8000
       
       # WebSocket Configuration
       - NEXT_PUBLIC_WS_URL=ws://localhost:8080
@@ -103,6 +128,8 @@ networks:
     driver: bridge
 
 volumes:
+  postgres_data:
+    driver: local
   backend_data:
     driver: local
   backend_logs:
