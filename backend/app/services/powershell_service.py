@@ -23,18 +23,56 @@ class PowerShellService:
         try:
             logger.info(f"Executing PowerShell command: {command}")
             
+            # Check for PowerShell availability
+            import shutil
+            import platform
+            
+            # Determine PowerShell executable
+            powershell_exe = None
+            if platform.system() == "Windows":
+                # Windows: try powershell.exe then pwsh.exe
+                if shutil.which('powershell.exe'):
+                    powershell_exe = 'powershell.exe'
+                elif shutil.which('pwsh.exe'):
+                    powershell_exe = 'pwsh.exe'
+            else:
+                # Linux/macOS: try pwsh (PowerShell Core)
+                if shutil.which('pwsh'):
+                    powershell_exe = 'pwsh'
+            
+            if not powershell_exe:
+                # PowerShell not available
+                execution_time = (datetime.now() - start_time).total_seconds()
+                error_msg = "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support."
+                logger.warning(error_msg)
+                
+                return CommandResponse(
+                    success=False,
+                    output="",
+                    error=error_msg,
+                    execution_time=execution_time,
+                    timestamp=start_time,
+                    command=command
+                )
+            
             # Prepare PowerShell command
             if run_as_admin:
-                # Run as administrator using Start-Process
-                ps_command = f'Start-Process powershell -ArgumentList "-Command", "{command}" -Verb RunAs -Wait'
+                # Run as administrator using Start-Process (Windows only)
+                if platform.system() == "Windows":
+                    ps_command = f'Start-Process {powershell_exe} -ArgumentList "-Command", "{command}" -Verb RunAs -Wait'
+                else:
+                    # On Linux/macOS, we can't elevate privileges the same way
+                    ps_command = command
+                    logger.warning("Admin privileges requested but not supported on this platform")
             else:
                 ps_command = command
             
+            logger.info(f"Using PowerShell executable: {powershell_exe}")
             logger.info(f"Final PowerShell command: {ps_command}")
             
             # Create process
             process = await asyncio.create_subprocess_exec(
-                'powershell.exe',
+                powershell_exe,
                 '-NoProfile',
                 '-NonInteractive',
                 '-Command',

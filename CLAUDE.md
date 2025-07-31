@@ -246,11 +246,20 @@ When user says "test raporunu oku" (read test report):
 1. Read test report from Windows path: `C:\test_report.md` (accessible from WSL as `/mnt/c/test_report.md`)
 2. Analyze findings and issues in the report
 3. Implement fixes for identified problems in the project
-4. Start Docker containers: `docker-compose up -d --build`  
-5. Perform own testing to verify fixes work
-6. Ask user for approval before committing changes
-7. After user approval, commit changes with descriptive message
-8. Stop Docker containers: `docker-compose down` (ONLY after commit is complete)
+4. Start Docker containers: `docker-compose up -d --build`
+5. Wait for services to initialize (30 seconds)
+6. Run comprehensive API test suite covering:
+   - Health endpoint testing
+   - User login and JWT token generation  
+   - Token validation via /me endpoint
+   - Agent registration and management
+   - Command execution testing (gracefully handles no WebSocket agent)
+   - PowerShell commands library access
+   - Authorization testing
+7. If API tests fail, analyze and fix issues, then re-test automatically
+8. Ask user for approval before committing changes: "Değişiklikleri commit etmemi onaylıyor musunuz?"
+9. After user approval, commit changes with descriptive message using GitHub token from `/home/ali/gitkey.md`
+10. Stop Docker containers: `docker-compose down` (ONLY after successful commit)
 
 ### Test Report Processing Steps
 ```bash
@@ -260,10 +269,22 @@ cat /mnt/c/test_report.md
 # Start project for testing fixes
 docker-compose up -d --build
 
-# After implementing fixes and testing
+# Wait for services to initialize
+sleep 30
+
+# Run comprehensive API tests
+python3 pre_commit_api_tests.py
+
+# If API tests fail, fix issues and re-run tests
 # Keep containers running for user testing
 # Ask user: "Değişiklikleri commit etmemi onaylıyor musunuz?" 
 # Wait for user approval before:
+
+# Configure git with token
+GITHUB_TOKEN=$(cat /home/ali/gitkey.md | head -n1 | tr -d '\n')
+git remote set-url origin "https://${GITHUB_TOKEN}@github.com/asedra/dex_agent.git"
+
+# Commit and push
 git add .
 git commit -m "fix: resolve issues from test report - [brief description]"
 git push origin main
