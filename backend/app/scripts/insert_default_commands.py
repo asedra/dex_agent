@@ -51,22 +51,6 @@ def insert_default_commands():
             'is_system': 1
         },
         {
-            'id': 'sys-event-logs',
-            'name': 'Get Event Logs',
-            'description': 'Retrieves system event logs with customizable parameters',
-            'category': 'monitoring',
-            'command': 'Get-EventLog -LogName $LogName -Newest $Count | Where-Object {$_.EntryType -eq "$Level"} | Select-Object TimeGenerated, EntryType, Source, Message | ConvertTo-Json',
-            'parameters': json.dumps([
-                {"name":"LogName","type":"string","default":"System","description":"Log name to query","required":True},
-                {"name":"Count","type":"number","default":"10","description":"Number of entries to retrieve","required":False},
-                {"name":"Level","type":"string","default":"Error","description":"Event level filter (Error, Warning, Information)","required":False}
-            ]),
-            'tags': json.dumps(["logs", "events", "monitoring", "troubleshooting"]),
-            'version': '1.0',
-            'author': 'System',
-            'is_system': 1
-        },
-        {
             'id': 'sys-security-audit',
             'name': 'Security Audit',
             'description': 'Performs basic security audit checks with JSON output',
