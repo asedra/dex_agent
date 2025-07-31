@@ -150,6 +150,34 @@ class MigrationManager:
                 logger.error(f"Failed to rollback migration {version}: {e}")
                 return False
     
+    def apply_function_migration(self, version: str, description: str, up_function):
+        """Apply a migration using a function"""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            try:
+                # Execute migration function
+                up_function(cursor)
+                
+                # Mark as applied
+                if self.is_postgresql:
+                    cursor.execute('''
+                        INSERT INTO migrations (version, description)
+                        VALUES (%s, %s)
+                    ''', (version, description))
+                else:
+                    cursor.execute('''
+                        INSERT INTO migrations (version, description)
+                        VALUES (?, ?)
+                    ''', (version, description))
+                
+                conn.commit()
+                logger.info(f"Applied migration {version}: {description}")
+                return True
+            except Exception as e:
+                conn.rollback()
+                logger.error(f"Failed to apply migration {version}: {e}")
+                return False
+    
     def run_migrations(self):
         """Run all pending migrations"""
         applied = self.get_applied_migrations()
@@ -157,11 +185,19 @@ class MigrationManager:
         
         for migration in migrations:
             if migration['version'] not in applied:
-                success = self.apply_migration(
-                    migration['version'],
-                    migration['description'],
-                    migration['up']
-                )
+                # Handle both SQL string and function migrations
+                if 'up_function' in migration:
+                    success = self.apply_function_migration(
+                        migration['version'],
+                        migration['description'],
+                        migration['up_function']
+                    )
+                else:
+                    success = self.apply_migration(
+                        migration['version'],
+                        migration['description'],
+                        migration['up']
+                    )
                 if not success:
                     logger.error(f"Migration {migration['version']} failed, stopping.")
                     break
@@ -187,7 +223,7 @@ class MigrationManager:
                 v004 = {
                     'version': 'v004',
                     'description': 'Create settings table',
-                    'up': lambda cursor: upgrade_postgresql(cursor)
+                    'up_function': upgrade_postgresql
                 }
                 migrations.append(v004)
             except ImportError:
