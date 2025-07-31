@@ -276,8 +276,90 @@ async def execute_saved_command(
         
         # Replace parameters in command template
         command_text = saved_command['command']
-        for param_name, param_value in execution.parameters.items():
+        
+        # Get command parameters definition from saved command
+        command_parameters = saved_command.get('parameters', [])
+        
+        # Auto-detect parameters from command text if definitions are missing
+        import re
+        
+        # Find all $variables but exclude PowerShell built-in variables
+        all_dollar_vars = re.findall(r'\$(\w+)', command_text)
+        
+        # PowerShell built-in and system variables to exclude
+        builtin_vars = {
+            '_', 'null', 'true', 'false', 'this', 'input', 'matches', 
+            'lastexitcode', 'error', 'executioncontext', 'foreach', 'switch',
+            'profile', 'pshome', 'psversion', 'pwd', 'args', 'home', 'host',
+            'myinvocation', 'ofs', 'shellid', 'stacktrace'
+        }
+        
+        # Only include custom parameters (not built-in PowerShell variables)
+        detected_params = [param for param in all_dollar_vars if param.lower() not in builtin_vars]
+        
+        # Create a comprehensive parameters dict with intelligent defaults
+        complete_parameters = {}
+        
+        # Default values for common PowerShell parameters
+        default_param_values = {
+            'LogName': 'System',
+            'Level': 'Error',
+            'Count': '10',
+            'ComputerName': 'localhost',
+            'Path': 'C:\\',
+            'Service': 'Spooler',
+            'ProcessName': 'explorer',
+            'Drive': 'C:',
+            'Directory': 'C:\\',
+            'EventID': '1000',
+            'Source': 'Application',
+            'Days': '7',
+            'Hours': '24',
+            'Minutes': '60',
+            'Size': '100MB',
+            'Top': '10',
+            'Limit': '100'
+        }
+        
+        # If we have parameter definitions, use them
+        if command_parameters:
+            for param in command_parameters:
+                param_name = param.get('name', '')
+                if param_name in execution.parameters and execution.parameters[param_name]:
+                    # Use provided value
+                    complete_parameters[param_name] = execution.parameters[param_name]
+                elif param.get('default'):
+                    # Use parameter's default value
+                    complete_parameters[param_name] = param.get('default')
+                elif param_name in default_param_values:
+                    # Use intelligent default
+                    complete_parameters[param_name] = default_param_values[param_name]
+                else:
+                    # Use empty string as fallback
+                    complete_parameters[param_name] = ''
+        else:
+            # No parameter definitions - use auto-detected parameters with intelligent defaults
+            for param_name in detected_params:
+                if param_name in execution.parameters and execution.parameters[param_name]:
+                    # Use provided value
+                    complete_parameters[param_name] = execution.parameters[param_name]
+                elif param_name in default_param_values:
+                    # Use intelligent default
+                    complete_parameters[param_name] = default_param_values[param_name]
+                else:
+                    # Use empty string as fallback
+                    complete_parameters[param_name] = ''
+        
+        # Replace all parameters in command text
+        for param_name, param_value in complete_parameters.items():
             command_text = command_text.replace(f"${param_name}", str(param_value))
+        
+        # Log the parameter substitution for debugging
+        logger.info(f"Command: {saved_command['name']}")
+        logger.info(f"Original: {saved_command['command']}")
+        logger.info(f"Detected params: {detected_params}")
+        logger.info(f"Complete params: {complete_parameters}")
+        logger.info(f"Final command: {command_text}")
         
         # Execute on each agent
         results = []

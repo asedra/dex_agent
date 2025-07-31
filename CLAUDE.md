@@ -250,7 +250,7 @@ When user says "test raporunu oku" (read test report):
 5. Perform own testing to verify fixes work
 6. Ask user for approval before committing changes
 7. After user approval, commit changes with descriptive message
-8. Stop Docker containers: `docker-compose down`
+8. Stop Docker containers: `docker-compose down` (ONLY after commit is complete)
 
 ### Test Report Processing Steps
 ```bash
@@ -261,13 +261,22 @@ cat /mnt/c/test_report.md
 docker-compose up -d --build
 
 # After implementing fixes and testing
+# Keep containers running for user testing
 # Ask user: "Değişiklikleri commit etmemi onaylıyor musunuz?" 
 # Wait for user approval before:
 git add .
 git commit -m "fix: resolve issues from test report - [brief description]"
 git push origin main
+
+# IMPORTANT: Only stop containers AFTER commit is complete
 docker-compose down
 ```
+
+### Important Container Management Rules:
+- **During Development**: Keep containers running for user testing
+- **Before Commit**: Allow user to test the running system
+- **After Commit**: Only stop containers after git push is complete
+- **User Experience**: Never stop containers before user confirms changes work
 
 ## Git Configuration
 

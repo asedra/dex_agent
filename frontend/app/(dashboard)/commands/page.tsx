@@ -158,12 +158,22 @@ export default function CommandLibraryPage() {
       setExecuting(true)
       setExecutionResult(null)
       
+      console.log('=== COMMAND EXECUTION DEBUG START ===')
+      console.log('Command:', command.name)
+      console.log('Selected agents:', selectedAgents)
+      console.log('Parameter values:', parameterValues)
+      
+      // Backend now handles parameter defaults comprehensively
+      // Just pass the parameters as provided by the user
       const result = await apiClient.executeSavedCommand(
         command.id!, 
         selectedAgents, 
         parameterValues, 
         30
       )
+      
+      console.log('Backend result:', result)
+      console.log('Result.results:', result.results)
       
       toast({
         title: "Success", 
@@ -175,12 +185,33 @@ export default function CommandLibraryPage() {
       
       await Promise.all(selectedAgents.map(async (agentId, index) => {
         try {
-          const commandId = result.results[index]?.command_id
+          console.log(`Processing agent ${agentId} (index ${index})`)
+          
+          // Find the result for this specific agent
+          const agentResult = result.results.find((r: any) => r.agent_id === agentId) || result.results[index]
+          console.log(`Agent ${agentId} result:`, agentResult)
+          
+          // Check if this agent's result has an error
+          if (agentResult?.success === false || agentResult?.error) {
+            console.error(`Agent ${agentId} has error:`, agentResult.error)
+            throw new Error(agentResult.error || 'Agent execution failed')
+          }
+          
+          const commandId = agentResult?.command_id
+          console.log(`Agent ${agentId} command ID:`, commandId)
+          
           if (!commandId) {
+            console.error(`No command ID for agent ${agentId}`)
             throw new Error('No command ID received')
           }
           
+          console.log(`Polling command result for agent ${agentId}, command ${commandId}`)
+          
+          // Add small delay to allow WebSocket response to be processed
+          await new Promise(resolve => setTimeout(resolve, 1000))
+          
           const commandResult = await pollCommandResult(agentId, commandId)
+          console.log(`Command result for agent ${agentId}:`, commandResult)
           
           if (commandResult.status === 'completed' && commandResult.result) {
             // Handle successful execution
@@ -195,15 +226,57 @@ export default function CommandLibraryPage() {
               }
             } else {
               // Command completed but failed
-              throw new Error(commandResult.result.error || 'Command execution failed')
+              console.error(`Command failed for agent ${agentId}:`, commandResult.result)
+              
+              // Handle PowerShell errors with empty error messages
+              let errorMessage = commandResult.result.error || ''
+              
+              // Check if we have an error object with empty error field
+              if (!errorMessage && commandResult.result.output) {
+                // Check if output is an object with error field
+                if (typeof commandResult.result.output === 'object' && 
+                    commandResult.result.output !== null && 
+                    'error' in commandResult.result.output) {
+                  errorMessage = commandResult.result.output.error || ''
+                } else {
+                  // Try to extract error from output
+                  errorMessage = typeof commandResult.result.output === 'string' 
+                    ? commandResult.result.output 
+                    : JSON.stringify(commandResult.result.output)
+                }
+              }
+              
+              // Provide user-friendly message for empty errors
+              if (!errorMessage || errorMessage === '{"error":""}' || errorMessage === '{}') {
+                errorMessage = 'PowerShell command failed. Possible causes:\n' +
+                  '• The Get-EventLog cmdlet requires administrator privileges\n' +
+                  '• The command may not be available on PowerShell Core (use Get-WinEvent instead)\n' +
+                  '• The Windows Event Log service may not be running'
+              }
+              
+              // Instead of throwing, we can store the error result
+              agentResults[agentId] = {
+                success: false,
+                error: errorMessage,
+                execution_time: commandResult.result.execution_time || 0,
+                timestamp: commandResult.result.timestamp || new Date().toISOString(),
+                note: 'Command executed but returned failure status'
+              }
             }
+          } else if (commandResult.status === 'pending') {
+            // Command still pending after polling
+            throw new Error('Command execution timeout - still pending after maximum polling attempts')
           } else {
             // Command not completed or no result
+            console.error(`Unexpected command result for agent ${agentId}:`, commandResult)
             const errorMessage = commandResult.result?.error || commandResult.error || 'Command execution failed or timed out'
             throw new Error(errorMessage)
           }
         } catch (error) {
-          console.error(`Error getting result for agent ${agentId}:`, error)
+          console.error(`=== Error getting result for agent ${agentId} ===`)
+          console.error('Error object:', error)
+          console.error('Error type:', typeof error)
+          console.error('Error stack:', error instanceof Error ? error.stack : 'No stack')
           
           agentResults[agentId] = {
             success: false,

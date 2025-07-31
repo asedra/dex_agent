@@ -241,16 +241,16 @@ async def handle_agent_message(agent_id: str, message: Dict[str, Any]):
         # Also store in database (ignore database errors for now)
         try:
             db_manager.add_command_history(agent_id, {
-                "command": command_result.get("command", ""),
-                "success": command_result.get("success", False),
-                "output": command_result.get("output", ""),
-                "error": command_result.get("error", ""),
-                "execution_time": command_result.get("execution_time", 0.0)
+                "command": data.get("command", "") if isinstance(data, dict) else "",
+                "success": success,
+                "output": data,
+                "error": error_msg,
+                "execution_time": execution_time
             })
         except Exception as e:
             logger.warning(f"Could not store command history in database: {e}")
         
-        logger.info(f"Command result processed for agent {agent_id}: {command_result.get('success', False)}")
+        logger.info(f"PowerShell result processed for agent {agent_id}: {success}")
     
     elif message_type == "system_info_update":
         # Handle system info update from agent
