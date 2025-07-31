@@ -291,7 +291,11 @@ async def execute_saved_command(
             '_', 'null', 'true', 'false', 'this', 'input', 'matches', 
             'lastexitcode', 'error', 'executioncontext', 'foreach', 'switch',
             'profile', 'pshome', 'psversion', 'pwd', 'args', 'home', 'host',
-            'myinvocation', 'ofs', 'shellid', 'stacktrace'
+            'myinvocation', 'ofs', 'shellid', 'stacktrace',
+            # Common script variables to exclude (lowercase for comparison)
+            'result', 'results', 'output', 'data', 'item', 'items',
+            'remoteservices', 'secprocs', 'services', 'users', 'processes',
+            'securityprocesses', 'temp', 'tmp', 'obj', 'object'
         }
         
         # Only include custom parameters (not built-in PowerShell variables)

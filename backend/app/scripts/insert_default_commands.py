@@ -55,10 +55,60 @@ def insert_default_commands():
             'name': 'Security Audit',
             'description': 'Performs basic security audit checks with JSON output',
             'category': 'security',
-            'command': '$users = Get-LocalUser | Select-Object Name, Enabled, LastLogon; $services = Get-Service | Where-Object {$_.Status -eq "Running" -and $_.Name -like "*Remote*"} | Select-Object Name, Status; @{Users=$users; RemoteServices=$services} | ConvertTo-Json -Depth 3',
+            'command': '''# Security Audit Script
+$result = @{
+    Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    Users = @()
+    RemoteServices = @()
+    SecurityProcesses = @()
+}
+
+# Check users (with error handling)
+try {
+    if (Get-Command Get-LocalUser -ErrorAction SilentlyContinue) {
+        $result.Users = Get-LocalUser | Select-Object Name, Enabled, LastLogon
+    } else {
+        $result.Users = @{Status='Get-LocalUser not available on this system'}
+    }
+} catch {
+    $result.Users = @{Status='Error'; Message=$_.Exception.Message}
+}
+
+# Check services
+try {
+    $remoteServices = Get-Service | Where-Object {
+        $_.Status -eq 'Running' -and 
+        ($_.Name -match 'Remote|RDP|SSH|WinRM|Telnet')
+    } | Select-Object Name, DisplayName, Status
+    
+    $result.RemoteServices = if ($remoteServices) {
+        $remoteServices
+    } else {
+        @{Status='No remote access services found'}
+    }
+} catch {
+    $result.RemoteServices = @{Status='Error'; Message=$_.Exception.Message}
+}
+
+# Check security processes
+try {
+    $secProcs = Get-Process | Where-Object {
+        $_.ProcessName -match 'defender|antivirus|firewall|security|malware'
+    } | Select-Object ProcessName, Id | Select-Object -First 5
+    
+    $result.SecurityProcesses = if ($secProcs) {
+        $secProcs
+    } else {
+        @{Status='No security processes found'}
+    }
+} catch {
+    $result.SecurityProcesses = @{Status='Error'; Message=$_.Exception.Message}
+}
+
+$result | ConvertTo-Json -Depth 3''',
             'parameters': '[]',
-            'tags': json.dumps(["security", "audit", "users", "services"]),
-            'version': '1.0',
+            'tags': json.dumps(["security", "audit", "users", "services", "processes"]),
+            'version': '2.2',
             'author': 'System',
             'is_system': 1
         },
