@@ -82,6 +82,22 @@ export interface CommandResult {
   exit_code?: number
 }
 
+export interface PowerShellCommand {
+  command: string
+  timeout?: number
+  working_directory?: string
+  run_as_admin?: boolean
+}
+
+export interface CommandResponse {
+  success: boolean
+  output?: string
+  error?: string
+  execution_time?: number
+  timestamp: string
+  command: string
+}
+
 export interface LoginRequest {
   username: string
   password: string
@@ -256,6 +272,23 @@ class ApiClient {
     return this.request<CommandResult>(`/api/v1/agents/${agentId}/execute`, {
       method: 'POST',
       body: JSON.stringify(command)
+    })
+  }
+
+  async refreshAgent(agentId: string): Promise<{ message: string; agent: Agent }> {
+    return this.request<{ message: string; agent: Agent }>(`/api/v1/agents/${agentId}/refresh`, {
+      method: 'POST'
+    })
+  }
+
+  async executeAgentCommand(agentId: string, command: string): Promise<CommandResponse> {
+    const commandData: PowerShellCommand = {
+      command: command,
+      timeout: 30
+    }
+    return this.request<CommandResponse>(`/api/v1/agents/${agentId}/command`, {
+      method: 'POST',
+      body: JSON.stringify(commandData)
     })
   }
 

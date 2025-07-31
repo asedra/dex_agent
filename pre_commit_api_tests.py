@@ -196,6 +196,36 @@ class PreCommitAPITester:
             self.log_test("Agent Registration", False, f"Registration error: {str(e)}")
             return None
     
+    def test_agent_refresh(self, agent_id: str) -> bool:
+        """Test agent refresh endpoint"""
+        if not self.token or not agent_id:
+            self.log_test("Agent Refresh", False, "No token or agent ID available")
+            return False
+            
+        try:
+            response = requests.post(
+                f"{self.base_url}/api/v1/agents/{agent_id}/refresh",
+                headers=self.headers,
+                timeout=10
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("message") and result.get("agent"):
+                    self.log_test("Agent Refresh", True, f"Agent refreshed: {result['message']}")
+                    return True
+                else:
+                    self.log_test("Agent Refresh", False, "Invalid response format")
+                    return False
+            else:
+                error_msg = response.json().get("detail", "Unknown error") if response.content else f"HTTP {response.status_code}"
+                self.log_test("Agent Refresh", False, error_msg)
+                return False
+                
+        except Exception as e:
+            self.log_test("Agent Refresh", False, f"Agent refresh error: {str(e)}")
+            return False
+
     def test_agent_command_execution(self, agent_id: str) -> bool:
         """Test command execution on agent (will fail if no WebSocket agent connected)"""
         if not self.token or not agent_id:
@@ -348,6 +378,11 @@ class PreCommitAPITester:
         agent_id = self.test_agent_registration()
         if agent_id:
             tests_passed += 1
+            
+            # Test agent refresh
+            total_tests += 1
+            if self.test_agent_refresh(agent_id):
+                tests_passed += 1
             
             # Test command execution (expected to fail gracefully)
             total_tests += 1
