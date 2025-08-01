@@ -10,11 +10,66 @@ When Claude Code starts, these custom commands are available:
 
 | Command | Description | Action |
 |---------|-------------|--------|
-| **"test raporunu oku"** | Read and fix test report | Reads `C:\test_report.md`, analyzes findings, implements fixes, tests in Docker, and requests commit approval |
+| **"/tasks_start"** | Start task planning process | Enters planning mode with ultrathink, analyzes stories/bugs/tasks and creates implementation plan |
+| **"test raporunu oku"** | Read and fix test report | Reads test results from `backend_test_results.md` and `frontend_test_results.md`, analyzes findings, implements fixes |
 | **"projeyi başlat"** | Start the project | Runs `docker-compose up -d --build` to start all services |
-| **"testleri çalıştır"** | Run comprehensive tests | Restarts Docker services and runs complete test suite including new AI features |
+| **"testleri çalıştır"** | Run comprehensive tests | User will manually run tests and document results in test result files |
 
 Simply type any of these commands to execute the corresponding workflow.
+
+## 📋 Project Management Workflow
+
+### Task Management Files Structure
+```
+dex_agent/
+├── story.md              # Current user stories (features to implement)
+├── bug.md                # Current bugs to fix
+├── task.md               # Current technical tasks
+├── story_archive.md      # Completed stories archive
+├── bug_archive.md        # Completed bugs archive  
+├── task_archive.md       # Completed tasks archive
+├── backend_test_results.md    # Manual test results for backend
+├── frontend_test_results.md   # Manual test results for frontend
+└── test_history.md       # History of test changes and approvals
+```
+
+### Workflow Process
+
+#### 1. Task Planning Phase (`/tasks_start` command)
+- **Mode**: Planning mode with ultrathink enabled
+- **Process**: 
+  - Analyze `story.md`, `bug.md`, `task.md` files
+  - If only stories exist, create detailed tasks breakdown
+  - Create comprehensive implementation plan
+  - **CRITICAL**: No code changes during planning, only analysis and planning
+
+#### 2. Development Phase
+- Implement features/fixes based on tasks
+- **Test Integration Rule**: Every new feature MUST have corresponding tests added
+- **Test Preservation Rule**: Existing tests MUST NEVER be deleted
+- **Test Modification Rule**: Require user approval for any test modifications
+- **History Tracking**: Document all test changes in `test_history.md`
+
+#### 3. Testing Phase
+- User manually runs comprehensive tests
+- Results documented in:
+  - `backend_test_results.md` - Backend API test results
+  - `frontend_test_results.md` - Frontend E2E test results
+- If bugs found: Create new entries in `bug.md`/`task.md`/`story.md` and return to step 1
+
+#### 4. Archive Phase
+- Move completed items from `story.md`/`bug.md`/`task.md` to respective archive files
+- **Archive Format**: Include completion date and brief summary
+
+#### 5. Commit Phase
+- **REQUIRES USER APPROVAL**: Must get explicit approval before any commit
+- After approval: Execute commit and push operations
+- **REQUIRES USER APPROVAL**: Must get explicit approval before stopping Docker services
+
+### Approval Requirements
+1. **Test Modifications**: Any changes to existing tests
+2. **Commit Operations**: Before git commit and push
+3. **Docker Management**: Before stopping services (`docker-compose down`)
 
 ## Project Overview
 
@@ -180,6 +235,27 @@ dex_agent/
 - **PostgreSQL**: Version 15+ (containerized via docker-compose)
 - **Chrome/Chromium**: For Playwright tests (auto-installed)
 
+### Test Development Rules
+
+#### 🚫 CRITICAL RULES - NEVER VIOLATE
+1. **NEVER DELETE EXISTING TESTS**: Existing tests must be preserved at all costs
+2. **REQUIRE APPROVAL FOR MODIFICATIONS**: Any changes to existing tests need explicit user approval
+3. **DOCUMENT ALL CHANGES**: Record all test modifications in `test_history.md`
+4. **ADD TESTS FOR NEW FEATURES**: Every new feature must include corresponding tests
+
+#### Test Addition Process
+1. Identify new functionality requiring tests
+2. Create new test files or add test cases to existing files
+3. Document new tests in commit messages
+4. Update test documentation
+
+#### Test Modification Process
+1. **STOP**: Request user approval for any test modifications
+2. Document reason for modification request
+3. Wait for explicit approval
+4. If approved: Make changes and document in `test_history.md`
+5. If denied: Find alternative solution without modifying existing tests
+
 ### Frontend Tests (Playwright)
 - **Location**: `/frontend/tests/e2e/`
 - **Coverage**: Authentication, Dashboard, Agents, Commands, API Integration, AI Features
@@ -218,52 +294,43 @@ frontend/tests/e2e/
 
 ## 🧪 Test Process
 
-### Comprehensive Test Suite
-The **"testleri çalıştır"** command runs a complete test suite that includes:
+### Manual Testing Workflow
+1. **User Executes Tests**: User manually runs comprehensive test suite
+2. **Results Documentation**: User documents results in:
+   - `backend_test_results.md` - Backend API test results
+   - `frontend_test_results.md` - Frontend E2E test results
+3. **Bug Analysis**: Claude analyzes test results and creates bug/task entries if needed
+4. **Fix Implementation**: Claude implements fixes based on test results
+5. **Test Enhancement**: Add new tests for any new functionality
 
-1. **Docker Restart**: Stops and restarts all services for a clean test environment
-2. **Backend API Tests**: Tests all endpoints including new AI features:
+### Comprehensive Test Suite
+The manual test process includes:
+
+1. **Backend API Tests**: Tests all endpoints including AI features:
    - AI command generation (`/api/v1/ai/generate-command`)
    - ChatGPT settings management (`/api/v1/settings`)
    - All existing API endpoints (auth, agents, commands, system)
-3. **Frontend E2E Tests**: Playwright tests including new AI features:
+2. **Frontend E2E Tests**: Playwright tests including AI features:
    - "Create Command with AI" button functionality
    - ChatGPT settings UI tests
    - All existing E2E tests (auth, dashboard, agents, commands)
-4. **Pre-commit Tests**: Additional validation and security checks
-5. **Performance Tests**: Basic response time validation
-6. **Test Reporting**: Generates comprehensive HTML and markdown reports
+3. **Performance Tests**: Basic response time validation
+4. **Security Tests**: Authentication and authorization validation
 
-### Test Execution Order
-1. Docker services restart (`docker-compose down && docker-compose up -d --build`)
-2. Backend API tests (45s timeout) - includes AI feature validation
-3. Frontend E2E tests (120s timeout) - includes AI UI testing
-4. Pre-commit comprehensive tests (45s timeout)
-5. Performance validation
-6. Report generation in `test-reports/[timestamp]/`
-
-### New AI Feature Tests
-- **Backend**: Multiple AI-related tests in comprehensive_api_test.py:
-  - `test_ai_command_generation()` - Tests AI command generation endpoint
-  - `test_chatgpt_settings()` - Tests ChatGPT settings management
-  - `test_ai_button_always_visible()` - Tests AI status endpoint availability
-  - `test_ai_redirect_to_settings()` - Tests AI behavior when not configured
-- **Frontend**: Complete AI workflow testing in ai-features.spec.ts:
-  - "Create Command with AI" button always visible test
-  - ChatGPT configuration workflow test
-  - Redirect to settings when not configured test
-  - Direct AI functionality when configured test
-  - Settings page ChatGPT configuration test
-- **Coverage**: API endpoints, UI components, error handling, configuration management, user workflow
+### Test Result Analysis
+- **Success Cases**: Document in test results files
+- **Failure Cases**: Create bug entries in `bug.md`
+- **Missing Coverage**: Create task entries in `task.md`
+- **New Features Needed**: Create story entries in `story.md`
 
 ## 🔧 Development Commands
 
 ### Docker Management
 ```bash
-# Start project
+# Start project (requires no approval)
 docker-compose up -d --build
 
-# Stop project
+# Stop project (REQUIRES USER APPROVAL)
 docker-compose down
 
 # View logs
@@ -286,7 +353,7 @@ npm run dev
 # Build for production
 npm run build
 
-# Run tests
+# Run tests (manual execution by user)
 npm run test:e2e
 npm run test:e2e:headed    # With browser
 npm run test:e2e:ui        # Interactive mode
@@ -302,7 +369,7 @@ pip install -r requirements.txt
 # Run server
 python run.py
 
-# Run tests
+# Run tests (manual execution by user)
 python comprehensive_api_test.py
 ```
 
@@ -316,7 +383,7 @@ python comprehensive_api_test.py
    lsof -i :3000
    lsof -i :8080
    
-   # Stop conflicting processes
+   # Stop conflicting processes (requires approval)
    docker-compose down
    ```
 
@@ -325,7 +392,7 @@ python comprehensive_api_test.py
    # Check PostgreSQL container
    docker-compose logs postgres
    
-   # Reset database
+   # Reset database (requires approval)
    docker-compose down -v
    docker-compose up -d
    ```
@@ -363,9 +430,10 @@ python comprehensive_api_test.py
 ### Pull Request Process
 1. Create feature branch from main
 2. Implement changes with tests
-3. Run test suite: `npm run test:e2e`
-4. Create PR with description
-5. Ensure CI passes
+3. User manually runs test suite and documents results
+4. **REQUIRES APPROVAL**: Get user approval for commit
+5. Create PR with description
+6. Ensure CI passes
 
 ### Security Considerations
 - JWT tokens expire in 24 hours
@@ -431,17 +499,22 @@ cp .env.example .env
 
 ## Memories and Notes
 
-- ☒ Read test report from C:\test_report.md için benden her seferinde izin istemesin
+- ☒ Read test report from test results files without asking permission each time
 - ☒ Project uses admin/admin123 for default authentication
 - ☒ Playwright tests cover comprehensive frontend functionality
 - ☒ Docker Compose manages all services in development
 - ☒ PostgreSQL replaced SQLite for better production readiness
+- ☒ Task management workflow with story/bug/task files implemented
+- ☒ Test preservation rules established - never delete existing tests
+- ☒ Approval requirements for commits and Docker management
+- ☒ Manual testing workflow with result documentation
 
 ## Recent Updates
 
-- ✅ Added comprehensive Playwright E2E test suite
-- ✅ Implemented helper functions for authentication and API mocking
-- ✅ Created detailed test documentation and guidelines
-- ✅ Enhanced CLAUDE.md with complete project information
-- ✅ Updated project architecture to use PostgreSQL
-- ✅ Added custom commands for Claude Code integration
+- ✅ Added comprehensive project management workflow
+- ✅ Implemented task/story/bug tracking system
+- ✅ Added test preservation and approval requirements
+- ✅ Created manual testing workflow with result documentation
+- ✅ Added `/tasks_start` command for planning mode
+- ✅ Established approval gates for commits and Docker operations
+- ✅ Added test history tracking and modification controls

@@ -186,7 +186,7 @@ export default function SettingsPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center space-x-2">
         <Settings className="h-8 w-8" />
-        <h1 className="text-3xl font-bold">Settings</h1>
+        <h1 className="text-3xl font-bold" data-testid="page-title">Settings</h1>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

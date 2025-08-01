@@ -67,7 +67,7 @@ export class APIMocks {
     const defaultAgents = [
       {
         id: 1,
-        hostname: 'TEST-PC-001',
+        hostname: 'desktop-jk5g34l-dexagent',
         status: 'online',
         is_connected: true,
         last_seen: '2024-01-15T10:30:00Z',
@@ -77,7 +77,7 @@ export class APIMocks {
       },
       {
         id: 2,
-        hostname: 'TEST-PC-002',
+        hostname: 'desktop-jk5g34l-dexagent-2',
         status: 'offline',
         is_connected: false,
         last_seen: '2024-01-15T09:15:00Z',

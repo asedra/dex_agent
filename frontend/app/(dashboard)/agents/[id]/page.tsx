@@ -361,7 +361,7 @@ export default function AgentDetailPage() {
             <div className="flex items-center gap-3">
               <Server className="h-8 w-8 text-blue-600" />
               <div>
-                <h2 className="text-3xl font-bold tracking-tight">{agent.hostname}</h2>
+                <h2 className="text-3xl font-bold tracking-tight" data-testid="page-title">{agent.hostname}</h2>
                 <p className="text-muted-foreground">Agent ID: {agent.id}</p>
               </div>
             </div>

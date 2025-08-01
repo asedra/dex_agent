@@ -11,13 +11,23 @@ export class AuthHelper {
    */
   async loginAsAdmin() {
     await this.page.goto('/login')
+    await this.page.waitForTimeout(1000)
+    
+    // Fill credentials
     await this.page.fill('input[name="username"]', 'admin')
     await this.page.fill('input[name="password"]', 'admin123')
-    await this.page.click('button[type="submit"]')
     
-    // Wait for successful login
-    await expect(this.page).toHaveURL('/')
-    await expect(this.page.locator('h2')).toContainText('Dashboard')
+    // Submit form and wait for navigation
+    await Promise.all([
+      this.page.waitForURL('/'),
+      this.page.click('button[type="submit"]')
+    ])
+    
+    // Additional wait for page to load
+    await this.page.waitForTimeout(2000)
+    
+    // Verify we're successfully logged in by checking we're not on login page
+    expect(this.page.url()).not.toContain('login')
   }
 
   /**

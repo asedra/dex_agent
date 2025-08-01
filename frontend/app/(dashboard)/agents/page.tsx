@@ -200,7 +200,7 @@ export default function AgentsPage() {
         <div className="flex items-center gap-4">
           <SidebarTrigger />
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Agents</h2>
+            <h2 className="text-3xl font-bold tracking-tight" data-testid="page-title">Agents</h2>
             <p className="text-muted-foreground">Manage your endpoint agents</p>
           </div>
         </div>

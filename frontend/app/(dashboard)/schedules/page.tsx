@@ -159,7 +159,7 @@ export default function SchedulesPage() {
         <div className="flex items-center gap-4">
           <SidebarTrigger />
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Scheduled Jobs</h2>
+            <h2 className="text-3xl font-bold tracking-tight" data-testid="page-title">Scheduled Jobs</h2>
             <p className="text-muted-foreground">Manage automated PowerShell command execution</p>
           </div>
         </div>

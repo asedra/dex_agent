@@ -118,7 +118,7 @@ function Dashboard() {
         <div className="flex items-center gap-4">
           <SidebarTrigger />
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+            <h2 className="text-3xl font-bold tracking-tight" data-testid="page-title">Dashboard</h2>
             <p className="text-muted-foreground">Overview of your endpoint agents and recent activity</p>
           </div>
         </div>

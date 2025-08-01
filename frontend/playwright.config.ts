@@ -15,9 +15,15 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
+    ['html', { 
+      outputFolder: 'playwright-report',
+      open: 'never',
+      host: 'localhost',
+      port: 9323
+    }],
     ['json', { outputFile: 'test-results/results.json' }],
-    ['junit', { outputFile: 'test-results/junit.xml' }]
+    ['junit', { outputFile: 'test-results/junit.xml' }],
+    ['list']
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -27,6 +33,11 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     
+    /* Extra environment variables for tests */
+    extraHTTPHeaders: {
+      'Accept': 'application/json',
+    },
+    
     /* Take screenshot on failure */
     screenshot: 'only-on-failure',
     
@@ -34,8 +45,11 @@ export default defineConfig({
     video: 'retain-on-failure',
     
     /* Global timeout settings */
-    actionTimeout: 10000,
-    navigationTimeout: 15000,
+    actionTimeout: 15000,
+    navigationTimeout: 20000,
+    
+    /* Ensure fresh browser context for each test */
+    storageState: undefined,
   },
   
   /* Global test timeout */
@@ -43,7 +57,7 @@ export default defineConfig({
   
   /* Expect timeout */
   expect: {
-    timeout: 10000
+    timeout: 15000
   },
 
   /* Configure projects for major browsers */

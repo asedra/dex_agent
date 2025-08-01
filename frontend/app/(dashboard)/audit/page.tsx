@@ -165,7 +165,7 @@ export default function AuditLogsPage() {
         <div className="flex items-center gap-4">
           <SidebarTrigger />
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Audit Logs</h2>
+            <h2 className="text-3xl font-bold tracking-tight" data-testid="page-title">Audit Logs</h2>
             <p className="text-muted-foreground">Track all system activities and user actions</p>
           </div>
         </div>
