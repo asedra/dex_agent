@@ -17,4 +17,15 @@ psycopg2-binary>=2.9.7
 sqlalchemy>=2.0.0
 alembic>=1.12.0
 cryptography>=41.0.0
-openai>=1.0.0 
+openai>=1.0.0
+
+# Testing dependencies (removed pytest-postgresql due to libpq conflicts)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx>=0.25.0
+factory-boy>=3.3.0
+pytest-cov>=4.1.0
+pytest-mock>=3.12.0
+pytest-xdist>=3.3.0
+websockets>=12.0
+pytest-html>=4.1.0 
