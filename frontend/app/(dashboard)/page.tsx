@@ -10,6 +10,8 @@ import { Progress } from "@/components/ui/progress"
 import Link from "next/link"
 import { apiClient, SystemInfo, Agent } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
+import { WebSocketDashboard } from "@/components/WebSocketDashboard"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 function Dashboard() {
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null)
@@ -123,6 +125,14 @@ function Dashboard() {
           </div>
         </div>
       </div>
+
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="realtime">Real-time Monitor</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview" className="space-y-4">
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -286,6 +296,12 @@ function Dashboard() {
           </CardContent>
         </Card>
       )}
+        </TabsContent>
+
+        <TabsContent value="realtime" className="space-y-4">
+          <WebSocketDashboard />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

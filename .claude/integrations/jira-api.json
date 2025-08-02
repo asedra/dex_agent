@@ -1,0 +1,31 @@
+{
+  "name": "jira-api",
+  "description": "Direct Jira REST API integration",
+  "version": "2.0.0",
+  "connection": {
+    "baseUrl": "${JIRA_BASE_URL}",
+    "apiVersion": "3",
+    "email": "${JIRA_EMAIL}",
+    "apiToken": "${JIRA_API_TOKEN}",
+    "orgId": "${JIRA_ORG_ID}"
+  },
+  "endpoints": {
+    "projects": "/rest/api/3/project",
+    "search": "/rest/api/3/search",
+    "issue": "/rest/api/3/issue",
+    "users": "/rest/api/3/users/search"
+  },
+  "projects": {
+    "KAN": "Claude Code Development", 
+    "SAM1": "Annual Product Roadmap Planning"
+  },
+  "cloudId": "e9ed7bab-c21a-4b0c-b996-fa7146d8e58b",
+  "settings": {
+    "timeout": 30,
+    "retries": 3,
+    "cache": {
+      "enabled": true,
+      "ttl": 900
+    }
+  }
+}

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import { useAuth } from "@/contexts/AuthContext"
 import Link from "next/link"
 
@@ -108,6 +109,7 @@ export function AppSidebar() {
                 {user?.email || 'admin@company.com'}
               </p>
             </div>
+            <ThemeToggle />
           </div>
           <Button 
             variant="outline" 
