@@ -1,0 +1,851 @@
+{
+  "success": true,
+  "total_commands": 6,
+  "excellent_commands": 6,
+  "good_commands": 0,
+  "acceptable_commands": 0,
+  "poor_commands": 0,
+  "error_commands": 0,
+  "detailed_results": [
+    {
+      "command_id": "sys-service-status",
+      "command_name": "Get Service Status",
+      "command_category": "system",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "warnings": []
+      },
+      "api_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "execution_successful": false,
+        "response_data": {
+          "success": false,
+          "output": "",
+          "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+          "execution_time": 0.003079,
+          "timestamp": "2025-07-31T10:22:08.040586",
+          "command": "Get-Service | Group-Object Status | Select-Object Name, Count | ConvertTo-Json"
+        },
+        "error": null
+      },
+      "saved_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "response_data": {
+          "command_id": "sys-service-status",
+          "command_name": "Get Service Status",
+          "executed_command": "Get-Service | Group-Object Status | Select-Object Name, Count | ConvertTo-Json",
+          "results": [
+            {
+              "agent_id": "agent_20250731_102208_35",
+              "success": false,
+              "error": "Agent not connected"
+            }
+          ]
+        },
+        "error": null
+      },
+      "overall_status": "excellent"
+    },
+    {
+      "command_id": "sys-process-list",
+      "command_name": "Get Running Processes",
+      "command_category": "system",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "warnings": [
+          "Command contains variables ['_', 'Count'] but no parameters defined"
+        ]
+      },
+      "api_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "execution_successful": false,
+        "response_data": {
+          "success": false,
+          "output": "",
+          "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+          "execution_time": 9.7e-05,
+          "timestamp": "2025-07-31T10:22:08.053140",
+          "command": "Get-Process | Select-Object Name, Id, CPU, WorkingSet, @{Name=\"Memory_MB\";Expression={[math]::Round($_.WorkingSet/1MB,2)}} | Sort-Object CPU -Descending | Select-Object -First $Count | ConvertTo-Json"
+        },
+        "error": null
+      },
+      "saved_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "response_data": {
+          "command_id": "sys-process-list",
+          "command_name": "Get Running Processes",
+          "executed_command": "Get-Process | Select-Object Name, Id, CPU, WorkingSet, @{Name=\"Memory_MB\";Expression={[math]::Round($_.WorkingSet/1MB,2)}} | Sort-Object CPU -Descending | Select-Object -First 10 | ConvertTo-Json",
+          "results": [
+            {
+              "agent_id": "agent_20250731_102208_35",
+              "success": false,
+              "error": "Agent not connected"
+            }
+          ]
+        },
+        "error": null
+      },
+      "overall_status": "excellent"
+    },
+    {
+      "command_id": "sys-security-audit",
+      "command_name": "Security Audit",
+      "command_category": "security",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "warnings": [
+          "Command contains variables ['result', 'result', 'result', 'result', '_', 'remoteServices', '_', '_', 'result', 'remoteServices', 'remoteServices', 'result', '_', 'secProcs', '_', 'result', 'secProcs', 'secProcs', 'result', '_', 'result'] but no parameters defined"
+        ]
+      },
+      "api_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "execution_successful": false,
+        "response_data": {
+          "success": false,
+          "output": "",
+          "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+          "execution_time": 9.2e-05,
+          "timestamp": "2025-07-31T10:22:08.061524",
+          "command": "# Security Audit Script\n$result = @{\n    Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'\n    Users = @()\n    RemoteServices = @()\n    SecurityProcesses = @()\n}\n\n# Check users (with error handling)\ntry {\n    if (Get-Command Get-LocalUser -ErrorAction SilentlyContinue) {\n        $result.Users = Get-LocalUser | Select-Object Name, Enabled, LastLogon\n    } else {\n        $result.Users = @{Status='Get-LocalUser not available on this system'}\n    }\n} catch {\n    $result.Users = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check services\ntry {\n    $remoteServices = Get-Service | Where-Object {\n        $_.Status -eq 'Running' -and \n        ($_.Name -match 'Remote|RDP|SSH|WinRM|Telnet')\n    } | Select-Object Name, DisplayName, Status\n    \n    $result.RemoteServices = if ($remoteServices) {\n        $remoteServices\n    } else {\n        @{Status='No remote access services found'}\n    }\n} catch {\n    $result.RemoteServices = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check security processes\ntry {\n    $secProcs = Get-Process | Where-Object {\n        $_.ProcessName -match 'defender|antivirus|firewall|security|malware'\n    } | Select-Object ProcessName, Id | Select-Object -First 5\n    \n    $result.SecurityProcesses = if ($secProcs) {\n        $secProcs\n    } else {\n        @{Status='No security processes found'}\n    }\n} catch {\n    $result.SecurityProcesses = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n$result | ConvertTo-Json -Depth 3"
+        },
+        "error": null
+      },
+      "saved_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "response_data": {
+          "command_id": "sys-security-audit",
+          "command_name": "Security Audit",
+          "executed_command": "# Security Audit Script\n$result = @{\n    Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'\n    Users = @()\n    RemoteServices = @()\n    SecurityProcesses = @()\n}\n\n# Check users (with error handling)\ntry {\n    if (Get-Command Get-LocalUser -ErrorAction SilentlyContinue) {\n        $result.Users = Get-LocalUser | Select-Object Name, Enabled, LastLogon\n    } else {\n        $result.Users = @{Status='Get-LocalUser not available on this system'}\n    }\n} catch {\n    $result.Users = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check services\ntry {\n    $remoteServices = Get-Service | Where-Object {\n        $_.Status -eq 'Running' -and \n        ($_.Name -match 'Remote|RDP|SSH|WinRM|Telnet')\n    } | Select-Object Name, DisplayName, Status\n    \n    $result.RemoteServices = if ($remoteServices) {\n        $remoteServices\n    } else {\n        @{Status='No remote access services found'}\n    }\n} catch {\n    $result.RemoteServices = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check security processes\ntry {\n    $secProcs = Get-Process | Where-Object {\n        $_.ProcessName -match 'defender|antivirus|firewall|security|malware'\n    } | Select-Object ProcessName, Id | Select-Object -First 5\n    \n    $result.SecurityProcesses = if ($secProcs) {\n        $secProcs\n    } else {\n        @{Status='No security processes found'}\n    }\n} catch {\n    $result.SecurityProcesses = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n$result | ConvertTo-Json -Depth 3",
+          "results": [
+            {
+              "agent_id": "agent_20250731_102208_35",
+              "success": false,
+              "error": "Agent not connected"
+            }
+          ]
+        },
+        "error": null
+      },
+      "overall_status": "excellent"
+    },
+    {
+      "command_id": "sys-network-config",
+      "command_name": "Get Network Configuration",
+      "command_category": "network",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "warnings": []
+      },
+      "api_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "execution_successful": false,
+        "response_data": {
+          "success": false,
+          "output": "",
+          "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+          "execution_time": 9.5e-05,
+          "timestamp": "2025-07-31T10:22:08.069664",
+          "command": "Get-NetIPConfiguration | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway | ConvertTo-Json"
+        },
+        "error": null
+      },
+      "saved_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "response_data": {
+          "command_id": "sys-network-config",
+          "command_name": "Get Network Configuration",
+          "executed_command": "Get-NetIPConfiguration | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway | ConvertTo-Json",
+          "results": [
+            {
+              "agent_id": "agent_20250731_102208_35",
+              "success": false,
+              "error": "Agent not connected"
+            }
+          ]
+        },
+        "error": null
+      },
+      "overall_status": "excellent"
+    },
+    {
+      "command_id": "sys-check-disk-space",
+      "command_name": "Check Disk Space",
+      "command_category": "disk",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "warnings": [
+          "Command contains variables ['_', '_', '_', '_', '_'] but no parameters defined"
+        ]
+      },
+      "api_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "execution_successful": false,
+        "response_data": {
+          "success": false,
+          "output": "",
+          "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+          "execution_time": 9.5e-05,
+          "timestamp": "2025-07-31T10:22:08.077386",
+          "command": "Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name=\"Size_GB\";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name=\"FreeSpace_GB\";Expression={[math]::Round($_.FreeSpace/1GB,2)}}, @{Name=\"UsedPercent\";Expression={[math]::Round((($_.Size-$_.FreeSpace)/$_.Size)*100,1)}} | ConvertTo-Json"
+        },
+        "error": null
+      },
+      "saved_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "response_data": {
+          "command_id": "sys-check-disk-space",
+          "command_name": "Check Disk Space",
+          "executed_command": "Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name=\"Size_GB\";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name=\"FreeSpace_GB\";Expression={[math]::Round($_.FreeSpace/1GB,2)}}, @{Name=\"UsedPercent\";Expression={[math]::Round((($_.Size-$_.FreeSpace)/$_.Size)*100,1)}} | ConvertTo-Json",
+          "results": [
+            {
+              "agent_id": "agent_20250731_102208_35",
+              "success": false,
+              "error": "Agent not connected"
+            }
+          ]
+        },
+        "error": null
+      },
+      "overall_status": "excellent"
+    },
+    {
+      "command_id": "sys-get-computer-info",
+      "command_name": "Get System Information",
+      "command_category": "system",
+      "validation": {
+        "valid": true,
+        "issues": [],
+        "warnings": []
+      },
+      "api_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "execution_successful": false,
+        "response_data": {
+          "success": false,
+          "output": "",
+          "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+          "execution_time": 0.000199,
+          "timestamp": "2025-07-31T10:22:08.084668",
+          "command": "Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors | ConvertTo-Json"
+        },
+        "error": null
+      },
+      "saved_execution": {
+        "api_accessible": true,
+        "status_code": 200,
+        "execution_attempted": true,
+        "response_data": {
+          "command_id": "sys-get-computer-info",
+          "command_name": "Get System Information",
+          "executed_command": "Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors | ConvertTo-Json",
+          "results": [
+            {
+              "agent_id": "agent_20250731_102208_35",
+              "success": false,
+              "error": "Agent not connected"
+            }
+          ]
+        },
+        "error": null
+      },
+      "overall_status": "excellent"
+    }
+  ],
+  "test_results": [
+    {
+      "test": "Command Validation - Get Service Status",
+      "success": true,
+      "message": "Command structure is valid",
+      "details": null,
+      "command_info": {
+        "id": "sys-service-status",
+        "name": "Get Service Status",
+        "description": "Check status of Windows services",
+        "category": "system",
+        "command": "Get-Service | Group-Object Status | Select-Object Name, Count | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "services",
+          "status",
+          "monitoring"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.310762",
+        "updated_at": "2025-07-31T06:06:24.310765",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.039198"
+    },
+    {
+      "test": "API Execution - Get Service Status",
+      "success": false,
+      "message": "Execution failed: None",
+      "details": {
+        "success": false,
+        "output": "",
+        "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+        "execution_time": 0.003079,
+        "timestamp": "2025-07-31T10:22:08.040586",
+        "command": "Get-Service | Group-Object Status | Select-Object Name, Count | ConvertTo-Json"
+      },
+      "command_info": {
+        "id": "sys-service-status",
+        "name": "Get Service Status",
+        "description": "Check status of Windows services",
+        "category": "system",
+        "command": "Get-Service | Group-Object Status | Select-Object Name, Count | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "services",
+          "status",
+          "monitoring"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.310762",
+        "updated_at": "2025-07-31T06:06:24.310765",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.044421"
+    },
+    {
+      "test": "Saved Command Execution - Get Service Status",
+      "success": true,
+      "message": "Saved command API call successful",
+      "details": {
+        "command_id": "sys-service-status",
+        "command_name": "Get Service Status",
+        "executed_command": "Get-Service | Group-Object Status | Select-Object Name, Count | ConvertTo-Json",
+        "results": [
+          {
+            "agent_id": "agent_20250731_102208_35",
+            "success": false,
+            "error": "Agent not connected"
+          }
+        ]
+      },
+      "command_info": {
+        "id": "sys-service-status",
+        "name": "Get Service Status",
+        "description": "Check status of Windows services",
+        "category": "system",
+        "command": "Get-Service | Group-Object Status | Select-Object Name, Count | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "services",
+          "status",
+          "monitoring"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.310762",
+        "updated_at": "2025-07-31T06:06:24.310765",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.052213"
+    },
+    {
+      "test": "Command Validation - Get Running Processes",
+      "success": true,
+      "message": "Command structure is valid",
+      "details": [
+        "Command contains variables ['_', 'Count'] but no parameters defined"
+      ],
+      "command_info": {
+        "id": "sys-process-list",
+        "name": "Get Running Processes",
+        "description": "Lists all running processes with resource usage",
+        "category": "system",
+        "command": "Get-Process | Select-Object Name, Id, CPU, WorkingSet, @{Name=\"Memory_MB\";Expression={[math]::Round($_.WorkingSet/1MB,2)}} | Sort-Object CPU -Descending | Select-Object -First $Count | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "processes",
+          "performance",
+          "monitoring"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.307435",
+        "updated_at": "2025-07-31T06:06:24.307439",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.052301"
+    },
+    {
+      "test": "API Execution - Get Running Processes",
+      "success": false,
+      "message": "Execution failed: None",
+      "details": {
+        "success": false,
+        "output": "",
+        "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+        "execution_time": 9.7e-05,
+        "timestamp": "2025-07-31T10:22:08.053140",
+        "command": "Get-Process | Select-Object Name, Id, CPU, WorkingSet, @{Name=\"Memory_MB\";Expression={[math]::Round($_.WorkingSet/1MB,2)}} | Sort-Object CPU -Descending | Select-Object -First $Count | ConvertTo-Json"
+      },
+      "command_info": {
+        "id": "sys-process-list",
+        "name": "Get Running Processes",
+        "description": "Lists all running processes with resource usage",
+        "category": "system",
+        "command": "Get-Process | Select-Object Name, Id, CPU, WorkingSet, @{Name=\"Memory_MB\";Expression={[math]::Round($_.WorkingSet/1MB,2)}} | Sort-Object CPU -Descending | Select-Object -First $Count | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "processes",
+          "performance",
+          "monitoring"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.307435",
+        "updated_at": "2025-07-31T06:06:24.307439",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.053726"
+    },
+    {
+      "test": "Saved Command Execution - Get Running Processes",
+      "success": true,
+      "message": "Saved command API call successful",
+      "details": {
+        "command_id": "sys-process-list",
+        "command_name": "Get Running Processes",
+        "executed_command": "Get-Process | Select-Object Name, Id, CPU, WorkingSet, @{Name=\"Memory_MB\";Expression={[math]::Round($_.WorkingSet/1MB,2)}} | Sort-Object CPU -Descending | Select-Object -First 10 | ConvertTo-Json",
+        "results": [
+          {
+            "agent_id": "agent_20250731_102208_35",
+            "success": false,
+            "error": "Agent not connected"
+          }
+        ]
+      },
+      "command_info": {
+        "id": "sys-process-list",
+        "name": "Get Running Processes",
+        "description": "Lists all running processes with resource usage",
+        "category": "system",
+        "command": "Get-Process | Select-Object Name, Id, CPU, WorkingSet, @{Name=\"Memory_MB\";Expression={[math]::Round($_.WorkingSet/1MB,2)}} | Sort-Object CPU -Descending | Select-Object -First $Count | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "processes",
+          "performance",
+          "monitoring"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.307435",
+        "updated_at": "2025-07-31T06:06:24.307439",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.060597"
+    },
+    {
+      "test": "Command Validation - Security Audit",
+      "success": true,
+      "message": "Command structure is valid",
+      "details": [
+        "Command contains variables ['result', 'result', 'result', 'result', '_', 'remoteServices', '_', '_', 'result', 'remoteServices', 'remoteServices', 'result', '_', 'secProcs', '_', 'result', 'secProcs', 'secProcs', 'result', '_', 'result'] but no parameters defined"
+      ],
+      "command_info": {
+        "id": "sys-security-audit",
+        "name": "Security Audit",
+        "description": "Performs basic security audit checks with error handling and JSON output",
+        "category": "security",
+        "command": "# Security Audit Script\n$result = @{\n    Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'\n    Users = @()\n    RemoteServices = @()\n    SecurityProcesses = @()\n}\n\n# Check users (with error handling)\ntry {\n    if (Get-Command Get-LocalUser -ErrorAction SilentlyContinue) {\n        $result.Users = Get-LocalUser | Select-Object Name, Enabled, LastLogon\n    } else {\n        $result.Users = @{Status='Get-LocalUser not available on this system'}\n    }\n} catch {\n    $result.Users = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check services\ntry {\n    $remoteServices = Get-Service | Where-Object {\n        $_.Status -eq 'Running' -and \n        ($_.Name -match 'Remote|RDP|SSH|WinRM|Telnet')\n    } | Select-Object Name, DisplayName, Status\n    \n    $result.RemoteServices = if ($remoteServices) {\n        $remoteServices\n    } else {\n        @{Status='No remote access services found'}\n    }\n} catch {\n    $result.RemoteServices = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check security processes\ntry {\n    $secProcs = Get-Process | Where-Object {\n        $_.ProcessName -match 'defender|antivirus|firewall|security|malware'\n    } | Select-Object ProcessName, Id | Select-Object -First 5\n    \n    $result.SecurityProcesses = if ($secProcs) {\n        $secProcs\n    } else {\n        @{Status='No security processes found'}\n    }\n} catch {\n    $result.SecurityProcesses = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n$result | ConvertTo-Json -Depth 3",
+        "parameters": [],
+        "tags": [
+          "security",
+          "audit",
+          "users",
+          "services"
+        ],
+        "version": "2.2",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.304189",
+        "updated_at": "2025-07-31T09:38:49.179265",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.060635"
+    },
+    {
+      "test": "API Execution - Security Audit",
+      "success": false,
+      "message": "Execution failed: None",
+      "details": {
+        "success": false,
+        "output": "",
+        "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+        "execution_time": 9.2e-05,
+        "timestamp": "2025-07-31T10:22:08.061524",
+        "command": "# Security Audit Script\n$result = @{\n    Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'\n    Users = @()\n    RemoteServices = @()\n    SecurityProcesses = @()\n}\n\n# Check users (with error handling)\ntry {\n    if (Get-Command Get-LocalUser -ErrorAction SilentlyContinue) {\n        $result.Users = Get-LocalUser | Select-Object Name, Enabled, LastLogon\n    } else {\n        $result.Users = @{Status='Get-LocalUser not available on this system'}\n    }\n} catch {\n    $result.Users = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check services\ntry {\n    $remoteServices = Get-Service | Where-Object {\n        $_.Status -eq 'Running' -and \n        ($_.Name -match 'Remote|RDP|SSH|WinRM|Telnet')\n    } | Select-Object Name, DisplayName, Status\n    \n    $result.RemoteServices = if ($remoteServices) {\n        $remoteServices\n    } else {\n        @{Status='No remote access services found'}\n    }\n} catch {\n    $result.RemoteServices = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check security processes\ntry {\n    $secProcs = Get-Process | Where-Object {\n        $_.ProcessName -match 'defender|antivirus|firewall|security|malware'\n    } | Select-Object ProcessName, Id | Select-Object -First 5\n    \n    $result.SecurityProcesses = if ($secProcs) {\n        $secProcs\n    } else {\n        @{Status='No security processes found'}\n    }\n} catch {\n    $result.SecurityProcesses = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n$result | ConvertTo-Json -Depth 3"
+      },
+      "command_info": {
+        "id": "sys-security-audit",
+        "name": "Security Audit",
+        "description": "Performs basic security audit checks with error handling and JSON output",
+        "category": "security",
+        "command": "# Security Audit Script\n$result = @{\n    Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'\n    Users = @()\n    RemoteServices = @()\n    SecurityProcesses = @()\n}\n\n# Check users (with error handling)\ntry {\n    if (Get-Command Get-LocalUser -ErrorAction SilentlyContinue) {\n        $result.Users = Get-LocalUser | Select-Object Name, Enabled, LastLogon\n    } else {\n        $result.Users = @{Status='Get-LocalUser not available on this system'}\n    }\n} catch {\n    $result.Users = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check services\ntry {\n    $remoteServices = Get-Service | Where-Object {\n        $_.Status -eq 'Running' -and \n        ($_.Name -match 'Remote|RDP|SSH|WinRM|Telnet')\n    } | Select-Object Name, DisplayName, Status\n    \n    $result.RemoteServices = if ($remoteServices) {\n        $remoteServices\n    } else {\n        @{Status='No remote access services found'}\n    }\n} catch {\n    $result.RemoteServices = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check security processes\ntry {\n    $secProcs = Get-Process | Where-Object {\n        $_.ProcessName -match 'defender|antivirus|firewall|security|malware'\n    } | Select-Object ProcessName, Id | Select-Object -First 5\n    \n    $result.SecurityProcesses = if ($secProcs) {\n        $secProcs\n    } else {\n        @{Status='No security processes found'}\n    }\n} catch {\n    $result.SecurityProcesses = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n$result | ConvertTo-Json -Depth 3",
+        "parameters": [],
+        "tags": [
+          "security",
+          "audit",
+          "users",
+          "services"
+        ],
+        "version": "2.2",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.304189",
+        "updated_at": "2025-07-31T09:38:49.179265",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.062115"
+    },
+    {
+      "test": "Saved Command Execution - Security Audit",
+      "success": true,
+      "message": "Saved command API call successful",
+      "details": {
+        "command_id": "sys-security-audit",
+        "command_name": "Security Audit",
+        "executed_command": "# Security Audit Script\n$result = @{\n    Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'\n    Users = @()\n    RemoteServices = @()\n    SecurityProcesses = @()\n}\n\n# Check users (with error handling)\ntry {\n    if (Get-Command Get-LocalUser -ErrorAction SilentlyContinue) {\n        $result.Users = Get-LocalUser | Select-Object Name, Enabled, LastLogon\n    } else {\n        $result.Users = @{Status='Get-LocalUser not available on this system'}\n    }\n} catch {\n    $result.Users = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check services\ntry {\n    $remoteServices = Get-Service | Where-Object {\n        $_.Status -eq 'Running' -and \n        ($_.Name -match 'Remote|RDP|SSH|WinRM|Telnet')\n    } | Select-Object Name, DisplayName, Status\n    \n    $result.RemoteServices = if ($remoteServices) {\n        $remoteServices\n    } else {\n        @{Status='No remote access services found'}\n    }\n} catch {\n    $result.RemoteServices = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check security processes\ntry {\n    $secProcs = Get-Process | Where-Object {\n        $_.ProcessName -match 'defender|antivirus|firewall|security|malware'\n    } | Select-Object ProcessName, Id | Select-Object -First 5\n    \n    $result.SecurityProcesses = if ($secProcs) {\n        $secProcs\n    } else {\n        @{Status='No security processes found'}\n    }\n} catch {\n    $result.SecurityProcesses = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n$result | ConvertTo-Json -Depth 3",
+        "results": [
+          {
+            "agent_id": "agent_20250731_102208_35",
+            "success": false,
+            "error": "Agent not connected"
+          }
+        ]
+      },
+      "command_info": {
+        "id": "sys-security-audit",
+        "name": "Security Audit",
+        "description": "Performs basic security audit checks with error handling and JSON output",
+        "category": "security",
+        "command": "# Security Audit Script\n$result = @{\n    Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'\n    Users = @()\n    RemoteServices = @()\n    SecurityProcesses = @()\n}\n\n# Check users (with error handling)\ntry {\n    if (Get-Command Get-LocalUser -ErrorAction SilentlyContinue) {\n        $result.Users = Get-LocalUser | Select-Object Name, Enabled, LastLogon\n    } else {\n        $result.Users = @{Status='Get-LocalUser not available on this system'}\n    }\n} catch {\n    $result.Users = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check services\ntry {\n    $remoteServices = Get-Service | Where-Object {\n        $_.Status -eq 'Running' -and \n        ($_.Name -match 'Remote|RDP|SSH|WinRM|Telnet')\n    } | Select-Object Name, DisplayName, Status\n    \n    $result.RemoteServices = if ($remoteServices) {\n        $remoteServices\n    } else {\n        @{Status='No remote access services found'}\n    }\n} catch {\n    $result.RemoteServices = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n# Check security processes\ntry {\n    $secProcs = Get-Process | Where-Object {\n        $_.ProcessName -match 'defender|antivirus|firewall|security|malware'\n    } | Select-Object ProcessName, Id | Select-Object -First 5\n    \n    $result.SecurityProcesses = if ($secProcs) {\n        $secProcs\n    } else {\n        @{Status='No security processes found'}\n    }\n} catch {\n    $result.SecurityProcesses = @{Status='Error'; Message=$_.Exception.Message}\n}\n\n$result | ConvertTo-Json -Depth 3",
+        "parameters": [],
+        "tags": [
+          "security",
+          "audit",
+          "users",
+          "services"
+        ],
+        "version": "2.2",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.304189",
+        "updated_at": "2025-07-31T09:38:49.179265",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.068813"
+    },
+    {
+      "test": "Command Validation - Get Network Configuration",
+      "success": true,
+      "message": "Command structure is valid",
+      "details": null,
+      "command_info": {
+        "id": "sys-network-config",
+        "name": "Get Network Configuration",
+        "description": "Retrieves network adapter configuration and IP settings",
+        "category": "network",
+        "command": "Get-NetIPConfiguration | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "network",
+          "ip",
+          "configuration"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.297195",
+        "updated_at": "2025-07-31T06:06:24.297199",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.068842"
+    },
+    {
+      "test": "API Execution - Get Network Configuration",
+      "success": false,
+      "message": "Execution failed: None",
+      "details": {
+        "success": false,
+        "output": "",
+        "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+        "execution_time": 9.5e-05,
+        "timestamp": "2025-07-31T10:22:08.069664",
+        "command": "Get-NetIPConfiguration | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway | ConvertTo-Json"
+      },
+      "command_info": {
+        "id": "sys-network-config",
+        "name": "Get Network Configuration",
+        "description": "Retrieves network adapter configuration and IP settings",
+        "category": "network",
+        "command": "Get-NetIPConfiguration | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "network",
+          "ip",
+          "configuration"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.297195",
+        "updated_at": "2025-07-31T06:06:24.297199",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.070237"
+    },
+    {
+      "test": "Saved Command Execution - Get Network Configuration",
+      "success": true,
+      "message": "Saved command API call successful",
+      "details": {
+        "command_id": "sys-network-config",
+        "command_name": "Get Network Configuration",
+        "executed_command": "Get-NetIPConfiguration | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway | ConvertTo-Json",
+        "results": [
+          {
+            "agent_id": "agent_20250731_102208_35",
+            "success": false,
+            "error": "Agent not connected"
+          }
+        ]
+      },
+      "command_info": {
+        "id": "sys-network-config",
+        "name": "Get Network Configuration",
+        "description": "Retrieves network adapter configuration and IP settings",
+        "category": "network",
+        "command": "Get-NetIPConfiguration | Select-Object InterfaceAlias, IPv4Address, IPv4DefaultGateway | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "network",
+          "ip",
+          "configuration"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.297195",
+        "updated_at": "2025-07-31T06:06:24.297199",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.076606"
+    },
+    {
+      "test": "Command Validation - Check Disk Space",
+      "success": true,
+      "message": "Command structure is valid",
+      "details": [
+        "Command contains variables ['_', '_', '_', '_', '_'] but no parameters defined"
+      ],
+      "command_info": {
+        "id": "sys-check-disk-space",
+        "name": "Check Disk Space",
+        "description": "Monitors disk space usage across all drives with JSON output",
+        "category": "disk",
+        "command": "Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name=\"Size_GB\";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name=\"FreeSpace_GB\";Expression={[math]::Round($_.FreeSpace/1GB,2)}}, @{Name=\"UsedPercent\";Expression={[math]::Round((($_.Size-$_.FreeSpace)/$_.Size)*100,1)}} | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "disk",
+          "storage",
+          "monitoring"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.293571",
+        "updated_at": "2025-07-31T06:06:24.293579",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.076640"
+    },
+    {
+      "test": "API Execution - Check Disk Space",
+      "success": false,
+      "message": "Execution failed: None",
+      "details": {
+        "success": false,
+        "output": "",
+        "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+        "execution_time": 9.5e-05,
+        "timestamp": "2025-07-31T10:22:08.077386",
+        "command": "Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name=\"Size_GB\";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name=\"FreeSpace_GB\";Expression={[math]::Round($_.FreeSpace/1GB,2)}}, @{Name=\"UsedPercent\";Expression={[math]::Round((($_.Size-$_.FreeSpace)/$_.Size)*100,1)}} | ConvertTo-Json"
+      },
+      "command_info": {
+        "id": "sys-check-disk-space",
+        "name": "Check Disk Space",
+        "description": "Monitors disk space usage across all drives with JSON output",
+        "category": "disk",
+        "command": "Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name=\"Size_GB\";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name=\"FreeSpace_GB\";Expression={[math]::Round($_.FreeSpace/1GB,2)}}, @{Name=\"UsedPercent\";Expression={[math]::Round((($_.Size-$_.FreeSpace)/$_.Size)*100,1)}} | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "disk",
+          "storage",
+          "monitoring"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.293571",
+        "updated_at": "2025-07-31T06:06:24.293579",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.077924"
+    },
+    {
+      "test": "Saved Command Execution - Check Disk Space",
+      "success": true,
+      "message": "Saved command API call successful",
+      "details": {
+        "command_id": "sys-check-disk-space",
+        "command_name": "Check Disk Space",
+        "executed_command": "Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name=\"Size_GB\";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name=\"FreeSpace_GB\";Expression={[math]::Round($_.FreeSpace/1GB,2)}}, @{Name=\"UsedPercent\";Expression={[math]::Round((($_.Size-$_.FreeSpace)/$_.Size)*100,1)}} | ConvertTo-Json",
+        "results": [
+          {
+            "agent_id": "agent_20250731_102208_35",
+            "success": false,
+            "error": "Agent not connected"
+          }
+        ]
+      },
+      "command_info": {
+        "id": "sys-check-disk-space",
+        "name": "Check Disk Space",
+        "description": "Monitors disk space usage across all drives with JSON output",
+        "category": "disk",
+        "command": "Get-WmiObject -Class Win32_LogicalDisk | Select-Object DeviceID, @{Name=\"Size_GB\";Expression={[math]::Round($_.Size/1GB,2)}}, @{Name=\"FreeSpace_GB\";Expression={[math]::Round($_.FreeSpace/1GB,2)}}, @{Name=\"UsedPercent\";Expression={[math]::Round((($_.Size-$_.FreeSpace)/$_.Size)*100,1)}} | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "disk",
+          "storage",
+          "monitoring"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.293571",
+        "updated_at": "2025-07-31T06:06:24.293579",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.083802"
+    },
+    {
+      "test": "Command Validation - Get System Information",
+      "success": true,
+      "message": "Command structure is valid",
+      "details": null,
+      "command_info": {
+        "id": "sys-get-computer-info",
+        "name": "Get System Information",
+        "description": "Retrieves comprehensive system information including OS, hardware, and network details",
+        "category": "system",
+        "command": "Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "system",
+          "hardware",
+          "info"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.221719",
+        "updated_at": "2025-07-31T06:06:24.221719",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.083824"
+    },
+    {
+      "test": "API Execution - Get System Information",
+      "success": false,
+      "message": "Execution failed: None",
+      "details": {
+        "success": false,
+        "output": "",
+        "error": "PowerShell not available on this system. Install PowerShell Core (pwsh) for cross-platform support.",
+        "execution_time": 0.000199,
+        "timestamp": "2025-07-31T10:22:08.084668",
+        "command": "Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors | ConvertTo-Json"
+      },
+      "command_info": {
+        "id": "sys-get-computer-info",
+        "name": "Get System Information",
+        "description": "Retrieves comprehensive system information including OS, hardware, and network details",
+        "category": "system",
+        "command": "Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "system",
+          "hardware",
+          "info"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.221719",
+        "updated_at": "2025-07-31T06:06:24.221719",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.085384"
+    },
+    {
+      "test": "Saved Command Execution - Get System Information",
+      "success": true,
+      "message": "Saved command API call successful",
+      "details": {
+        "command_id": "sys-get-computer-info",
+        "command_name": "Get System Information",
+        "executed_command": "Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors | ConvertTo-Json",
+        "results": [
+          {
+            "agent_id": "agent_20250731_102208_35",
+            "success": false,
+            "error": "Agent not connected"
+          }
+        ]
+      },
+      "command_info": {
+        "id": "sys-get-computer-info",
+        "name": "Get System Information",
+        "description": "Retrieves comprehensive system information including OS, hardware, and network details",
+        "category": "system",
+        "command": "Get-ComputerInfo | Select-Object WindowsProductName, TotalPhysicalMemory, CsProcessors | ConvertTo-Json",
+        "parameters": [],
+        "tags": [
+          "system",
+          "hardware",
+          "info"
+        ],
+        "version": "1.0",
+        "author": "System",
+        "created_at": "2025-07-31T06:06:24.221719",
+        "updated_at": "2025-07-31T06:06:24.221719",
+        "is_system": true
+      },
+      "timestamp": "2025-07-31T13:22:08.091705"
+    }
+  ],
+  "timestamp": "2025-07-31T13:22:08.100663"
+}
