@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "node",
+      "args": ["/home/ali/dex_agent/mcp-server-playwright/dist/index.js"],
+      "env": {
+        "PLAYWRIGHT_HEADLESS": "false"
+      }
+    }
+  }
+}

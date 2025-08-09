@@ -138,32 +138,54 @@ dmypy.json
 .DS_Store
 Thumbs.db
 
-# Project specific
-agent/logs/
-backend/logs/
-backend/temp/
-backend/data/
-backend/agent_installers/
+# Project specific - Monorepo structure
+apps/agent/logs/
+apps/backend/logs/
+apps/backend/temp/
+apps/backend/data/
+apps/backend/agent_installers/
+apps/backend/chatgpt.key/
 *.db
 *.sqlite
 *.sqlite3
 *.exe
 *.zip
-test_*.py
-db_test.py
 
 # Agent specific
-agent/venv/
-agent/build/
-agent/dist/
-agent/__pycache__/
-agent/*.spec
+apps/agent/venv/
+apps/agent/build/
+apps/agent/dist/
+apps/agent/__pycache__/
+apps/agent/*.spec
 
 # Frontend specific
-frontend/node_modules/
-frontend/.next/
-frontend/out/
-frontend/.pnpm-store/
+apps/frontend/node_modules/
+apps/frontend/.next/
+apps/frontend/out/
+apps/frontend/.pnpm-store/
+apps/frontend/package-lock.json
+apps/frontend/yarn.lock
+
+# Test reports and artifacts
+test-reports/
+playwright-report/
+test-results/
+coverage/
+
+# Tools and scripts outputs
+tools/outputs/
+tools/reports/
+
+# Workspace specific
+packages/*/node_modules/
+packages/*/dist/
+packages/*/lib/
+packages/*/build/
+
+# Old structure (for cleanup reference)
+agent/
+backend/
+frontend/
 
 # Docker
 docker-compose.override.yml

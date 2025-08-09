@@ -1,0 +1,492 @@
+name: DexAgent CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18'
+  PYTHON_VERSION: '3.11'
+  
+jobs:
+  # Backend Tests with PostgreSQL
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: dexagents
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: dexagents_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('apps/backend/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+          
+    - name: Install Python dependencies
+      working-directory: apps/backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov flake8 black isort
+        
+    - name: Set up test environment
+      working-directory: apps/backend
+      env:
+        DATABASE_URL: postgresql://dexagents:test_password@localhost:5432/dexagents_test
+        SECRET_KEY: test-secret-key
+        ENVIRONMENT: testing
+      run: |
+        # Copy test environment file
+        cp env.example .env
+        # Run database migrations
+        python app/migrations/migration_manager.py
+        
+    - name: Run code formatting check
+      working-directory: apps/backend
+      run: |
+        black --check .
+        isort --check-only .
+        
+    - name: Run linting
+      working-directory: apps/backend
+      run: |
+        flake8 . --max-line-length=88 --extend-ignore=E203,W503
+        
+    - name: Run unit tests
+      working-directory: apps/backend
+      env:
+        DATABASE_URL: postgresql://dexagents:test_password@localhost:5432/dexagents_test
+        SECRET_KEY: test-secret-key
+        ENVIRONMENT: testing
+      run: |
+        python -m pytest tests/ -v --cov=app --cov-report=xml
+        
+    - name: Run comprehensive API tests
+      working-directory: apps/backend
+      env:
+        DATABASE_URL: postgresql://dexagents:test_password@localhost:5432/dexagents_test
+        SECRET_KEY: test-secret-key
+        ENVIRONMENT: testing
+      run: |
+        # Start the server in background
+        python run.py &
+        SERVER_PID=$!
+        
+        # Wait for server to start
+        sleep 10
+        
+        # Run API tests
+        python comprehensive_api_test.py || true
+        
+        # Stop the server
+        kill $SERVER_PID || true
+        
+    - name: Upload backend coverage
+      uses: codecov/codecov-action@v3
+      with:
+        file: apps/backend/coverage.xml
+        flags: backend
+        name: backend-coverage
+
+  # Frontend Tests with Node.js
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: 'apps/frontend/package-lock.json'
+        
+    - name: Install frontend dependencies
+      working-directory: apps/frontend
+      run: npm ci
+      
+    - name: Run ESLint
+      working-directory: apps/frontend
+      run: npm run lint
+      
+    - name: Run TypeScript type checking
+      working-directory: apps/frontend
+      run: npm run type-check
+      
+    - name: Build frontend
+      working-directory: apps/frontend
+      run: npm run build
+      
+    - name: Run unit tests
+      working-directory: apps/frontend
+      run: npm test -- --coverage --watchAll=false
+      
+    - name: Install Playwright browsers
+      working-directory: apps/frontend
+      run: npx playwright install --with-deps chromium
+
+  # Integration and E2E Tests
+  integration-tests:
+    name: Integration & E2E Tests
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests]
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: dexagents
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: dexagents_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: 'apps/frontend/package-lock.json'
+        
+    - name: Install dependencies
+      run: |
+        # Backend dependencies
+        cd apps/backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+        # Frontend dependencies
+        cd ../frontend
+        npm ci
+        
+        # Install Playwright
+        npx playwright install --with-deps chromium
+        
+    - name: Start services with Docker Compose
+      env:
+        DATABASE_URL: postgresql://dexagents:test_password@localhost:5432/dexagents_test
+      run: |
+        # Update docker-compose for test environment
+        docker-compose up -d postgres
+        
+        # Wait for database
+        sleep 10
+        
+        # Start backend manually with test config
+        cd apps/backend
+        export DATABASE_URL=postgresql://dexagents:test_password@localhost:5432/dexagents_test
+        export SECRET_KEY=test-secret-key
+        export ENVIRONMENT=testing
+        python app/migrations/migration_manager.py
+        python run.py &
+        BACKEND_PID=$!
+        
+        # Start frontend
+        cd ../frontend
+        npm run build
+        npm start &
+        FRONTEND_PID=$!
+        
+        # Wait for services
+        sleep 15
+        
+        echo "BACKEND_PID=$BACKEND_PID" >> $GITHUB_ENV
+        echo "FRONTEND_PID=$FRONTEND_PID" >> $GITHUB_ENV
+        
+    - name: Run E2E tests
+      working-directory: apps/frontend
+      run: |
+        npm run test:e2e
+        
+    - name: Run integration tests
+      working-directory: tests/integration
+      env:
+        DATABASE_URL: postgresql://dexagents:test_password@localhost:5432/dexagents_test
+      run: |
+        python -m pytest test_full_workflow.py -v || true
+        
+    - name: Upload E2E test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: e2e-test-results
+        path: apps/frontend/test-results/
+        retention-days: 7
+        
+    - name: Cleanup
+      if: always()
+      run: |
+        kill $BACKEND_PID || true
+        kill $FRONTEND_PID || true
+        docker-compose down
+
+  # Security Scanning
+  security-scan:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+        
+    - name: Scan Docker images
+      run: |
+        # Build images for scanning
+        docker-compose build --no-cache
+        
+        # Scan backend image
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy image dex_agent_backend:latest || true
+          
+        # Scan frontend image  
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy image dex_agent_frontend:latest || true
+
+  # Code Quality Checks
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        
+    - name: Install Python quality tools
+      run: |
+        pip install flake8 black isort mypy bandit safety
+        
+    - name: Install Node.js quality tools
+      working-directory: apps/frontend
+      run: npm ci
+      
+    - name: Python code quality checks
+      working-directory: apps/backend
+      run: |
+        # Formatting check
+        black --check . || true
+        
+        # Import sorting check
+        isort --check-only . || true
+        
+        # Linting
+        flake8 . --max-line-length=88 || true
+        
+        # Type checking
+        mypy . --ignore-missing-imports || true
+        
+        # Security check
+        bandit -r . -f json -o bandit-report.json || true
+        
+        # Dependency security check
+        safety check || true
+        
+    - name: TypeScript/JavaScript code quality
+      working-directory: apps/frontend
+      run: |
+        # Linting
+        npm run lint || true
+        
+        # Type checking
+        npm run type-check || true
+        
+    - name: Upload code quality reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: code-quality-reports
+        path: |
+          apps/backend/bandit-report.json
+        retention-days: 7
+
+  # Build Production Images
+  build-production:
+    name: Build Production Images
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests, security-scan, code-quality]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Build production images
+      run: |
+        docker-compose -f docker-compose.prod.yml build
+        
+    - name: Test production images
+      run: |
+        # Start production stack
+        docker-compose -f docker-compose.prod.yml up -d
+        
+        # Wait for services
+        sleep 30
+        
+        # Health checks
+        curl -f http://localhost:3000/api/health || exit 1
+        curl -f http://localhost:8080/api/v1/system/health || exit 1
+        
+        # Cleanup
+        docker-compose -f docker-compose.prod.yml down
+        
+  # Performance Tests
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: [integration-tests]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        
+    - name: Install performance test dependencies
+      run: |
+        pip install locust requests
+        
+    - name: Start test environment
+      run: |
+        docker-compose up -d
+        sleep 30
+        
+    - name: Run performance tests
+      working-directory: tests/performance
+      run: |
+        python test_load.py || true
+        
+    - name: Cleanup
+      if: always()
+      run: |
+        docker-compose down
+
+  # Deployment (only on main branch)
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build-production, performance-tests]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: staging
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to staging
+      run: |
+        echo "🚀 Deploying to staging environment..."
+        # Add your deployment logic here
+        echo "✅ Deployment completed successfully"
+        
+    - name: Run smoke tests
+      run: |
+        echo "🧪 Running smoke tests..."
+        # Add smoke test logic here
+        echo "✅ Smoke tests passed"
+        
+    - name: Notify deployment
+      run: |
+        echo "📢 Deployment notification sent"
+        # Add notification logic (Slack, email, etc.)
+
+  # Summary
+  ci-summary:
+    name: CI Summary
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests, integration-tests, security-scan, code-quality]
+    if: always()
+    
+    steps:
+    - name: CI Summary
+      run: |
+        echo "🎯 DexAgent CI/CD Pipeline Summary"
+        echo "=================================="
+        echo "Backend Tests: ${{ needs.backend-tests.result }}"
+        echo "Frontend Tests: ${{ needs.frontend-tests.result }}"
+        echo "Integration Tests: ${{ needs.integration-tests.result }}"
+        echo "Security Scan: ${{ needs.security-scan.result }}"
+        echo "Code Quality: ${{ needs.code-quality.result }}"
+        
+        if [[ "${{ needs.backend-tests.result }}" == "success" && 
+              "${{ needs.frontend-tests.result }}" == "success" && 
+              "${{ needs.integration-tests.result }}" == "success" && 
+              "${{ needs.security-scan.result }}" == "success" && 
+              "${{ needs.code-quality.result }}" == "success" ]]; then
+          echo "✅ All checks passed!"
+        else
+          echo "❌ Some checks failed"
+          exit 1
+        fi

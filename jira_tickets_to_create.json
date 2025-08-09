@@ -1,0 +1,1189 @@
+{
+  "analysis_timestamp": "2025-08-09T14:57:24.979741",
+  "total_tickets_prepared": 13,
+  "critical_count": 12,
+  "high_count": 1,
+  "tickets": [
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] commands - test_ai_generate_command",
+        "description": "## Test Information\n- Test Suite: commands\n- Test Name: test_ai_generate_command\n- Test File: commands_results.json\n- Endpoint: POST /api/v1/commands/ai/generate\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 3.397703170776367ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/commands/ai/generate\",\n  \"data\": {\n    \"prompt\": \"Generate a PowerShell command to list all services\",\n    \"max_tokens\": 150,\n    \"temperature\": 0.7\n  },\n  \"params\": null,\n  \"auth_required\": true\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"message\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"prompt\": \"Generate a PowerShell command to list all services\",\n        \"max_tokens\": 150,\n        \"temperature\": 0.7\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py commands`\n4. Observe failure for test: `test_ai_generate_command`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "commands",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "commands",
+        "test_name": "test_ai_generate_command"
+      },
+      "failure": {
+        "test_suite": "commands",
+        "test_name": "test_ai_generate_command",
+        "endpoint": "POST /api/v1/commands/ai/generate",
+        "response_code": 422,
+        "response_time_ms": 3.397703170776367,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/commands/ai/generate",
+          "data": {
+            "prompt": "Generate a PowerShell command to list all services",
+            "max_tokens": 150,
+            "temperature": 0.7
+          },
+          "params": null,
+          "auth_required": true
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "message"
+              ],
+              "msg": "Field required",
+              "input": {
+                "prompt": "Generate a PowerShell command to list all services",
+                "max_tokens": 150,
+                "temperature": 0.7
+              }
+            }
+          ]
+        },
+        "file": "commands_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] commands - test_ai_test_connection",
+        "description": "## Test Information\n- Test Suite: commands\n- Test Name: test_ai_test_connection\n- Test File: commands_results.json\n- Endpoint: POST /api/v1/commands/ai/test\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 3.4554004669189453ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/commands/ai/test\",\n  \"data\": {\n    \"test_prompt\": \"Hello, AI service test\"\n  },\n  \"params\": null,\n  \"auth_required\": true\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"command\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"test_prompt\": \"Hello, AI service test\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"agent_id\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"test_prompt\": \"Hello, AI service test\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py commands`\n4. Observe failure for test: `test_ai_test_connection`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "commands",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "commands",
+        "test_name": "test_ai_test_connection"
+      },
+      "failure": {
+        "test_suite": "commands",
+        "test_name": "test_ai_test_connection",
+        "endpoint": "POST /api/v1/commands/ai/test",
+        "response_code": 422,
+        "response_time_ms": 3.4554004669189453,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/commands/ai/test",
+          "data": {
+            "test_prompt": "Hello, AI service test"
+          },
+          "params": null,
+          "auth_required": true
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "command"
+              ],
+              "msg": "Field required",
+              "input": {
+                "test_prompt": "Hello, AI service test"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "agent_id"
+              ],
+              "msg": "Field required",
+              "input": {
+                "test_prompt": "Hello, AI service test"
+              }
+            }
+          ]
+        },
+        "file": "commands_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 3.9641857147216797ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"TEST-PC-a964d291\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:94:4d\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-a964d291\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:94:4d\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-a964d291\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:94:4d\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 3.9641857147216797,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "TEST-PC-a964d291",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:94:4d",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-a964d291",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:94:4d",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-a964d291",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:94:4d",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 2.8083324432373047ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"TEST-PC-69daf000\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:fe:b0\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-69daf000\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:fe:b0\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-69daf000\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:fe:b0\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 2.8083324432373047,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "TEST-PC-69daf000",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:fe:b0",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-69daf000",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:fe:b0",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-69daf000",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:fe:b0",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent_duplicate",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent_duplicate\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 2.7604103088378906ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"DESKTOP-JK5G34L\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:44:55\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"DESKTOP-JK5G34L\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:44:55\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"DESKTOP-JK5G34L\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:44:55\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent_duplicate`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent_duplicate"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent_duplicate",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 2.7604103088378906,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "DESKTOP-JK5G34L",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:44:55",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "DESKTOP-JK5G34L",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:44:55",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "DESKTOP-JK5G34L",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:44:55",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 2.9435157775878906ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"TEST-PC-72788b88\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:37:fd\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-72788b88\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:37:fd\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-72788b88\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:37:fd\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 2.9435157775878906,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "TEST-PC-72788b88",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:37:fd",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-72788b88",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:37:fd",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-72788b88",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:37:fd",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 2.885103225708008ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"TEST-PC-402d69e8\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:f7:a5\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-402d69e8\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:f7:a5\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-402d69e8\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:f7:a5\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 2.885103225708008,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "TEST-PC-402d69e8",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:f7:a5",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-402d69e8",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:f7:a5",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-402d69e8",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:f7:a5",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 2.7816295623779297ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"TEST-PC-75941c71\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:44:f3\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-75941c71\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:44:f3\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-75941c71\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:44:f3\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 2.7816295623779297,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "TEST-PC-75941c71",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:44:f3",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-75941c71",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:44:f3",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-75941c71",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:44:f3",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 2.763986587524414ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"TEST-PC-ea2db565\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:f1:e5\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-ea2db565\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:f1:e5\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-ea2db565\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:f1:e5\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 2.763986587524414,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "TEST-PC-ea2db565",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:f1:e5",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-ea2db565",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:f1:e5",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-ea2db565",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:f1:e5",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 2.843141555786133ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"TEST-PC-ebc933d1\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:83:bc\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-ebc933d1\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:83:bc\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-ebc933d1\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:83:bc\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 2.843141555786133,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "TEST-PC-ebc933d1",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:83:bc",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-ebc933d1",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:83:bc",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-ebc933d1",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:83:bc",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 2.8028488159179688ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"TEST-PC-3f2f7594\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:ad:e3\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-3f2f7594\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:ad:e3\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-3f2f7594\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:ad:e3\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 2.8028488159179688,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "TEST-PC-3f2f7594",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:ad:e3",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-3f2f7594",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:ad:e3",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-3f2f7594",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:ad:e3",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] agents - test_register_agent",
+        "description": "## Test Information\n- Test Suite: agents\n- Test Name: test_register_agent\n- Test File: agents_results.json\n- Endpoint: POST /api/v1/agents/register\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 422\n**Response Time**: 3.0083656311035156ms\n**Error**: Expected status 200 but got 422\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/agents/register\",\n  \"data\": {\n    \"hostname\": \"TEST-PC-8697bfa0\",\n    \"os\": \"Windows 10\",\n    \"os_version\": \"10.0.19045\",\n    \"ip_address\": \"192.168.1.100\",\n    \"mac_address\": \"00:11:22:33:12:46\",\n    \"agent_version\": \"1.0.0\",\n    \"powershell_version\": \"5.1.19041.1\"\n  },\n  \"params\": null,\n  \"auth_required\": false\n}\n```\n\n## Response Details\n```json\n{\n  \"detail\": [\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"ip\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-8697bfa0\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:12:46\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    },\n    {\n      \"type\": \"missing\",\n      \"loc\": [\n        \"body\",\n        \"version\"\n      ],\n      \"msg\": \"Field required\",\n      \"input\": {\n        \"hostname\": \"TEST-PC-8697bfa0\",\n        \"os\": \"Windows 10\",\n        \"os_version\": \"10.0.19045\",\n        \"ip_address\": \"192.168.1.100\",\n        \"mac_address\": \"00:11:22:33:12:46\",\n        \"agent_version\": \"1.0.0\",\n        \"powershell_version\": \"5.1.19041.1\"\n      }\n    }\n  ]\n}\n```\n\n## Failed Assertions\n\n1. **status_code**\n   - Expected: `200`\n   - Actual: `422`\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py agents`\n4. Observe failure for test: `test_register_agent`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Expected status 200 but got 422\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "Highest",
+        "severity": "Critical",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "agents",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "agents",
+        "test_name": "test_register_agent"
+      },
+      "failure": {
+        "test_suite": "agents",
+        "test_name": "test_register_agent",
+        "endpoint": "POST /api/v1/agents/register",
+        "response_code": 422,
+        "response_time_ms": 3.0083656311035156,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 422,
+            "passed": false
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/agents/register",
+          "data": {
+            "hostname": "TEST-PC-8697bfa0",
+            "os": "Windows 10",
+            "os_version": "10.0.19045",
+            "ip_address": "192.168.1.100",
+            "mac_address": "00:11:22:33:12:46",
+            "agent_version": "1.0.0",
+            "powershell_version": "5.1.19041.1"
+          },
+          "params": null,
+          "auth_required": false
+        },
+        "response": {
+          "detail": [
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "ip"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-8697bfa0",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:12:46",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            },
+            {
+              "type": "missing",
+              "loc": [
+                "body",
+                "version"
+              ],
+              "msg": "Field required",
+              "input": {
+                "hostname": "TEST-PC-8697bfa0",
+                "os": "Windows 10",
+                "os_version": "10.0.19045",
+                "ip_address": "192.168.1.100",
+                "mac_address": "00:11:22:33:12:46",
+                "agent_version": "1.0.0",
+                "powershell_version": "5.1.19041.1"
+              }
+            }
+          ]
+        },
+        "file": "agents_results.json",
+        "failure_reason": "Expected status 200 but got 422",
+        "severity": "Critical"
+      },
+      "priority": "Highest",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    },
+    {
+      "ticket_data": {
+        "summary": "[API Test Failure] commands - test_execute_simple_command",
+        "description": "## Test Information\n- Test Suite: commands\n- Test Name: test_execute_simple_command\n- Test File: commands_results.json\n- Endpoint: POST /api/v1/commands/execute\n- Agent ID Used: DESKTOP-JK5G34L\n\n## Failure Details\n**Response Code**: 200\n**Response Time**: 394.66094970703125ms\n**Error**: Custom validation failed: Missing command ID or results\n\n## Request Details\n```json\n{\n  \"method\": \"POST\",\n  \"endpoint\": \"/api/v1/commands/execute\",\n  \"data\": {\n    \"command\": \"Get-Date\",\n    \"target\": \"all\"\n  },\n  \"params\": null,\n  \"auth_required\": true\n}\n```\n\n## Response Details\n```json\n{\n  \"success\": true,\n  \"output\": \"Saturday, 09 August 2025 11:54:39\",\n  \"error\": null,\n  \"execution_time\": 0.39272,\n  \"timestamp\": \"2025-08-09T11:54:38.937279\",\n  \"command\": \"Get-Date\"\n}\n```\n\n## Failed Assertions\n\n1. **custom_validation**\n   - Error: Missing command ID or results\n\n\n## Steps to Reproduce\n1. Navigate to API test directory: `/home/ali/dex_agent/docs/backend/api/`\n2. Ensure Docker services are running: `docker compose up -d`\n3. Run specific test: `python3 run_all_tests.py commands`\n4. Observe failure for test: `test_execute_simple_command`\n\n## Expected vs Actual\n- **Expected**: Test should pass with proper response\n- **Actual**: Custom validation failed: Missing command ID or results\n\n## Environment\n- API Base URL: http://localhost:8080\n- Test Agent: DESKTOP-JK5G34L\n- Execution Date: 2025-08-09 14:57:59\n",
+        "priority": "High",
+        "severity": "High",
+        "labels": [
+          "api-test",
+          "automated-test",
+          "commands",
+          "DESKTOP-JK5G34L"
+        ],
+        "components": [
+          "API",
+          "Testing"
+        ],
+        "test_suite": "commands",
+        "test_name": "test_execute_simple_command"
+      },
+      "failure": {
+        "test_suite": "commands",
+        "test_name": "test_execute_simple_command",
+        "endpoint": "POST /api/v1/commands/execute",
+        "response_code": 200,
+        "response_time_ms": 394.66094970703125,
+        "error": null,
+        "assertions": [
+          {
+            "type": "status_code",
+            "expected": 200,
+            "actual": 200,
+            "passed": true
+          },
+          {
+            "type": "custom_validation",
+            "passed": false,
+            "error": "Missing command ID or results"
+          },
+          {
+            "type": "performance",
+            "expected": "<= 5000ms",
+            "actual": "394.66ms",
+            "passed": true
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "endpoint": "/api/v1/commands/execute",
+          "data": {
+            "command": "Get-Date",
+            "target": "all"
+          },
+          "params": null,
+          "auth_required": true
+        },
+        "response": {
+          "success": true,
+          "output": "Saturday, 09 August 2025 11:54:39",
+          "error": null,
+          "execution_time": 0.39272,
+          "timestamp": "2025-08-09T11:54:38.937279",
+          "command": "Get-Date"
+        },
+        "file": "commands_results.json",
+        "failure_reason": "Custom validation failed: Missing command ID or results",
+        "severity": "High"
+      },
+      "priority": "High",
+      "created": false,
+      "ticket_key": null,
+      "error": null
+    }
+  ]
+}

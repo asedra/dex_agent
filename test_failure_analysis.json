@@ -1,0 +1,3725 @@
+{
+  "analysis_timestamp": "2025-08-09T14:57:24.979741",
+  "total_failures": 60,
+  "severity_breakdown": {
+    "Critical": 12,
+    "High": 1,
+    "Medium": 10,
+    "Low": 37
+  },
+  "failures_by_suite": {
+    "commands": 9,
+    "files": 6,
+    "authentication": 2,
+    "monitoring": 5,
+    "settings": 13,
+    "installer": 3,
+    "system": 3,
+    "agents": 18,
+    "websocket": 1
+  },
+  "critical_failures": [
+    {
+      "test_suite": "commands",
+      "test_name": "test_ai_generate_command",
+      "endpoint": "POST /api/v1/commands/ai/generate",
+      "response_code": 422,
+      "response_time_ms": 3.397703170776367,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/commands/ai/generate",
+        "data": {
+          "prompt": "Generate a PowerShell command to list all services",
+          "max_tokens": 150,
+          "temperature": 0.7
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "message"
+            ],
+            "msg": "Field required",
+            "input": {
+              "prompt": "Generate a PowerShell command to list all services",
+              "max_tokens": 150,
+              "temperature": 0.7
+            }
+          }
+        ]
+      },
+      "file": "commands_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "commands",
+      "test_name": "test_ai_test_connection",
+      "endpoint": "POST /api/v1/commands/ai/test",
+      "response_code": 422,
+      "response_time_ms": 3.4554004669189453,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/commands/ai/test",
+        "data": {
+          "test_prompt": "Hello, AI service test"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "command"
+            ],
+            "msg": "Field required",
+            "input": {
+              "test_prompt": "Hello, AI service test"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "agent_id"
+            ],
+            "msg": "Field required",
+            "input": {
+              "test_prompt": "Hello, AI service test"
+            }
+          }
+        ]
+      },
+      "file": "commands_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 3.9641857147216797,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "TEST-PC-a964d291",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:94:4d",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-a964d291",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:94:4d",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-a964d291",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:94:4d",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 2.8083324432373047,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "TEST-PC-69daf000",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:fe:b0",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-69daf000",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:fe:b0",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-69daf000",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:fe:b0",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent_duplicate",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 2.7604103088378906,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "DESKTOP-JK5G34L",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:44:55",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "DESKTOP-JK5G34L",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:44:55",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "DESKTOP-JK5G34L",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:44:55",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 2.9435157775878906,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "TEST-PC-72788b88",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:37:fd",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-72788b88",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:37:fd",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-72788b88",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:37:fd",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 2.885103225708008,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "TEST-PC-402d69e8",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:f7:a5",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-402d69e8",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:f7:a5",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-402d69e8",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:f7:a5",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 2.7816295623779297,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "TEST-PC-75941c71",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:44:f3",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-75941c71",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:44:f3",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-75941c71",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:44:f3",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 2.763986587524414,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "TEST-PC-ea2db565",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:f1:e5",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-ea2db565",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:f1:e5",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-ea2db565",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:f1:e5",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 2.843141555786133,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "TEST-PC-ebc933d1",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:83:bc",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-ebc933d1",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:83:bc",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-ebc933d1",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:83:bc",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 2.8028488159179688,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "TEST-PC-3f2f7594",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:ad:e3",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-3f2f7594",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:ad:e3",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-3f2f7594",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:ad:e3",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_register_agent",
+      "endpoint": "POST /api/v1/agents/register",
+      "response_code": 422,
+      "response_time_ms": 3.0083656311035156,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/register",
+        "data": {
+          "hostname": "TEST-PC-8697bfa0",
+          "os": "Windows 10",
+          "os_version": "10.0.19045",
+          "ip_address": "192.168.1.100",
+          "mac_address": "00:11:22:33:12:46",
+          "agent_version": "1.0.0",
+          "powershell_version": "5.1.19041.1"
+        },
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "ip"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-8697bfa0",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:12:46",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "version"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC-8697bfa0",
+              "os": "Windows 10",
+              "os_version": "10.0.19045",
+              "ip_address": "192.168.1.100",
+              "mac_address": "00:11:22:33:12:46",
+              "agent_version": "1.0.0",
+              "powershell_version": "5.1.19041.1"
+            }
+          }
+        ]
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Critical"
+    }
+  ],
+  "high_priority_failures": [
+    {
+      "test_suite": "commands",
+      "test_name": "test_execute_simple_command",
+      "endpoint": "POST /api/v1/commands/execute",
+      "response_code": 200,
+      "response_time_ms": 394.66094970703125,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Missing command ID or results"
+        },
+        {
+          "type": "performance",
+          "expected": "<= 5000ms",
+          "actual": "394.66ms",
+          "passed": true
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/commands/execute",
+        "data": {
+          "command": "Get-Date",
+          "target": "all"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "success": true,
+        "output": "Saturday, 09 August 2025 11:54:39",
+        "error": null,
+        "execution_time": 0.39272,
+        "timestamp": "2025-08-09T11:54:38.937279",
+        "command": "Get-Date"
+      },
+      "file": "commands_results.json",
+      "failure_reason": "Custom validation failed: Missing command ID or results",
+      "severity": "High"
+    }
+  ],
+  "medium_priority_failures": [
+    {
+      "test_suite": "monitoring",
+      "test_name": "test_get_metrics",
+      "endpoint": "GET /api/v1/metrics",
+      "response_code": 200,
+      "response_time_ms": 1004.713773727417,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Expecting value: line 1 column 1 (char 0)"
+        },
+        {
+          "type": "performance",
+          "expected": "<= 50ms",
+          "actual": "1004.71ms",
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/metrics",
+        "data": null,
+        "params": null,
+        "auth_required": true
+      },
+      "response": "# HELP http_requests_total Total count of http_requests\n# TYPE http_requests_total counter\n# HELP http_request_duration_seconds http_request_duration_seconds\n# TYPE http_request_duration_seconds gauge\n# HELP agent_last_seen_timestamp agent_last_seen_timestamp\n# TYPE agent_last_seen_timestamp gauge\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"135\"} 1754740478.157543\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"138\"} 1754740478.150529\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"131\"} 1754740478.1318\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"112\"} 1754740478.112692\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"109\"} 1754740478.109631\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"105\"} 1754740478.105948\nagent_last_seen_timestamp{agent=\"id\"} 1754740475.86295\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"123\"} 1754730889.123545\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"130\"} 1754730889.130199\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"150\"} 1754730889.150522\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"158\"} 1754730889.158127\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"154\"} 1754730889.154493\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"126\"} 1754730889.126993\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"688\"} 1754730591.688228\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"695\"} 1754730591.695093\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"714\"} 1754730591.714244\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"720\"} 1754730591.720142\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"717\"} 1754730591.71722\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"692\"} 1754730591.692084\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"232\"} 1754725694.034129\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"225\"} 1754725694.026404\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073045=\"306\"} 1754724645.30521\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"229\"} 1754724641.229515\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"124\"} 1754724640.123129\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"132\"} 1754724640.131061\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"182\"} 1754724640.182014\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"188\"} 1754724640.188459\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"185\"} 1754724640.185258\n# HELP agent_command_failures_total Total count of agent_command_failures\n# TYPE agent_command_failures_total counter\n# HELP database_connections database_connections\n# TYPE database_connections gauge\ndatabase_connections 0\n# HELP system_cpu_usage_percent Current system_cpu_usage_percent\n# TYPE system_cpu_usage_percent gauge\nsystem_cpu_usage_percent 0.4\n# HELP system_memory_usage_bytes Current system_memory_usage_bytes\n# TYPE system_memory_usage_bytes gauge\nsystem_memory_usage_bytes 2300719104\n# HELP system_memory_total_bytes system_memory_total_bytes\n# TYPE system_memory_total_bytes gauge\nsystem_memory_total_bytes 16655069184\n# HELP system_memory_usage_percent Current system_memory_usage_percent\n# TYPE system_memory_usage_percent gauge\nsystem_memory_usage_percent 16.1\n# HELP system_disk_usage_bytes Current system_disk_usage_bytes\n# TYPE system_disk_usage_bytes gauge\nsystem_disk_usage_bytes 70521995264\n# HELP system_disk_total_bytes system_disk_total_bytes\n# TYPE system_disk_total_bytes gauge\nsystem_disk_total_bytes 1081101176832\n# HELP system_disk_usage_percent Current system_disk_usage_percent\n# TYPE system_disk_usage_percent gauge\nsystem_disk_usage_percent 6.523163305644881\n# HELP agents_online_total Total count of agents_online\n# TYPE agents_online_total counter\nagents_online_total 4\n# HELP agents_offline_total Total count of agents_offline\n# TYPE agents_offline_total counter\nagents_offline_total 24\n# HELP agents_total Total count of agents\n# TYPE agents_total counter\nagents_total 28",
+      "file": "monitoring_results.json",
+      "failure_reason": "Custom validation failed: Expecting value: line 1 column 1 (char 0); Performance threshold exceeded: 1004.71ms > <= 50ms",
+      "severity": "Medium"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_update_chatgpt_config",
+      "endpoint": "POST /api/v1/settings/chatgpt/config",
+      "response_code": 422,
+      "response_time_ms": 3.3965110778808594,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/settings/chatgpt/config",
+        "data": {
+          "model": "gpt-3.5-turbo",
+          "temperature": 0.7,
+          "max_tokens": 150,
+          "enabled": true
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "api_key"
+            ],
+            "msg": "Field required",
+            "input": {
+              "model": "gpt-3.5-turbo",
+              "temperature": 0.7,
+              "max_tokens": 150,
+              "enabled": true
+            }
+          }
+        ]
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Medium"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_setting_type_boolean",
+      "endpoint": "POST /api/v1/settings/",
+      "response_code": 422,
+      "response_time_ms": 2.809286117553711,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/settings/",
+        "data": {
+          "key": "test_bool_a668a686",
+          "value": true,
+          "type": "boolean"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "string_type",
+            "loc": [
+              "body",
+              "value"
+            ],
+            "msg": "Input should be a valid string",
+            "input": true
+          }
+        ]
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 201 but got 422",
+      "severity": "Medium"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_setting_type_integer",
+      "endpoint": "POST /api/v1/settings/",
+      "response_code": 422,
+      "response_time_ms": 2.735137939453125,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/settings/",
+        "data": {
+          "key": "test_int_c8720b40",
+          "value": 42,
+          "type": "integer"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "string_type",
+            "loc": [
+              "body",
+              "value"
+            ],
+            "msg": "Input should be a valid string",
+            "input": 42
+          }
+        ]
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 201 but got 422",
+      "severity": "Medium"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_setting_type_float",
+      "endpoint": "POST /api/v1/settings/",
+      "response_code": 422,
+      "response_time_ms": 2.6569366455078125,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/settings/",
+        "data": {
+          "key": "test_float_6a4e1403",
+          "value": 3.14,
+          "type": "float"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "string_type",
+            "loc": [
+              "body",
+              "value"
+            ],
+            "msg": "Input should be a valid string",
+            "input": 3.14
+          }
+        ]
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 201 but got 422",
+      "severity": "Medium"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_setting_type_array",
+      "endpoint": "POST /api/v1/settings/",
+      "response_code": 422,
+      "response_time_ms": 2.9342174530029297,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/settings/",
+        "data": {
+          "key": "test_list_e0c008c3",
+          "value": [
+            "a",
+            "b",
+            "c"
+          ],
+          "type": "array"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "string_type",
+            "loc": [
+              "body",
+              "value"
+            ],
+            "msg": "Input should be a valid string",
+            "input": [
+              "a",
+              "b",
+              "c"
+            ]
+          }
+        ]
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 201 but got 422",
+      "severity": "Medium"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_setting_type_object",
+      "endpoint": "POST /api/v1/settings/",
+      "response_code": 422,
+      "response_time_ms": 2.694368362426758,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/settings/",
+        "data": {
+          "key": "test_dict_661791aa",
+          "value": {
+            "nested": "value"
+          },
+          "type": "object"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "string_type",
+            "loc": [
+              "body",
+              "value"
+            ],
+            "msg": "Input should be a valid string",
+            "input": {
+              "nested": "value"
+            }
+          }
+        ]
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 201 but got 422",
+      "severity": "Medium"
+    },
+    {
+      "test_suite": "installer",
+      "test_name": "test_create_installer",
+      "endpoint": "POST /api/v1/installer/create",
+      "response_code": 422,
+      "response_time_ms": 2.2001266479492188,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/installer/create",
+        "data": {
+          "hostname": "TEST-PC",
+          "server_url": "http://localhost:8080",
+          "auto_start": true
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "api_token"
+            ],
+            "msg": "Field required",
+            "input": {
+              "hostname": "TEST-PC",
+              "server_url": "http://localhost:8080",
+              "auto_start": true
+            }
+          }
+        ]
+      },
+      "file": "installer_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Medium"
+    },
+    {
+      "test_suite": "installer",
+      "test_name": "test_create_python_installer",
+      "endpoint": "POST /api/v1/installer/create-python",
+      "response_code": 422,
+      "response_time_ms": 0.8096694946289062,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 422,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/installer/create-python",
+        "data": {
+          "include_dependencies": true,
+          "target_os": "windows"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "server_url"
+            ],
+            "msg": "Field required",
+            "input": {
+              "include_dependencies": true,
+              "target_os": "windows"
+            }
+          },
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "api_token"
+            ],
+            "msg": "Field required",
+            "input": {
+              "include_dependencies": true,
+              "target_os": "windows"
+            }
+          }
+        ]
+      },
+      "file": "installer_results.json",
+      "failure_reason": "Expected status 200 but got 422",
+      "severity": "Medium"
+    },
+    {
+      "test_suite": "system",
+      "test_name": "test_get_system_info",
+      "endpoint": "GET /api/v1/system/info",
+      "response_code": 200,
+      "response_time_ms": 1003.6380290985107,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Missing version info"
+        },
+        {
+          "type": "performance",
+          "expected": "<= 50ms",
+          "actual": "1003.64ms",
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/system/info",
+        "data": null,
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "hostname": "47b25e30e87a",
+        "os_version": "Linux 5.15.167.4-microsoft-standard-WSL2",
+        "cpu_usage": 0.5,
+        "memory_usage": 16.1,
+        "disk_usage": {
+          "/dev/sdc": 6.523165578882624
+        }
+      },
+      "file": "system_results.json",
+      "failure_reason": "Custom validation failed: Missing version info; Performance threshold exceeded: 1003.64ms > <= 50ms",
+      "severity": "Medium"
+    }
+  ],
+  "low_priority_failures": [
+    {
+      "test_suite": "commands",
+      "test_name": "test_create_saved_command",
+      "endpoint": "POST /api/v1/commands/saved",
+      "response_code": 200,
+      "response_time_ms": 10.002374649047852,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/commands/saved",
+        "data": {
+          "name": "Test Command 6b3bd91c",
+          "description": "Test command for API testing",
+          "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+          "category": "System",
+          "tags": [
+            "test",
+            "system",
+            "info"
+          ]
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "id": "ed658a73-4db0-4b4f-9eb0-cc55f869c624",
+        "name": "Test Command 6b3bd91c",
+        "description": "Test command for API testing",
+        "category": "System",
+        "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+        "parameters": [],
+        "tags": [
+          "test",
+          "system",
+          "info"
+        ],
+        "version": "1.0",
+        "author": "Unknown",
+        "created_at": "2025-08-09T11:54:48.172745",
+        "updated_at": "2025-08-09T11:54:48.172750",
+        "is_system": false
+      },
+      "file": "commands_results.json",
+      "failure_reason": "Expected status 201 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "commands",
+      "test_name": "test_create_saved_command",
+      "endpoint": "POST /api/v1/commands/saved",
+      "response_code": 200,
+      "response_time_ms": 6.702184677124023,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/commands/saved",
+        "data": {
+          "name": "Test Command 697f06b3",
+          "description": "Test command for API testing",
+          "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+          "category": "System",
+          "tags": [
+            "test",
+            "system",
+            "info"
+          ]
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "id": "2328eced-7986-4ca5-b7cd-9e3a10dc985b",
+        "name": "Test Command 697f06b3",
+        "description": "Test command for API testing",
+        "category": "System",
+        "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+        "parameters": [],
+        "tags": [
+          "test",
+          "system",
+          "info"
+        ],
+        "version": "1.0",
+        "author": "Unknown",
+        "created_at": "2025-08-09T11:54:48.180198",
+        "updated_at": "2025-08-09T11:54:48.180200",
+        "is_system": false
+      },
+      "file": "commands_results.json",
+      "failure_reason": "Expected status 201 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "commands",
+      "test_name": "test_create_saved_command",
+      "endpoint": "POST /api/v1/commands/saved",
+      "response_code": 200,
+      "response_time_ms": 6.287574768066406,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/commands/saved",
+        "data": {
+          "name": "Test Command 22dd8d8a",
+          "description": "Test command for API testing",
+          "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+          "category": "System",
+          "tags": [
+            "test",
+            "system",
+            "info"
+          ]
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "id": "a854a8d8-45d8-4641-8d3f-67c19944d9a8",
+        "name": "Test Command 22dd8d8a",
+        "description": "Test command for API testing",
+        "category": "System",
+        "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+        "parameters": [],
+        "tags": [
+          "test",
+          "system",
+          "info"
+        ],
+        "version": "1.0",
+        "author": "Unknown",
+        "created_at": "2025-08-09T11:54:48.186753",
+        "updated_at": "2025-08-09T11:54:48.186755",
+        "is_system": false
+      },
+      "file": "commands_results.json",
+      "failure_reason": "Expected status 201 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "commands",
+      "test_name": "test_create_saved_command",
+      "endpoint": "POST /api/v1/commands/saved",
+      "response_code": 200,
+      "response_time_ms": 6.251335144042969,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/commands/saved",
+        "data": {
+          "name": "Test Command a67427ab",
+          "description": "Test command for API testing",
+          "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+          "category": "System",
+          "tags": [
+            "test",
+            "system",
+            "info"
+          ]
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "id": "30c24366-80d5-48ae-a58e-65a8e2fe68eb",
+        "name": "Test Command a67427ab",
+        "description": "Test command for API testing",
+        "category": "System",
+        "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+        "parameters": [],
+        "tags": [
+          "test",
+          "system",
+          "info"
+        ],
+        "version": "1.0",
+        "author": "Unknown",
+        "created_at": "2025-08-09T11:54:48.193107",
+        "updated_at": "2025-08-09T11:54:48.193108",
+        "is_system": false
+      },
+      "file": "commands_results.json",
+      "failure_reason": "Expected status 201 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "commands",
+      "test_name": "test_create_saved_command",
+      "endpoint": "POST /api/v1/commands/saved",
+      "response_code": 200,
+      "response_time_ms": 6.392240524291992,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/commands/saved",
+        "data": {
+          "name": "Test Command e01ad7c8",
+          "description": "Test command for API testing",
+          "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+          "category": "System",
+          "tags": [
+            "test",
+            "system",
+            "info"
+          ]
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "id": "47f92026-c92f-430c-a9cd-ec313b583118",
+        "name": "Test Command e01ad7c8",
+        "description": "Test command for API testing",
+        "category": "System",
+        "command": "Get-ComputerInfo | Select-Object -Property CsName, OsName, OsVersion",
+        "parameters": [],
+        "tags": [
+          "test",
+          "system",
+          "info"
+        ],
+        "version": "1.0",
+        "author": "Unknown",
+        "created_at": "2025-08-09T11:54:48.199526",
+        "updated_at": "2025-08-09T11:54:48.199528",
+        "is_system": false
+      },
+      "file": "commands_results.json",
+      "failure_reason": "Expected status 201 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "commands",
+      "test_name": "test_ai_status",
+      "endpoint": "GET /api/v1/commands/ai/status",
+      "response_code": 200,
+      "response_time_ms": 3.008127212524414,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Missing provider info"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/commands/ai/status",
+        "data": null,
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "available": true,
+        "message": "AI service is available"
+      },
+      "file": "commands_results.json",
+      "failure_reason": "Custom validation failed: Missing provider info",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "files",
+      "test_name": "test_list_files",
+      "endpoint": "GET /api/v1/agents/test-agent-001/files",
+      "response_code": 404,
+      "response_time_ms": 1.2347698211669922,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/agents/test-agent-001/files",
+        "data": null,
+        "params": {
+          "path": "C:\\"
+        },
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Not Found"
+      },
+      "file": "files_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "files",
+      "test_name": "test_file_search",
+      "endpoint": "POST /api/v1/agents/test-agent-001/files/search",
+      "response_code": 404,
+      "response_time_ms": 0.8168220520019531,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/test-agent-001/files/search",
+        "data": {
+          "pattern": "*.txt",
+          "path": "C:\\",
+          "recursive": true
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Not Found"
+      },
+      "file": "files_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "files",
+      "test_name": "test_create_folder",
+      "endpoint": "POST /api/v1/agents/test-agent-001/files/folder",
+      "response_code": 404,
+      "response_time_ms": 0.7185935974121094,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/test-agent-001/files/folder",
+        "data": {
+          "path": "C:\\temp\\test_447b70e2",
+          "create_parents": true
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Not Found"
+      },
+      "file": "files_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "files",
+      "test_name": "test_file_operation_copy",
+      "endpoint": "POST /api/v1/agents/test-agent-001/files/operation",
+      "response_code": 404,
+      "response_time_ms": 0.6864070892333984,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/test-agent-001/files/operation",
+        "data": {
+          "operation": "copy",
+          "source": "C:\\test.txt",
+          "destination": "C:\\test_copy.txt"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Not Found"
+      },
+      "file": "files_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "files",
+      "test_name": "test_file_operation_move",
+      "endpoint": "POST /api/v1/agents/test-agent-001/files/operation",
+      "response_code": 404,
+      "response_time_ms": 0.7250308990478516,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/test-agent-001/files/operation",
+        "data": {
+          "operation": "move",
+          "source": "C:\\test_copy.txt",
+          "destination": "C:\\test_moved.txt"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Not Found"
+      },
+      "file": "files_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "files",
+      "test_name": "test_file_operation_delete",
+      "endpoint": "POST /api/v1/agents/test-agent-001/files/operation",
+      "response_code": 404,
+      "response_time_ms": 0.7119178771972656,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/test-agent-001/files/operation",
+        "data": {
+          "operation": "delete",
+          "path": "C:\\test_moved.txt"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Not Found"
+      },
+      "file": "files_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "authentication",
+      "test_name": "test_get_current_user_without_token",
+      "endpoint": "GET /api/v1/auth/me",
+      "response_code": 200,
+      "response_time_ms": 3.203868865966797,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 401,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/auth/me",
+        "data": null,
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "id": "1",
+        "username": "admin",
+        "email": "admin@dexagents.local",
+        "full_name": "System Administrator",
+        "is_active": true,
+        "created_at": "2025-08-02T13:49:39.310444",
+        "last_login": "2025-08-09T11:54:38.363772"
+      },
+      "file": "authentication_results.json",
+      "failure_reason": "Expected status 401 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "authentication",
+      "test_name": "test_logout_without_token",
+      "endpoint": "POST /api/v1/auth/logout",
+      "response_code": 200,
+      "response_time_ms": 3.0798912048339844,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 401,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/auth/logout",
+        "data": null,
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "message": "Successfully logged out"
+      },
+      "file": "authentication_results.json",
+      "failure_reason": "Expected status 401 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "monitoring",
+      "test_name": "test_metrics_filtering",
+      "endpoint": "GET /api/v1/metrics",
+      "response_code": 200,
+      "response_time_ms": 1009.9911689758301,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/metrics",
+        "data": null,
+        "params": {
+          "type": "system"
+        },
+        "auth_required": true
+      },
+      "response": "# HELP http_requests_total Total count of http_requests\n# TYPE http_requests_total counter\n# HELP http_request_duration_seconds http_request_duration_seconds\n# TYPE http_request_duration_seconds gauge\n# HELP agent_last_seen_timestamp agent_last_seen_timestamp\n# TYPE agent_last_seen_timestamp gauge\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"135\"} 1754740478.157543\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"138\"} 1754740478.150529\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"131\"} 1754740478.1318\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"112\"} 1754740478.112692\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"109\"} 1754740478.109631\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"105\"} 1754740478.105948\nagent_last_seen_timestamp{agent=\"id\"} 1754740475.86295\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"123\"} 1754730889.123545\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"130\"} 1754730889.130199\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"150\"} 1754730889.150522\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"158\"} 1754730889.158127\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"154\"} 1754730889.154493\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"126\"} 1754730889.126993\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"688\"} 1754730591.688228\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"695\"} 1754730591.695093\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"714\"} 1754730591.714244\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"720\"} 1754730591.720142\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"717\"} 1754730591.71722\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"692\"} 1754730591.692084\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"232\"} 1754725694.034129\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"225\"} 1754725694.026404\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073045=\"306\"} 1754724645.30521\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"229\"} 1754724641.229515\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"124\"} 1754724640.123129\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"132\"} 1754724640.131061\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"182\"} 1754724640.182014\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"188\"} 1754724640.188459\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"185\"} 1754724640.185258\n# HELP agent_command_failures_total Total count of agent_command_failures\n# TYPE agent_command_failures_total counter\n# HELP database_connections database_connections\n# TYPE database_connections gauge\ndatabase_connections 0\n# HELP system_cpu_usage_percent Current system_cpu_usage_percent\n# TYPE system_cpu_usage_percent gauge\nsystem_cpu_usage_percent 0.3\n# HELP system_memory_usage_bytes Current system_memory_usage_bytes\n# TYPE system_memory_usage_bytes gauge\nsystem_memory_usage_bytes 2302038016\n# HELP system_memory_total_bytes system_memory_total_bytes\n# TYPE system_memory_total_bytes gauge\nsystem_memory_total_bytes 16655069184\n# HELP system_memory_usage_percent Current system_memory_usage_percent\n# TYPE system_memory_usage_percent gauge\nsystem_memory_usage_percent 16.1\n# HELP system_disk_usage_bytes Current system_disk_usage_bytes\n# TYPE system_disk_usage_bytes gauge\nsystem_disk_usage_bytes 70521995264\n# HELP system_disk_total_bytes system_disk_total_bytes\n# TYPE system_disk_total_bytes gauge\nsystem_disk_total_bytes 1081101176832\n# HELP system_disk_usage_percent Current system_disk_usage_percent\n# TYPE system_disk_usage_percent gauge\nsystem_disk_usage_percent 6.523163305644881\n# HELP agents_online_total Total count of agents_online\n# TYPE agents_online_total counter\nagents_online_total 4\n# HELP agents_offline_total Total count of agents_offline\n# TYPE agents_offline_total counter\nagents_offline_total 24\n# HELP agents_total Total count of agents\n# TYPE agents_total counter\nagents_total 28",
+      "file": "monitoring_results.json",
+      "failure_reason": "Custom validation failed: Expecting value: line 1 column 1 (char 0)",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "monitoring",
+      "test_name": "test_metrics_time_range",
+      "endpoint": "GET /api/v1/metrics",
+      "response_code": 200,
+      "response_time_ms": 1005.6989192962646,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/metrics",
+        "data": null,
+        "params": {
+          "start": "2025-08-09T13:54:51.609999",
+          "end": "2025-08-09T14:54:51.610011"
+        },
+        "auth_required": true
+      },
+      "response": "# HELP http_requests_total Total count of http_requests\n# TYPE http_requests_total counter\n# HELP http_request_duration_seconds http_request_duration_seconds\n# TYPE http_request_duration_seconds gauge\n# HELP agent_last_seen_timestamp agent_last_seen_timestamp\n# TYPE agent_last_seen_timestamp gauge\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"135\"} 1754740478.157543\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"138\"} 1754740478.150529\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"131\"} 1754740478.1318\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"112\"} 1754740478.112692\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"109\"} 1754740478.109631\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"105\"} 1754740478.105948\nagent_last_seen_timestamp{agent=\"id\"} 1754740475.86295\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"123\"} 1754730889.123545\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"130\"} 1754730889.130199\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"150\"} 1754730889.150522\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"158\"} 1754730889.158127\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"154\"} 1754730889.154493\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"126\"} 1754730889.126993\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"688\"} 1754730591.688228\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"695\"} 1754730591.695093\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"714\"} 1754730591.714244\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"720\"} 1754730591.720142\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"717\"} 1754730591.71722\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"692\"} 1754730591.692084\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"232\"} 1754725694.034129\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"225\"} 1754725694.026404\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073045=\"306\"} 1754724645.30521\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"229\"} 1754724641.229515\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"124\"} 1754724640.123129\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"132\"} 1754724640.131061\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"182\"} 1754724640.182014\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"188\"} 1754724640.188459\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"185\"} 1754724640.185258\n# HELP agent_command_failures_total Total count of agent_command_failures\n# TYPE agent_command_failures_total counter\n# HELP database_connections database_connections\n# TYPE database_connections gauge\ndatabase_connections 0\n# HELP system_cpu_usage_percent Current system_cpu_usage_percent\n# TYPE system_cpu_usage_percent gauge\nsystem_cpu_usage_percent 0.2\n# HELP system_memory_usage_bytes Current system_memory_usage_bytes\n# TYPE system_memory_usage_bytes gauge\nsystem_memory_usage_bytes 2302480384\n# HELP system_memory_total_bytes system_memory_total_bytes\n# TYPE system_memory_total_bytes gauge\nsystem_memory_total_bytes 16655069184\n# HELP system_memory_usage_percent Current system_memory_usage_percent\n# TYPE system_memory_usage_percent gauge\nsystem_memory_usage_percent 16.1\n# HELP system_disk_usage_bytes Current system_disk_usage_bytes\n# TYPE system_disk_usage_bytes gauge\nsystem_disk_usage_bytes 70521995264\n# HELP system_disk_total_bytes system_disk_total_bytes\n# TYPE system_disk_total_bytes gauge\nsystem_disk_total_bytes 1081101176832\n# HELP system_disk_usage_percent Current system_disk_usage_percent\n# TYPE system_disk_usage_percent gauge\nsystem_disk_usage_percent 6.523163305644881\n# HELP agents_online_total Total count of agents_online\n# TYPE agents_online_total counter\nagents_online_total 4\n# HELP agents_offline_total Total count of agents_offline\n# TYPE agents_offline_total counter\nagents_offline_total 24\n# HELP agents_total Total count of agents\n# TYPE agents_total counter\nagents_total 28",
+      "file": "monitoring_results.json",
+      "failure_reason": "Custom validation failed: Expecting value: line 1 column 1 (char 0)",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "monitoring",
+      "test_name": "test_real_time_metrics",
+      "endpoint": "GET /api/v1/metrics/realtime",
+      "response_code": 404,
+      "response_time_ms": 1.1038780212402344,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/metrics/realtime",
+        "data": null,
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Not Found"
+      },
+      "file": "monitoring_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "monitoring",
+      "test_name": "test_metrics_aggregation",
+      "endpoint": "GET /api/v1/metrics",
+      "response_code": 200,
+      "response_time_ms": 1005.0191879272461,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Expecting value: line 1 column 1 (char 0)"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/metrics",
+        "data": null,
+        "params": {
+          "aggregate": "avg",
+          "interval": "5m"
+        },
+        "auth_required": true
+      },
+      "response": "# HELP http_requests_total Total count of http_requests\n# TYPE http_requests_total counter\n# HELP http_request_duration_seconds http_request_duration_seconds\n# TYPE http_request_duration_seconds gauge\n# HELP agent_last_seen_timestamp agent_last_seen_timestamp\n# TYPE agent_last_seen_timestamp gauge\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"135\"} 1754740478.157543\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"138\"} 1754740478.150529\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"131\"} 1754740478.1318\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"112\"} 1754740478.112692\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"109\"} 1754740478.109631\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",115438=\"105\"} 1754740478.105948\nagent_last_seen_timestamp{agent=\"id\"} 1754740475.86295\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"123\"} 1754730889.123545\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"130\"} 1754730889.130199\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"150\"} 1754730889.150522\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"158\"} 1754730889.158127\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"154\"} 1754730889.154493\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",091449=\"126\"} 1754730889.126993\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"688\"} 1754730591.688228\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"695\"} 1754730591.695093\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"714\"} 1754730591.714244\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"720\"} 1754730591.720142\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"717\"} 1754730591.71722\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",090951=\"692\"} 1754730591.692084\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"232\"} 1754725694.034129\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"225\"} 1754725694.026404\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073045=\"306\"} 1754724645.30521\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073041=\"229\"} 1754724641.229515\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"124\"} 1754724640.123129\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"132\"} 1754724640.131061\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"182\"} 1754724640.182014\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"188\"} 1754724640.188459\nagent_last_seen_timestamp{agent=\"id\",agent=\"20250809\",073040=\"185\"} 1754724640.185258\n# HELP agent_command_failures_total Total count of agent_command_failures\n# TYPE agent_command_failures_total counter\n# HELP database_connections database_connections\n# TYPE database_connections gauge\ndatabase_connections 0\n# HELP system_cpu_usage_percent Current system_cpu_usage_percent\n# TYPE system_cpu_usage_percent gauge\nsystem_cpu_usage_percent 0.2\n# HELP system_memory_usage_bytes Current system_memory_usage_bytes\n# TYPE system_memory_usage_bytes gauge\nsystem_memory_usage_bytes 2302447616\n# HELP system_memory_total_bytes system_memory_total_bytes\n# TYPE system_memory_total_bytes gauge\nsystem_memory_total_bytes 16655069184\n# HELP system_memory_usage_percent Current system_memory_usage_percent\n# TYPE system_memory_usage_percent gauge\nsystem_memory_usage_percent 16.1\n# HELP system_disk_usage_bytes Current system_disk_usage_bytes\n# TYPE system_disk_usage_bytes gauge\nsystem_disk_usage_bytes 70521995264\n# HELP system_disk_total_bytes system_disk_total_bytes\n# TYPE system_disk_total_bytes gauge\nsystem_disk_total_bytes 1081101176832\n# HELP system_disk_usage_percent Current system_disk_usage_percent\n# TYPE system_disk_usage_percent gauge\nsystem_disk_usage_percent 6.523163305644881\n# HELP agents_online_total Total count of agents_online\n# TYPE agents_online_total counter\nagents_online_total 4\n# HELP agents_offline_total Total count of agents_offline\n# TYPE agents_offline_total counter\nagents_offline_total 24\n# HELP agents_total Total count of agents\n# TYPE agents_total counter\nagents_total 28",
+      "file": "monitoring_results.json",
+      "failure_reason": "Custom validation failed: Expecting value: line 1 column 1 (char 0)",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_create_setting",
+      "endpoint": "POST /api/v1/settings/",
+      "response_code": 200,
+      "response_time_ms": 9.795188903808594,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/settings/",
+        "data": {
+          "key": "test_setting_c3f9280c",
+          "value": "test_value_123",
+          "description": "Test setting for API testing",
+          "category": "test"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "key": "test_setting_c3f9280c",
+        "value": "test_value_123",
+        "description": "Test setting for API testing",
+        "is_encrypted": false,
+        "created_at": "2025-08-09 11:54:56.688828",
+        "updated_at": "2025-08-09 11:54:56.688828"
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 201 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_update_setting",
+      "endpoint": "PUT /api/v1/settings/test_setting_c3f9280c",
+      "response_code": 405,
+      "response_time_ms": 0.7960796356201172,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 405,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "endpoint": "/api/v1/settings/test_setting_c3f9280c",
+        "data": {
+          "value": "updated_value_456",
+          "description": "Updated test setting"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Method Not Allowed"
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 200 but got 405",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_setting_type_string",
+      "endpoint": "POST /api/v1/settings/",
+      "response_code": 200,
+      "response_time_ms": 9.031534194946289,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 201,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/settings/",
+        "data": {
+          "key": "test_str_0b36433d",
+          "value": "test string",
+          "type": "string"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "key": "test_str_0b36433d",
+        "value": "test string",
+        "description": null,
+        "is_encrypted": false,
+        "created_at": "2025-08-09 11:54:57.795454",
+        "updated_at": "2025-08-09 11:54:57.795454"
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 201 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_protected_setting_database_url",
+      "endpoint": "PUT /api/v1/settings/database_url",
+      "response_code": 405,
+      "response_time_ms": 0.7472038269042969,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 403,
+          "actual": 405,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "endpoint": "/api/v1/settings/database_url",
+        "data": {
+          "value": "hacked"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Method Not Allowed"
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 403 but got 405",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_protected_setting_jwt_secret",
+      "endpoint": "PUT /api/v1/settings/jwt_secret",
+      "response_code": 405,
+      "response_time_ms": 0.7059574127197266,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 403,
+          "actual": 405,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "endpoint": "/api/v1/settings/jwt_secret",
+        "data": {
+          "value": "hacked"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Method Not Allowed"
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 403 but got 405",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_protected_setting_admin_password",
+      "endpoint": "PUT /api/v1/settings/admin_password",
+      "response_code": 405,
+      "response_time_ms": 0.6473064422607422,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 403,
+          "actual": 405,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "endpoint": "/api/v1/settings/admin_password",
+        "data": {
+          "value": "hacked"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Method Not Allowed"
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 403 but got 405",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "settings",
+      "test_name": "test_bulk_settings_update",
+      "endpoint": "PUT /api/v1/settings/bulk",
+      "response_code": 405,
+      "response_time_ms": 0.8518695831298828,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 405,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "endpoint": "/api/v1/settings/bulk",
+        "data": {
+          "settings": [
+            {
+              "key": "bulk_test_1_29f34e3b",
+              "value": "value1"
+            },
+            {
+              "key": "bulk_test_2_d55b0973",
+              "value": "value2"
+            },
+            {
+              "key": "bulk_test_3_5e4f60bf",
+              "value": "value3"
+            }
+          ]
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Method Not Allowed"
+      },
+      "file": "settings_results.json",
+      "failure_reason": "Expected status 200 but got 405",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "installer",
+      "test_name": "test_get_installer_config",
+      "endpoint": "GET /api/v1/installer/config",
+      "response_code": 200,
+      "response_time_ms": 0.8184909820556641,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Missing version"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/installer/config",
+        "data": null,
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "server_url": "http://localhost:8080",
+        "api_token": "your-api-token-here",
+        "agent_name": null,
+        "tags": [],
+        "auto_start": true,
+        "run_as_service": true
+      },
+      "file": "installer_results.json",
+      "failure_reason": "Custom validation failed: Missing version",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "system",
+      "test_name": "test_get_system_info_without_auth",
+      "endpoint": "GET /api/v1/system/info",
+      "response_code": 200,
+      "response_time_ms": 1004.0640830993652,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 401,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/system/info",
+        "data": null,
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "hostname": "47b25e30e87a",
+        "os_version": "Linux 5.15.167.4-microsoft-standard-WSL2",
+        "cpu_usage": 0.4,
+        "memory_usage": 16.1,
+        "disk_usage": {
+          "/dev/sdc": 6.523165578882624
+        }
+      },
+      "file": "system_results.json",
+      "failure_reason": "Expected status 401 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "system",
+      "test_name": "test_system_database_health",
+      "endpoint": "GET /api/v1/system/health/database",
+      "response_code": 404,
+      "response_time_ms": 0.8082389831542969,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/system/health/database",
+        "data": null,
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "detail": "Not Found"
+      },
+      "file": "system_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_list_agents",
+      "endpoint": "GET /api/v1/agents/",
+      "response_code": 200,
+      "response_time_ms": 6.573915481567383,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Response should be a list"
+        },
+        {
+          "type": "performance",
+          "expected": "<= 50ms",
+          "actual": "6.57ms",
+          "passed": true
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/agents/",
+        "data": null,
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "agents": [
+          {
+            "id": "desktop-jk5g34l-dexagent",
+            "hostname": "DESKTOP-JK5G34L",
+            "ip": null,
+            "os": null,
+            "version": "2.0.0",
+            "status": "online",
+            "last_seen": "2025-08-09T11:54:35.862950",
+            "tags": [],
+            "system_info": {
+              "uptime": 18196.576344251633,
+              "hostname": "DESKTOP-JK5G34L",
+              "platform": "Windows-11-10.0.22631-SP0",
+              "cpu_count": 24,
+              "cpu_usage": 0.7,
+              "disk_usage": {
+                "C:": 97.9
+              },
+              "cpu_percent": 0.7,
+              "architecture": "64bit",
+              "memory_usage": 51.1,
+              "total_memory": 34130554880,
+              "process_count": 257,
+              "memory_percent": 51.1,
+              "available_memory": 16693993472
+            },
+            "connection_id": null,
+            "is_connected": true
+          },
+          {
+            "id": "agent_20250809_091449_123",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.123545",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_130",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.130199",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_150",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.150522",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_158",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.158127",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_154",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.154493",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_126",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.126993",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_688",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.688228",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_695",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.695093",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_714",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.714244",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_720",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.720142",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_717",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.717220",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_692",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.692084",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073041_232",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:48:14.034129",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073041_225",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:48:14.026404",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073045_306",
+            "hostname": "CMD-TEST-5eea78ba",
+            "ip": null,
+            "os": "Windows 10",
+            "version": null,
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:45.305210",
+            "tags": [],
+            "system_info": null,
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073041_229",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:41.229515",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_124",
+            "hostname": "TEST-PC-001",
+            "ip": null,
+            "os": "Windows 10",
+            "version": null,
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.123129",
+            "tags": [],
+            "system_info": null,
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_132",
+            "hostname": "INCOMPLETE-PC",
+            "ip": null,
+            "os": null,
+            "version": null,
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.131061",
+            "tags": [],
+            "system_info": null,
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_182",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.182014",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_188",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.188459",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_185",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.185258",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          }
+        ],
+        "count": 22,
+        "filters": {
+          "status": null,
+          "limit": null,
+          "offset": 0,
+          "order_by": "updated_at",
+          "order_desc": true
+        }
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Custom validation failed: Response should be a list",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_list_agents_without_auth",
+      "endpoint": "GET /api/v1/agents/",
+      "response_code": 200,
+      "response_time_ms": 5.397796630859375,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 401,
+          "actual": 200,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/agents/",
+        "data": null,
+        "params": null,
+        "auth_required": false
+      },
+      "response": {
+        "agents": [
+          {
+            "id": "desktop-jk5g34l-dexagent",
+            "hostname": "DESKTOP-JK5G34L",
+            "ip": null,
+            "os": null,
+            "version": "2.0.0",
+            "status": "online",
+            "last_seen": "2025-08-09T11:54:35.862950",
+            "tags": [],
+            "system_info": {
+              "uptime": 18196.576344251633,
+              "hostname": "DESKTOP-JK5G34L",
+              "platform": "Windows-11-10.0.22631-SP0",
+              "cpu_count": 24,
+              "cpu_usage": 0.7,
+              "disk_usage": {
+                "C:": 97.9
+              },
+              "cpu_percent": 0.7,
+              "architecture": "64bit",
+              "memory_usage": 51.1,
+              "total_memory": 34130554880,
+              "process_count": 257,
+              "memory_percent": 51.1,
+              "available_memory": 16693993472
+            },
+            "connection_id": null,
+            "is_connected": true
+          },
+          {
+            "id": "agent_20250809_091449_123",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.123545",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_130",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.130199",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_150",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.150522",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_158",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.158127",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_154",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.154493",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_091449_126",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.126993",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_688",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.688228",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_695",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.695093",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_714",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.714244",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_720",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.720142",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_717",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.717220",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_090951_692",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:09:51.692084",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073041_232",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:48:14.034129",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073041_225",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:48:14.026404",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073045_306",
+            "hostname": "CMD-TEST-5eea78ba",
+            "ip": null,
+            "os": "Windows 10",
+            "version": null,
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:45.305210",
+            "tags": [],
+            "system_info": null,
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073041_229",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:41.229515",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_124",
+            "hostname": "TEST-PC-001",
+            "ip": null,
+            "os": "Windows 10",
+            "version": null,
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.123129",
+            "tags": [],
+            "system_info": null,
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_132",
+            "hostname": "INCOMPLETE-PC",
+            "ip": null,
+            "os": null,
+            "version": null,
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.131061",
+            "tags": [],
+            "system_info": null,
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_182",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.182014",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_188",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.188459",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_073040_185",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T07:30:40.185258",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          }
+        ],
+        "count": 22,
+        "filters": {
+          "status": null,
+          "limit": null,
+          "offset": 0,
+          "order_by": "updated_at",
+          "order_desc": true
+        }
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 401 but got 200",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_get_connected_agents",
+      "endpoint": "GET /api/v1/agents/connected",
+      "response_code": 404,
+      "response_time_ms": 4.553556442260742,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/agents/connected",
+        "data": null,
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Agent not found"
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_get_offline_agents",
+      "endpoint": "GET /api/v1/agents/offline",
+      "response_code": 404,
+      "response_time_ms": 4.638433456420898,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/agents/offline",
+        "data": null,
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Agent not found"
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_seed_agents",
+      "endpoint": "POST /api/v1/agents/seed",
+      "response_code": 200,
+      "response_time_ms": 12.605905532836914,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Missing message or agents list"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/seed",
+        "data": {
+          "count": 3,
+          "prefix": "TEST-SEED"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": [
+        {
+          "id": "agent_20250809_115438_105",
+          "hostname": "DESKTOP-ABC123",
+          "ip": "192.168.1.100",
+          "os": "Windows 11",
+          "version": "10.0.22000",
+          "status": "online",
+          "last_seen": null,
+          "tags": [
+            "development",
+            "test"
+          ],
+          "system_info": null,
+          "connection_id": null,
+          "is_connected": false
+        },
+        {
+          "id": "agent_20250809_115438_109",
+          "hostname": "LAPTOP-XYZ789",
+          "ip": "192.168.1.101",
+          "os": "Windows 10",
+          "version": "10.0.19045",
+          "status": "offline",
+          "last_seen": null,
+          "tags": [
+            "production",
+            "critical"
+          ],
+          "system_info": null,
+          "connection_id": null,
+          "is_connected": false
+        },
+        {
+          "id": "agent_20250809_115438_112",
+          "hostname": "SERVER-MAIN",
+          "ip": "192.168.1.102",
+          "os": "Windows Server 2022",
+          "version": "10.0.20348",
+          "status": "online",
+          "last_seen": null,
+          "tags": [
+            "server",
+            "production",
+            "database"
+          ],
+          "system_info": null,
+          "connection_id": null,
+          "is_connected": false
+        }
+      ],
+      "file": "agents_results.json",
+      "failure_reason": "Custom validation failed: Missing message or agents list",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_agent_filtering_by_status",
+      "endpoint": "GET /api/v1/agents/",
+      "response_code": 200,
+      "response_time_ms": 4.992246627807617,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Response should be a list"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/agents/",
+        "data": null,
+        "params": {
+          "status": "online"
+        },
+        "auth_required": true
+      },
+      "response": {
+        "agents": [
+          {
+            "id": "agent_20250809_115438_112",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "online",
+            "last_seen": "2025-08-09T11:54:38.112692",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_115438_105",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "online",
+            "last_seen": "2025-08-09T11:54:38.105948",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "desktop-jk5g34l-dexagent",
+            "hostname": "DESKTOP-JK5G34L",
+            "ip": null,
+            "os": null,
+            "version": "2.0.0",
+            "status": "online",
+            "last_seen": "2025-08-09T11:54:35.862950",
+            "tags": [],
+            "system_info": {
+              "uptime": 18196.576344251633,
+              "hostname": "DESKTOP-JK5G34L",
+              "platform": "Windows-11-10.0.22631-SP0",
+              "cpu_count": 24,
+              "cpu_usage": 0.7,
+              "disk_usage": {
+                "C:": 97.9
+              },
+              "cpu_percent": 0.7,
+              "architecture": "64bit",
+              "memory_usage": 51.1,
+              "total_memory": 34130554880,
+              "process_count": 257,
+              "memory_percent": 51.1,
+              "available_memory": 16693993472
+            },
+            "connection_id": null,
+            "is_connected": true
+          }
+        ],
+        "count": 3,
+        "filters": {
+          "status": "online",
+          "limit": null,
+          "offset": 0,
+          "order_by": "updated_at",
+          "order_desc": true
+        }
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Custom validation failed: Response should be a list",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_agent_pagination",
+      "endpoint": "GET /api/v1/agents/",
+      "response_code": 200,
+      "response_time_ms": 5.005836486816406,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Missing items/results"
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "endpoint": "/api/v1/agents/",
+        "data": null,
+        "params": {
+          "limit": 5,
+          "offset": 0
+        },
+        "auth_required": true
+      },
+      "response": {
+        "agents": [
+          {
+            "id": "agent_20250809_115438_112",
+            "hostname": "SERVER-MAIN",
+            "ip": "192.168.1.102",
+            "os": "Windows Server 2022",
+            "version": "10.0.20348",
+            "status": "online",
+            "last_seen": "2025-08-09T11:54:38.112692",
+            "tags": [
+              "server",
+              "production",
+              "database"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_115438_109",
+            "hostname": "LAPTOP-XYZ789",
+            "ip": "192.168.1.101",
+            "os": "Windows 10",
+            "version": "10.0.19045",
+            "status": "offline",
+            "last_seen": "2025-08-09T11:54:38.109631",
+            "tags": [
+              "production",
+              "critical"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "agent_20250809_115438_105",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "online",
+            "last_seen": "2025-08-09T11:54:38.105948",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          },
+          {
+            "id": "desktop-jk5g34l-dexagent",
+            "hostname": "DESKTOP-JK5G34L",
+            "ip": null,
+            "os": null,
+            "version": "2.0.0",
+            "status": "online",
+            "last_seen": "2025-08-09T11:54:35.862950",
+            "tags": [],
+            "system_info": {
+              "uptime": 18196.576344251633,
+              "hostname": "DESKTOP-JK5G34L",
+              "platform": "Windows-11-10.0.22631-SP0",
+              "cpu_count": 24,
+              "cpu_usage": 0.7,
+              "disk_usage": {
+                "C:": 97.9
+              },
+              "cpu_percent": 0.7,
+              "architecture": "64bit",
+              "memory_usage": 51.1,
+              "total_memory": 34130554880,
+              "process_count": 257,
+              "memory_percent": 51.1,
+              "available_memory": 16693993472
+            },
+            "connection_id": null,
+            "is_connected": true
+          },
+          {
+            "id": "agent_20250809_091449_123",
+            "hostname": "DESKTOP-ABC123",
+            "ip": "192.168.1.100",
+            "os": "Windows 11",
+            "version": "10.0.22000",
+            "status": "offline",
+            "last_seen": "2025-08-09T09:14:49.123545",
+            "tags": [
+              "development",
+              "test"
+            ],
+            "system_info": {},
+            "connection_id": null,
+            "is_connected": false
+          }
+        ],
+        "count": 5,
+        "filters": {
+          "status": null,
+          "limit": 5,
+          "offset": 0,
+          "order_by": "updated_at",
+          "order_desc": true
+        }
+      },
+      "file": "agents_results.json",
+      "failure_reason": "Custom validation failed: Missing items/results",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "agents",
+      "test_name": "test_seed_agents",
+      "endpoint": "POST /api/v1/agents/seed",
+      "response_code": 200,
+      "response_time_ms": 12.192010879516602,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 200,
+          "passed": true
+        },
+        {
+          "type": "custom_validation",
+          "passed": false,
+          "error": "Missing message or agents list"
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/agents/seed",
+        "data": {
+          "count": 3,
+          "prefix": "TEST-SEED"
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": [
+        {
+          "id": "agent_20250809_115438_131",
+          "hostname": "DESKTOP-ABC123",
+          "ip": "192.168.1.100",
+          "os": "Windows 11",
+          "version": "10.0.22000",
+          "status": "online",
+          "last_seen": null,
+          "tags": [
+            "development",
+            "test"
+          ],
+          "system_info": null,
+          "connection_id": null,
+          "is_connected": false
+        },
+        {
+          "id": "agent_20250809_115438_135",
+          "hostname": "LAPTOP-XYZ789",
+          "ip": "192.168.1.101",
+          "os": "Windows 10",
+          "version": "10.0.19045",
+          "status": "offline",
+          "last_seen": null,
+          "tags": [
+            "production",
+            "critical"
+          ],
+          "system_info": null,
+          "connection_id": null,
+          "is_connected": false
+        },
+        {
+          "id": "agent_20250809_115438_138",
+          "hostname": "SERVER-MAIN",
+          "ip": "192.168.1.102",
+          "os": "Windows Server 2022",
+          "version": "10.0.20348",
+          "status": "online",
+          "last_seen": null,
+          "tags": [
+            "server",
+            "production",
+            "database"
+          ],
+          "system_info": null,
+          "connection_id": null,
+          "is_connected": false
+        }
+      ],
+      "file": "agents_results.json",
+      "failure_reason": "Custom validation failed: Missing message or agents list",
+      "severity": "Low"
+    },
+    {
+      "test_suite": "websocket",
+      "test_name": "test_send_command_via_websocket",
+      "endpoint": "POST /api/v1/send/test-agent-001/command",
+      "response_code": 404,
+      "response_time_ms": 1.5654563903808594,
+      "error": null,
+      "assertions": [
+        {
+          "type": "status_code",
+          "expected": 200,
+          "actual": 404,
+          "passed": false
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "endpoint": "/api/v1/send/test-agent-001/command",
+        "data": {
+          "command": "Get-Date",
+          "timeout": 30
+        },
+        "params": null,
+        "auth_required": true
+      },
+      "response": {
+        "detail": "Agent not connected"
+      },
+      "file": "websocket_results.json",
+      "failure_reason": "Expected status 200 but got 404",
+      "severity": "Low"
+    }
+  ]
+}

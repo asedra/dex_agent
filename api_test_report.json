@@ -1,0 +1,553 @@
+{
+  "summary": {
+    "total": 53,
+    "passed": 0,
+    "failed": 53,
+    "skipped": 0,
+    "pass_rate": 0.0,
+    "avg_response_time": 0.0,
+    "duration": 0.028153,
+    "timestamp": "2025-08-09T17:22:04.801824"
+  },
+  "categories": {
+    "auth": {
+      "passed": 0,
+      "failed": 3,
+      "total": 3
+    },
+    "system": {
+      "passed": 0,
+      "failed": 2,
+      "total": 2
+    },
+    "health": {
+      "passed": 0,
+      "failed": 1,
+      "total": 1
+    },
+    "stats": {
+      "passed": 0,
+      "failed": 1,
+      "total": 1
+    },
+    "metrics": {
+      "passed": 0,
+      "failed": 1,
+      "total": 1
+    },
+    "other": {
+      "passed": 0,
+      "failed": 1,
+      "total": 1
+    },
+    "agents": {
+      "passed": 0,
+      "failed": 14,
+      "total": 14
+    },
+    "commands": {
+      "passed": 0,
+      "failed": 9,
+      "total": 9
+    },
+    "software": {
+      "passed": 0,
+      "failed": 9,
+      "total": 9
+    },
+    "settings": {
+      "passed": 0,
+      "failed": 8,
+      "total": 8
+    },
+    "connected": {
+      "passed": 0,
+      "failed": 1,
+      "total": 1
+    },
+    "installer": {
+      "passed": 0,
+      "failed": 3,
+      "total": 3
+    }
+  },
+  "results": [
+    {
+      "endpoint": "/api/v1/auth/login",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/auth/me",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/auth/logout",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/system/health",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/health",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/system/info",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/stats",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/metrics",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/list",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/connected",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/offline",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent",
+      "method": "PUT",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/heartbeat",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/refresh",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/status/desktop-jk5g34l-dexagent",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/commands",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/command",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/bulk",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/register",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/seed",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/saved",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/saved",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/execute",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/execute/batch",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/ai/status",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/ai/generate",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/test/status",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/test/mock-agent",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/test/mock-agent/mock-test-id",
+      "method": "DELETE",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/packages",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/packages",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/packages/upload",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/chocolatey/search",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/winget/search",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/repositories",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/repositories",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/bulk-install",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/jobs",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/settings/",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/settings/",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/settings/test_setting",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/settings/test_setting",
+      "method": "DELETE",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/settings/chatgpt/config",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/settings/chatgpt/config",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/settings/chatgpt/test",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/settings/reload-ai-service",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/connected",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/installer/config",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/installer/create",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/installer/create-python",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": null,
+      "response_time": null,
+      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "details": null
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+# DexAgent Pre-commit Configuration
+# See https://pre-commit.com for more information
+
+repos:
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+      - id: check-toml
+      - id: check-xml
+      - id: check-added-large-files
+        args: [--maxkb=10000]
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
+
+  # Python hooks
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+        files: ^(apps/backend|tools|tests)/.*\.py$
+        args: [--line-length=88]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        files: ^(apps/backend|tools|tests)/.*\.py$
+        args: [--profile=black, --line-length=88]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        files: ^(apps/backend|tools|tests)/.*\.py$
+        args:
+          - --max-line-length=88
+          - --extend-ignore=E203,W503
+          - --per-file-ignores=__init__.py:F401
+
+  - repo: https://github.com/pycqa/bandit
+    rev: 1.7.4
+    hooks:
+      - id: bandit
+        files: ^(apps/backend|tools)/.*\.py$
+        args: [-c, pyproject.toml]
+
+  # TypeScript/JavaScript hooks
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.36.0
+    hooks:
+      - id: eslint
+        files: ^apps/frontend/.*\.(js|jsx|ts|tsx)$
+        additional_dependencies:
+          - eslint@8.36.0
+          - "@typescript-eslint/eslint-plugin@5.55.0"
+          - "@typescript-eslint/parser@5.55.0"
+          - "eslint-config-next@13.2.4"
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.7.1
+    hooks:
+      - id: prettier
+        files: ^apps/frontend/.*\.(js|jsx|ts|tsx|json|css|scss|md)$
+        exclude: ^apps/frontend/(node_modules|\.next|dist)/.*$
+
+  # Docker hooks
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        files: ^.*Dockerfile.*$
+
+  # Markdown hooks
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.33.0
+    hooks:
+      - id: markdownlint
+        files: \.md$
+        args: [--fix, --config=.markdownlint.json]
+
+  # YAML hooks
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.29.0
+    hooks:
+      - id: yamllint
+        files: \.(yaml|yml)$
+        args: [-c=.yamllint.yaml]
+
+  # Git hooks
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v2.42.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  # Security hooks
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+        exclude: ^(\.git|node_modules|\.next|dist|build)/.*$
+
+  # Custom hooks
+  - repo: local
+    hooks:
+      - id: jira-commit-validation
+        name: Validate Jira Issue References
+        entry: python tools/scripts/git_jira_hooks.py pre-commit
+        language: system
+        stages: [commit-msg]
+        always_run: true
+
+      - id: test-coverage-check
+        name: Check Test Coverage
+        entry: python tools/scripts/check_coverage.py
+        language: system
+        files: ^(apps/backend|apps/frontend)/.*\.(py|ts|tsx)$
+        pass_filenames: false
+
+      - id: dependency-check
+        name: Check Dependencies
+        entry: python tools/scripts/check_dependencies.py
+        language: system
+        files: ^(requirements\.txt|package\.json|.*lock\.json)$
+        pass_filenames: false
+
+# Global configuration
+default_stages: [commit, push]
+fail_fast: false
+minimum_pre_commit_version: 3.0.0
