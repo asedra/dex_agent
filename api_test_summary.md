@@ -1,135 +1,129 @@
 # DexAgents API Test Report
 
 ## 📊 Summary
-- **Date**: 2025-08-09 17:22:04
-- **Total Tests**: 53
-- **Passed**: 0 (0.0%)
-- **Failed**: 53
-- **Average Response Time**: 0.0ms
-- **Test Duration**: 0.0s
+- **Date**: 2025-08-10 00:11:39
+- **Total Tests**: 121
+- **Passed**: 72 (59.5%)
+- **Failed**: 49
+- **Average Response Time**: 105.5ms
+- **Test Duration**: 12.8s
 
 ## 📈 Results by Category
 
 | Category | Passed | Total | Pass Rate |
 |----------|--------|-------|-----------|
-| agents | 0 | 14 | 0% |
-| auth | 0 | 3 | 0% |
-| commands | 0 | 9 | 0% |
-| connected | 0 | 1 | 0% |
-| health | 0 | 1 | 0% |
-| installer | 0 | 3 | 0% |
-| metrics | 0 | 1 | 0% |
-| other | 0 | 1 | 0% |
-| settings | 0 | 8 | 0% |
-| software | 0 | 9 | 0% |
-| stats | 0 | 1 | 0% |
-| system | 0 | 2 | 0% |
+| agents | 30 | 56 | 54% |
+| auth | 3 | 3 | 100% |
+| commands | 12 | 16 | 75% |
+| connected | 1 | 1 | 100% |
+| files | 0 | 12 | 0% |
+| health | 1 | 1 | 100% |
+| installer | 1 | 3 | 33% |
+| metrics | 1 | 1 | 100% |
+| other | 1 | 1 | 100% |
+| send | 0 | 1 | 0% |
+| settings | 8 | 8 | 100% |
+| software | 11 | 15 | 73% |
+| stats | 1 | 1 | 100% |
+| system | 2 | 2 | 100% |
 
 ## ❌ Failed Tests
 
-- **POST /api/v1/auth/login**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/auth/me**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/auth/logout**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/system/health**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/health**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/system/info**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/stats**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/metrics**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/agents/**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/agents/list**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/agents/connected**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/agents/offline**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/agents/desktop-jk5g34l-dexagent**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **PUT /api/v1/agents/desktop-jk5g34l-dexagent**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/agents/desktop-jk5g34l-dexagent/heartbeat**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/agents/desktop-jk5g34l-dexagent/refresh**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/agents/status/desktop-jk5g34l-dexagent**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/agents/desktop-jk5g34l-dexagent/commands**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/agents/desktop-jk5g34l-dexagent/command**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/agents/bulk**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/agents/register**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/agents/seed**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/commands/saved**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/commands/saved**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/commands/execute**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/commands/execute/batch**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/commands/ai/status**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/commands/ai/generate**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/commands/test/status**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+- **POST /api/v1/agents/agent_20250809_211035_156/command**
+  - Error: HTTP 400
+- **POST /api/v1/commands/agent/agent_20250809_211035_156/execute**
+  - Error: HTTP 500
+- **POST /api/v1/commands/agent/agent_20250809_211035_156/execute/async**
+  - Error: HTTP 500
 - **POST /api/v1/commands/test/mock-agent**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+  - Error: HTTP 403
 - **DELETE /api/v1/commands/test/mock-agent/mock-test-id**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/software/packages**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/software/packages**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+  - Error: HTTP 403
+- **GET /api/v1/agents/agent_20250809_211035_156/services**
+  - Error: HTTP 400
+- **GET /api/v1/agents/agent_20250809_211035_156/services/W32Time**
+  - Error: HTTP 400
+- **GET /api/v1/agents/agent_20250809_211035_156/services/W32Time/dependencies**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/services/action**
+  - Error: HTTP 400
+- **PUT /api/v1/agents/agent_20250809_211035_156/services/W32Time/config**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/services/batch**
+  - Error: HTTP 400
+- **GET /api/v1/agents/agent_20250809_211035_156/registry/keys**
+  - Error: HTTP 400
+- **GET /api/v1/agents/agent_20250809_211035_156/registry/values**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/registry/search**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/registry/values**
+  - Error: HTTP 400
+- **DELETE /api/v1/agents/agent_20250809_211035_156/registry/values**
+  - Error: HTTP 400
+- **DELETE /api/v1/agents/agent_20250809_211035_156/registry/keys**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/registry/export**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/registry/import**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/registry/backup**
+  - Error: HTTP 400
+- **GET /api/v1/files/agents/agent_20250809_211035_156/files**
+  - Error: HTTP 400
+- **GET /api/v1/files/agents/agent_20250809_211035_156/files/tree**
+  - Error: HTTP 400
+- **POST /api/v1/files/agents/agent_20250809_211035_156/files/search**
+  - Error: HTTP 400
+- **GET /api/v1/files/agents/agent_20250809_211035_156/files/preview**
+  - Error: HTTP 400
+- **POST /api/v1/files/agents/agent_20250809_211035_156/files/folder**
+  - Error: HTTP 400
+- **POST /api/v1/files/agents/agent_20250809_211035_156/files/upload**
+  - Error: HTTP 400
+- **GET /api/v1/files/agents/agent_20250809_211035_156/files/download**
+  - Error: HTTP 400
+- **POST /api/v1/files/agents/agent_20250809_211035_156/files/operation**
+  - Error: HTTP 400
+- **POST /api/v1/files/agents/agent_20250809_211035_156/files/compress**
+  - Error: HTTP 400
+- **POST /api/v1/files/agents/agent_20250809_211035_156/files/extract**
+  - Error: HTTP 400
+- **POST /api/v1/files/agents/agent_20250809_211035_156/files/batch-upload**
+  - Error: HTTP 400
+- **DELETE /api/v1/files/agents/agent_20250809_211035_156/files**
+  - Error: HTTP 400
+- **GET /api/v1/agents/agent_20250809_211035_156/network/adapters**
+  - Error: HTTP 400
+- **GET /api/v1/agents/agent_20250809_211035_156/network/firewall/rules**
+  - Error: HTTP 400
+- **GET /api/v1/agents/agent_20250809_211035_156/network/routing/table**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/network/test**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/network/configure**
+  - Error: HTTP 400
+- **GET /api/v1/agents/agent_20250809_211035_156/processes/**
+  - Error: HTTP 400
+- **GET /api/v1/agents/agent_20250809_211035_156/processes/tree**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/processes/kill**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/processes/priority**
+  - Error: HTTP 400
+- **POST /api/v1/agents/agent_20250809_211035_156/processes/suspend-resume**
+  - Error: HTTP 400
+- **GET /api/v1/software/packages/1**
+  - Error: HTTP 404
 - **POST /api/v1/software/packages/upload**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/software/chocolatey/search**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/software/winget/search**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/software/repositories**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/software/repositories**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+  - Error: HTTP 422
+- **POST /api/v1/software/agents/agent_20250809_211035_156/install**
+  - Error: HTTP 422
 - **POST /api/v1/software/bulk-install**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/software/jobs**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/settings/**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/settings/**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/settings/test_setting**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **DELETE /api/v1/settings/test_setting**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/settings/chatgpt/config**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/settings/chatgpt/config**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/settings/chatgpt/test**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **POST /api/v1/settings/reload-ai-service**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/connected**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
-- **GET /api/v1/installer/config**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+  - Error: HTTP 500
+- **POST /api/v1/send/agent_20250809_211035_156/command**
+  - Error: HTTP 404
 - **POST /api/v1/installer/create**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+  - Error: HTTP 422
 - **POST /api/v1/installer/create-python**
-  - Error: ('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))
+  - Error: HTTP 422

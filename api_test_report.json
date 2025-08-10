@@ -1,73 +1,83 @@
 {
   "summary": {
-    "total": 53,
-    "passed": 0,
-    "failed": 53,
+    "total": 121,
+    "passed": 72,
+    "failed": 49,
     "skipped": 0,
-    "pass_rate": 0.0,
-    "avg_response_time": 0.0,
-    "duration": 0.028153,
-    "timestamp": "2025-08-09T17:22:04.801824"
+    "pass_rate": 59.50413223140496,
+    "avg_response_time": 105.52627390081233,
+    "duration": 12.828333,
+    "timestamp": "2025-08-10T00:11:39.209378"
   },
   "categories": {
     "auth": {
-      "passed": 0,
-      "failed": 3,
+      "passed": 3,
+      "failed": 0,
       "total": 3
     },
     "system": {
-      "passed": 0,
-      "failed": 2,
+      "passed": 2,
+      "failed": 0,
       "total": 2
     },
     "health": {
-      "passed": 0,
-      "failed": 1,
+      "passed": 1,
+      "failed": 0,
       "total": 1
     },
     "stats": {
-      "passed": 0,
-      "failed": 1,
+      "passed": 1,
+      "failed": 0,
       "total": 1
     },
     "metrics": {
-      "passed": 0,
-      "failed": 1,
+      "passed": 1,
+      "failed": 0,
       "total": 1
     },
     "other": {
-      "passed": 0,
-      "failed": 1,
+      "passed": 1,
+      "failed": 0,
       "total": 1
     },
     "agents": {
-      "passed": 0,
-      "failed": 14,
-      "total": 14
+      "passed": 30,
+      "failed": 26,
+      "total": 56
     },
     "commands": {
+      "passed": 12,
+      "failed": 4,
+      "total": 16
+    },
+    "files": {
       "passed": 0,
-      "failed": 9,
-      "total": 9
+      "failed": 12,
+      "total": 12
     },
     "software": {
-      "passed": 0,
-      "failed": 9,
-      "total": 9
+      "passed": 11,
+      "failed": 4,
+      "total": 15
     },
     "settings": {
-      "passed": 0,
-      "failed": 8,
+      "passed": 8,
+      "failed": 0,
       "total": 8
     },
     "connected": {
+      "passed": 1,
+      "failed": 0,
+      "total": 1
+    },
+    "send": {
       "passed": 0,
       "failed": 1,
       "total": 1
     },
     "installer": {
-      "passed": 0,
-      "failed": 3,
+      "passed": 1,
+      "failed": 2,
       "total": 3
     }
   },
@@ -75,478 +85,1090 @@
     {
       "endpoint": "/api/v1/auth/login",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 7.3108673095703125,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/auth/me",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.432201385498047,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/auth/logout",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.381895065307617,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/system/health",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1.5468597412109375,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/health",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 7.792234420776367,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/system/info",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1005.1834583282471,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/stats",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1012.7661228179932,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/metrics",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1008.2697868347168,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1.5485286712646484,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 10.18977165222168,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/list",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 10.216712951660156,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/connected",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 6.77490234375,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/offline",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 14.216184616088867,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 7.009983062744141,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent",
       "method": "PUT",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 15.34581184387207,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/heartbeat",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1016.8960094451904,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/refresh",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 115.52119255065918,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/status/desktop-jk5g34l-dexagent",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 8.094310760498047,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/commands",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 11.170625686645508,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/command",
       "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 2955.363988876343,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 7.562398910522461,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156",
+      "method": "PUT",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 17.200469970703125,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/heartbeat",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1015.5513286590576,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/refresh",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 15.227556228637695,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/status/agent_20250809_211035_156",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 6.712436676025391,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/commands",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 10.834932327270508,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/command",
+      "method": "POST",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 400,
+      "response_time": 6.919384002685547,
+      "error": "HTTP 400",
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/bulk",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 15.441417694091797,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/register",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 12.382745742797852,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/agents/seed",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 18.594026565551758,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/commands/saved",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 8.545160293579102,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/commands/saved",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 10.606050491333008,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/saved/6fe69935-ffb9-43ac-8a8a-27a663fd0eb2",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 7.5740814208984375,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/saved/6fe69935-ffb9-43ac-8a8a-27a663fd0eb2",
+      "method": "PUT",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 13.511419296264648,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/saved/6fe69935-ffb9-43ac-8a8a-27a663fd0eb2/execute",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 8.481264114379883,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/saved/6fe69935-ffb9-43ac-8a8a-27a663fd0eb2",
+      "method": "DELETE",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 12.804031372070312,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/commands/execute",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 370.8152770996094,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/commands/execute/batch",
       "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 639.6167278289795,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/agent/agent_20250809_211035_156/execute",
+      "method": "POST",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 500,
+      "response_time": 1.6818046569824219,
+      "error": "HTTP 500",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/agent/agent_20250809_211035_156/execute/async",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 500,
+      "response_time": 1.39617919921875,
+      "error": "HTTP 500",
       "details": null
     },
     {
       "endpoint": "/api/v1/commands/ai/status",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.280256271362305,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/commands/ai/generate",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 2000.4246234893799,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/ai/test",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.935264587402344,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/commands/test/status",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.790782928466797,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/commands/test/mock-agent",
       "method": "POST",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 403,
+      "response_time": 4.944324493408203,
+      "error": "HTTP 403",
       "details": null
     },
     {
       "endpoint": "/api/v1/commands/test/mock-agent/mock-test-id",
       "method": "DELETE",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 403,
+      "response_time": 4.235267639160156,
+      "error": "HTTP 403",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.012056350708008,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/W32Time",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.392810821533203,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/W32Time/dependencies",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.543325424194336,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/action",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.753133773803711,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/W32Time/config",
+      "method": "PUT",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.188247680664062,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/batch",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.969141006469727,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/keys",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 6.857633590698242,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/values",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.366584777832031,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/search",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.443355560302734,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/values",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.636713027954102,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/values",
+      "method": "DELETE",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.369518280029297,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/keys",
+      "method": "DELETE",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.7972412109375,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/export",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.415699005126953,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/import",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.606672286987305,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/backup",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.395029067993164,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.791280746459961,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/tree",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.4075927734375,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/search",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.696866989135742,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/preview",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.93545150756836,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/folder",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.154153823852539,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/upload",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.388280868530273,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/download",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 6.76417350769043,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/operation",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.7037811279296875,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/compress",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.175134658813477,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/extract",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.174657821655273,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/batch-upload",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.699655532836914,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files",
+      "method": "DELETE",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.9135894775390625,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/adapters",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.264780044555664,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/firewall/rules",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.826089859008789,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/routing/table",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.863759994506836,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/test",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.781194686889648,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/configure",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 7.866859436035156,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/status",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 7.518291473388672,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/plans",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 8.45479965209961,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/events",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 8.542537689208984,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/plans/activate",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 8.615255355834961,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/action",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 9.564399719238281,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 9.067296981811523,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/tree",
+      "method": "GET",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 8.122682571411133,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/kill",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 9.199142456054688,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/priority",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 9.277582168579102,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/suspend-resume",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 400,
+      "response_time": 9.454965591430664,
+      "error": "HTTP 400",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.980802536010742,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/stats",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.762577056884766,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/alert-rules",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.594968795776367,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/alert-rules",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.270719528198242,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/export",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.316972732543945,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/software/packages",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.955053329467773,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/software/packages",
       "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.805326461791992,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/packages/1",
+      "method": "GET",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 404,
+      "response_time": 7.491111755371094,
+      "error": "HTTP 404",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/packages/1",
+      "method": "PUT",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.099058151245117,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/packages/1",
+      "method": "DELETE",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.448102951049805,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/software/packages/upload",
       "method": "POST",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 422,
+      "response_time": 5.20014762878418,
+      "error": "HTTP 422",
       "details": null
     },
     {
       "endpoint": "/api/v1/software/chocolatey/search",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.009889602661133,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/software/winget/search",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.211830139160156,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/software/repositories",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.000114440917969,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/software/repositories",
       "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.140781402587891,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/agents/agent_20250809_211035_156/installed",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.713773727416992,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/agents/agent_20250809_211035_156/install",
+      "method": "POST",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 422,
+      "response_time": 5.365610122680664,
+      "error": "HTTP 422",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/software/agents/agent_20250809_211035_156/uninstall",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 5.199909210205078,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/software/bulk-install",
       "method": "POST",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 500,
+      "response_time": 4.5299530029296875,
+      "error": "HTTP 500",
       "details": null
     },
     {
       "endpoint": "/api/v1/software/jobs",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.801750183105469,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/settings/",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 7.488727569580078,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/settings/",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 14.012575149536133,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/settings/test_setting",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 8.833885192871094,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/settings/test_setting",
       "method": "DELETE",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 10.081291198730469,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/settings/chatgpt/config",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 22.39060401916504,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/settings/chatgpt/config",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 47.376155853271484,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/settings/chatgpt/test",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 729.4106483459473,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/settings/reload-ai-service",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 19.190073013305664,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/connected",
       "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 4.761457443237305,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/send/agent_20250809_211035_156/command",
+      "method": "POST",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 404,
+      "response_time": 1.806020736694336,
+      "error": "HTTP 404",
       "details": null
     },
     {
       "endpoint": "/api/v1/installer/config",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1.2519359588623047,
+      "error": null,
       "details": null
     },
     {
       "endpoint": "/api/v1/installer/create",
       "method": "POST",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 422,
+      "response_time": 1.2192726135253906,
+      "error": "HTTP 422",
       "details": null
     },
     {
       "endpoint": "/api/v1/installer/create-python",
       "method": "POST",
       "status": "FAIL",
-      "response_code": null,
-      "response_time": null,
-      "error": "('Connection aborted.', ConnectionResetError(104, 'Connection reset by peer'))",
+      "response_code": 422,
+      "response_time": 0.8859634399414062,
+      "error": "HTTP 422",
       "details": null
     }
   ]
