@@ -1,13 +1,13 @@
 {
   "summary": {
-    "total": 121,
-    "passed": 72,
-    "failed": 49,
+    "total": 117,
+    "passed": 104,
+    "failed": 13,
     "skipped": 0,
-    "pass_rate": 59.50413223140496,
-    "avg_response_time": 105.52627390081233,
-    "duration": 12.828333,
-    "timestamp": "2025-08-10T00:11:39.209378"
+    "pass_rate": 88.88888888888889,
+    "avg_response_time": 288.22500481564776,
+    "duration": 34.269879,
+    "timestamp": "2025-08-12T13:52:11.583030"
   },
   "categories": {
     "auth": {
@@ -41,18 +41,18 @@
       "total": 1
     },
     "agents": {
-      "passed": 30,
-      "failed": 26,
-      "total": 56
+      "passed": 48,
+      "failed": 3,
+      "total": 51
     },
     "commands": {
-      "passed": 12,
-      "failed": 4,
-      "total": 16
+      "passed": 15,
+      "failed": 2,
+      "total": 17
     },
     "files": {
-      "passed": 0,
-      "failed": 12,
+      "passed": 10,
+      "failed": 2,
       "total": 12
     },
     "software": {
@@ -71,8 +71,8 @@
       "total": 1
     },
     "send": {
-      "passed": 0,
-      "failed": 1,
+      "passed": 1,
+      "failed": 0,
       "total": 1
     },
     "installer": {
@@ -87,7 +87,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 7.3108673095703125,
+      "response_time": 169.3558692932129,
       "error": null,
       "details": null
     },
@@ -96,7 +96,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.432201385498047,
+      "response_time": 4.3010711669921875,
       "error": null,
       "details": null
     },
@@ -105,7 +105,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.381895065307617,
+      "response_time": 3.782987594604492,
       "error": null,
       "details": null
     },
@@ -114,7 +114,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 1.5468597412109375,
+      "response_time": 1.0521411895751953,
       "error": null,
       "details": null
     },
@@ -123,7 +123,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 7.792234420776367,
+      "response_time": 6.785869598388672,
       "error": null,
       "details": null
     },
@@ -132,7 +132,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 1005.1834583282471,
+      "response_time": 1004.2812824249268,
       "error": null,
       "details": null
     },
@@ -141,7 +141,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 1012.7661228179932,
+      "response_time": 1013.7763023376465,
       "error": null,
       "details": null
     },
@@ -150,7 +150,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 1008.2697868347168,
+      "response_time": 1008.7029933929443,
       "error": null,
       "details": null
     },
@@ -159,7 +159,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 1.5485286712646484,
+      "response_time": 1.1074542999267578,
       "error": null,
       "details": null
     },
@@ -168,7 +168,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 10.18977165222168,
+      "response_time": 11.658430099487305,
       "error": null,
       "details": null
     },
@@ -177,7 +177,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 10.216712951660156,
+      "response_time": 9.209394454956055,
       "error": null,
       "details": null
     },
@@ -186,7 +186,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 6.77490234375,
+      "response_time": 5.618810653686523,
       "error": null,
       "details": null
     },
@@ -195,7 +195,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 14.216184616088867,
+      "response_time": 13.684988021850586,
       "error": null,
       "details": null
     },
@@ -204,7 +204,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 7.009983062744141,
+      "response_time": 6.990909576416016,
       "error": null,
       "details": null
     },
@@ -213,7 +213,7 @@
       "method": "PUT",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 15.34581184387207,
+      "response_time": 11.794567108154297,
       "error": null,
       "details": null
     },
@@ -222,7 +222,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 1016.8960094451904,
+      "response_time": 1013.6356353759766,
       "error": null,
       "details": null
     },
@@ -231,7 +231,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 115.52119255065918,
+      "response_time": 118.99113655090332,
       "error": null,
       "details": null
     },
@@ -240,7 +240,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 8.094310760498047,
+      "response_time": 6.103277206420898,
       "error": null,
       "details": null
     },
@@ -249,7 +249,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 11.170625686645508,
+      "response_time": 8.775711059570312,
       "error": null,
       "details": null
     },
@@ -258,71 +258,71 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 2955.363988876343,
+      "response_time": 3226.442337036133,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent",
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 7.562398910522461,
+      "response_time": 6.495237350463867,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent",
       "method": "PUT",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 17.200469970703125,
+      "response_time": 12.091636657714844,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/heartbeat",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/heartbeat",
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 1015.5513286590576,
+      "response_time": 1015.6378746032715,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/refresh",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/refresh",
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 15.227556228637695,
+      "response_time": 114.349365234375,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/status/agent_20250809_211035_156",
+      "endpoint": "/api/v1/agents/status/desktop-jk5g34l-dexagent",
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 6.712436676025391,
+      "response_time": 6.306171417236328,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/commands",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/commands",
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 10.834932327270508,
+      "response_time": 9.154796600341797,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/command",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/command",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 6.919384002685547,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 3025.1314640045166,
+      "error": null,
       "details": null
     },
     {
@@ -330,7 +330,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 15.441417694091797,
+      "response_time": 12.16888427734375,
       "error": null,
       "details": null
     },
@@ -339,7 +339,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 12.382745742797852,
+      "response_time": 9.290933609008789,
       "error": null,
       "details": null
     },
@@ -348,7 +348,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 18.594026565551758,
+      "response_time": 14.028787612915039,
       "error": null,
       "details": null
     },
@@ -357,7 +357,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 8.545160293579102,
+      "response_time": 7.317304611206055,
       "error": null,
       "details": null
     },
@@ -366,43 +366,43 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 10.606050491333008,
+      "response_time": 7.045507431030273,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/commands/saved/6fe69935-ffb9-43ac-8a8a-27a663fd0eb2",
+      "endpoint": "/api/v1/commands/saved/341c62ea-927d-4299-9cf1-f3febfa28024",
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 7.5740814208984375,
+      "response_time": 5.936622619628906,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/commands/saved/6fe69935-ffb9-43ac-8a8a-27a663fd0eb2",
+      "endpoint": "/api/v1/commands/saved/341c62ea-927d-4299-9cf1-f3febfa28024",
       "method": "PUT",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 13.511419296264648,
+      "response_time": 9.624242782592773,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/commands/saved/6fe69935-ffb9-43ac-8a8a-27a663fd0eb2/execute",
+      "endpoint": "/api/v1/commands/saved/341c62ea-927d-4299-9cf1-f3febfa28024/execute",
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 8.481264114379883,
+      "response_time": 5.890607833862305,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/commands/saved/6fe69935-ffb9-43ac-8a8a-27a663fd0eb2",
+      "endpoint": "/api/v1/commands/saved/341c62ea-927d-4299-9cf1-f3febfa28024",
       "method": "DELETE",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 12.804031372070312,
+      "response_time": 9.526729583740234,
       "error": null,
       "details": null
     },
@@ -411,7 +411,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 370.8152770996094,
+      "response_time": 584.6071243286133,
       "error": null,
       "details": null
     },
@@ -420,26 +420,35 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 639.6167278289795,
+      "response_time": 622.3628520965576,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/commands/agent/agent_20250809_211035_156/execute",
+      "endpoint": "/api/v1/commands/agent/desktop-jk5g34l-dexagent/execute",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 500,
-      "response_time": 1.6818046569824219,
-      "error": "HTTP 500",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 103.5158634185791,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/commands/agent/agent_20250809_211035_156/execute/async",
+      "endpoint": "/api/v1/commands/agent/desktop-jk5g34l-dexagent/execute/async",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 500,
-      "response_time": 1.39617919921875,
-      "error": "HTTP 500",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1.383066177368164,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/commands/agent/desktop-jk5g34l-dexagent/result/async_1754995910.575146_3202f64a",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1.7676353454589844,
+      "error": null,
       "details": null
     },
     {
@@ -447,7 +456,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.280256271362305,
+      "response_time": 4.438161849975586,
       "error": null,
       "details": null
     },
@@ -456,7 +465,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 2000.4246234893799,
+      "response_time": 2037.2161865234375,
       "error": null,
       "details": null
     },
@@ -465,7 +474,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.935264587402344,
+      "response_time": 2005.3679943084717,
       "error": null,
       "details": null
     },
@@ -474,7 +483,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.790782928466797,
+      "response_time": 5.334138870239258,
       "error": null,
       "details": null
     },
@@ -483,7 +492,7 @@
       "method": "POST",
       "status": "FAIL",
       "response_code": 403,
-      "response_time": 4.944324493408203,
+      "response_time": 4.052162170410156,
       "error": "HTTP 403",
       "details": null
     },
@@ -492,430 +501,385 @@
       "method": "DELETE",
       "status": "FAIL",
       "response_code": 403,
-      "response_time": 4.235267639160156,
+      "response_time": 4.380702972412109,
       "error": "HTTP 403",
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/services",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.012056350708008,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 643.5813903808594,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/W32Time",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/services/W32Time",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.392810821533203,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 352.09083557128906,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/W32Time/dependencies",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/services/W32Time/dependencies",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.543325424194336,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 135.0257396697998,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/action",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/services/action",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.753133773803711,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 116.87421798706055,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/W32Time/config",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/services/W32Time/config",
       "method": "PUT",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.188247680664062,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 176.76854133605957,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/services/batch",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/services/batch",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.969141006469727,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 135.4832649230957,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/keys",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/registry/keys",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 6.857633590698242,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 167.32430458068848,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/values",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/registry/values",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.366584777832031,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 167.74892807006836,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/search",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/registry/search",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.443355560302734,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 128.67331504821777,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/values",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/registry/values",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.636713027954102,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 159.90591049194336,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/values",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/registry/values",
       "method": "DELETE",
       "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.369518280029297,
-      "error": "HTTP 400",
+      "response_code": 500,
+      "response_time": 163.49053382873535,
+      "error": "HTTP 500",
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/keys",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/registry/keys",
       "method": "DELETE",
       "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.7972412109375,
-      "error": "HTTP 400",
+      "response_code": 500,
+      "response_time": 158.9360237121582,
+      "error": "HTTP 500",
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/export",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/registry/export",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1909.3306064605713,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/registry/import",
       "method": "POST",
       "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.415699005126953,
-      "error": "HTTP 400",
+      "response_code": 500,
+      "response_time": 4582.679510116577,
+      "error": "HTTP 500",
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/import",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/registry/backup",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.606672286987305,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 113.21520805358887,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/registry/backup",
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 166.63479804992676,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/tree",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 103.26528549194336,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/search",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.395029067993164,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 106.12154006958008,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files",
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/preview",
       "method": "GET",
       "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.791280746459961,
-      "error": "HTTP 400",
+      "response_code": 500,
+      "response_time": 149.29604530334473,
+      "error": "HTTP 500",
       "details": null
     },
     {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/tree",
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/folder",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 99.16234016418457,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/upload",
+      "method": "POST",
+      "status": "FAIL",
+      "response_code": 500,
+      "response_time": 100.63695907592773,
+      "error": "HTTP 500",
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/download",
       "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.4075927734375,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 97.80502319335938,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/search",
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/operation",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.696866989135742,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 100.67081451416016,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/preview",
-      "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.93545150756836,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/folder",
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/compress",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.154153823852539,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 97.87344932556152,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/upload",
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/extract",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.388280868530273,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 98.94728660583496,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/download",
-      "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 6.76417350769043,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/operation",
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files/batch-upload",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.7037811279296875,
-      "error": "HTTP 400",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 188.45033645629883,
+      "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/compress",
-      "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.175134658813477,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/extract",
-      "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.174657821655273,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files/batch-upload",
-      "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.699655532836914,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/files/agents/agent_20250809_211035_156/files",
+      "endpoint": "/api/v1/files/agents/desktop-jk5g34l-dexagent/files",
       "method": "DELETE",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.9135894775390625,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/adapters",
-      "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.264780044555664,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/firewall/rules",
-      "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.826089859008789,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/routing/table",
-      "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.863759994506836,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/test",
-      "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.781194686889648,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/network/configure",
-      "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 7.866859436035156,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/status",
-      "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 7.518291473388672,
+      "response_time": 105.3476333618164,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/plans",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/network/adapters",
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 8.45479965209961,
+      "response_time": 472.8586673736572,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/events",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/network/firewall/rules",
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 8.542537689208984,
+      "response_time": 660.8381271362305,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/plans/activate",
-      "method": "POST",
-      "status": "PASS",
-      "response_code": 200,
-      "response_time": 8.615255355834961,
-      "error": null,
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/power/action",
-      "method": "POST",
-      "status": "PASS",
-      "response_code": 200,
-      "response_time": 9.564399719238281,
-      "error": null,
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/",
-      "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 9.067296981811523,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/tree",
-      "method": "GET",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 8.122682571411133,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/kill",
-      "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 9.199142456054688,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/priority",
-      "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 9.277582168579102,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/processes/suspend-resume",
-      "method": "POST",
-      "status": "FAIL",
-      "response_code": 400,
-      "response_time": 9.454965591430664,
-      "error": "HTTP 400",
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/network/routing/table",
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.980802536010742,
+      "response_time": 332.97276496887207,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/stats",
-      "method": "GET",
-      "status": "PASS",
-      "response_code": 200,
-      "response_time": 5.762577056884766,
-      "error": null,
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/alert-rules",
-      "method": "GET",
-      "status": "PASS",
-      "response_code": 200,
-      "response_time": 5.594968795776367,
-      "error": null,
-      "details": null
-    },
-    {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/alert-rules",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/network/test",
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.270719528198242,
+      "response_time": 1157.1431159973145,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/agents/agent_20250809_211035_156/events/export",
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/network/configure",
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.316972732543945,
+      "response_time": 1049.196481704712,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/processes/",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 555.3958415985107,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/processes/tree",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 325.3049850463867,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/processes/kill",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 132.07316398620605,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/processes/priority",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 94.46573257446289,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/processes/suspend-resume",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 6.005287170410156,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/events/",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 3.5707950592041016,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/events/stats",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 3.541231155395508,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/events/alert-rules",
+      "method": "GET",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 3.0989646911621094,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/events/alert-rules",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 3.1342506408691406,
+      "error": null,
+      "details": null
+    },
+    {
+      "endpoint": "/api/v1/agents/desktop-jk5g34l-dexagent/events/export",
+      "method": "POST",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 3.1037330627441406,
       "error": null,
       "details": null
     },
@@ -924,7 +888,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.955053329467773,
+      "response_time": 3.15093994140625,
       "error": null,
       "details": null
     },
@@ -933,7 +897,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.805326461791992,
+      "response_time": 5.935907363891602,
       "error": null,
       "details": null
     },
@@ -942,7 +906,7 @@
       "method": "GET",
       "status": "FAIL",
       "response_code": 404,
-      "response_time": 7.491111755371094,
+      "response_time": 5.594015121459961,
       "error": "HTTP 404",
       "details": null
     },
@@ -951,7 +915,7 @@
       "method": "PUT",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.099058151245117,
+      "response_time": 5.16200065612793,
       "error": null,
       "details": null
     },
@@ -960,7 +924,7 @@
       "method": "DELETE",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.448102951049805,
+      "response_time": 3.275156021118164,
       "error": null,
       "details": null
     },
@@ -969,7 +933,7 @@
       "method": "POST",
       "status": "FAIL",
       "response_code": 422,
-      "response_time": 5.20014762878418,
+      "response_time": 3.420114517211914,
       "error": "HTTP 422",
       "details": null
     },
@@ -978,7 +942,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.009889602661133,
+      "response_time": 3.030061721801758,
       "error": null,
       "details": null
     },
@@ -987,7 +951,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.211830139160156,
+      "response_time": 3.1332969665527344,
       "error": null,
       "details": null
     },
@@ -996,7 +960,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.000114440917969,
+      "response_time": 3.083944320678711,
       "error": null,
       "details": null
     },
@@ -1005,34 +969,34 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.140781402587891,
+      "response_time": 3.8483142852783203,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/software/agents/agent_20250809_211035_156/installed",
+      "endpoint": "/api/v1/software/agents/desktop-jk5g34l-dexagent/installed",
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.713773727416992,
+      "response_time": 3.3528804779052734,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/software/agents/agent_20250809_211035_156/install",
+      "endpoint": "/api/v1/software/agents/desktop-jk5g34l-dexagent/install",
       "method": "POST",
       "status": "FAIL",
       "response_code": 422,
-      "response_time": 5.365610122680664,
+      "response_time": 4.518270492553711,
       "error": "HTTP 422",
       "details": null
     },
     {
-      "endpoint": "/api/v1/software/agents/agent_20250809_211035_156/uninstall",
+      "endpoint": "/api/v1/software/agents/desktop-jk5g34l-dexagent/uninstall",
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 5.199909210205078,
+      "response_time": 3.8933753967285156,
       "error": null,
       "details": null
     },
@@ -1041,7 +1005,7 @@
       "method": "POST",
       "status": "FAIL",
       "response_code": 500,
-      "response_time": 4.5299530029296875,
+      "response_time": 3.7016868591308594,
       "error": "HTTP 500",
       "details": null
     },
@@ -1050,7 +1014,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.801750183105469,
+      "response_time": 2.9840469360351562,
       "error": null,
       "details": null
     },
@@ -1059,7 +1023,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 7.488727569580078,
+      "response_time": 5.260705947875977,
       "error": null,
       "details": null
     },
@@ -1068,7 +1032,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 14.012575149536133,
+      "response_time": 10.164260864257812,
       "error": null,
       "details": null
     },
@@ -1077,7 +1041,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 8.833885192871094,
+      "response_time": 5.800485610961914,
       "error": null,
       "details": null
     },
@@ -1086,7 +1050,7 @@
       "method": "DELETE",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 10.081291198730469,
+      "response_time": 7.224559783935547,
       "error": null,
       "details": null
     },
@@ -1095,7 +1059,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 22.39060401916504,
+      "response_time": 15.695810317993164,
       "error": null,
       "details": null
     },
@@ -1104,7 +1068,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 47.376155853271484,
+      "response_time": 34.68060493469238,
       "error": null,
       "details": null
     },
@@ -1113,7 +1077,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 729.4106483459473,
+      "response_time": 941.1911964416504,
       "error": null,
       "details": null
     },
@@ -1122,7 +1086,7 @@
       "method": "POST",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 19.190073013305664,
+      "response_time": 16.944408416748047,
       "error": null,
       "details": null
     },
@@ -1131,17 +1095,17 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 4.761457443237305,
+      "response_time": 3.6742687225341797,
       "error": null,
       "details": null
     },
     {
-      "endpoint": "/api/v1/send/agent_20250809_211035_156/command",
+      "endpoint": "/api/v1/send/desktop-jk5g34l-dexagent/command",
       "method": "POST",
-      "status": "FAIL",
-      "response_code": 404,
-      "response_time": 1.806020736694336,
-      "error": "HTTP 404",
+      "status": "PASS",
+      "response_code": 200,
+      "response_time": 1.644134521484375,
+      "error": null,
       "details": null
     },
     {
@@ -1149,7 +1113,7 @@
       "method": "GET",
       "status": "PASS",
       "response_code": 200,
-      "response_time": 1.2519359588623047,
+      "response_time": 0.8933544158935547,
       "error": null,
       "details": null
     },
@@ -1158,7 +1122,7 @@
       "method": "POST",
       "status": "FAIL",
       "response_code": 422,
-      "response_time": 1.2192726135253906,
+      "response_time": 1.6331672668457031,
       "error": "HTTP 422",
       "details": null
     },
@@ -1167,7 +1131,7 @@
       "method": "POST",
       "status": "FAIL",
       "response_code": 422,
-      "response_time": 0.8859634399414062,
+      "response_time": 0.9183883666992188,
       "error": "HTTP 422",
       "details": null
     }

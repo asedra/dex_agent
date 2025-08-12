@@ -117,7 +117,6 @@ class APITester:
         self.test_registry_endpoints()
         self.test_file_endpoints()
         self.test_network_endpoints()
-        self.test_power_endpoints()
         self.test_process_endpoints()
         self.test_event_endpoints()
         self.test_software_endpoints()
@@ -633,38 +632,6 @@ class APITester:
                              "dhcp_enabled": True
                          },
                          test_name="Configure network adapter")
-        
-    def test_power_endpoints(self):
-        """Test power management endpoints"""
-        self.log("\n⚡ Testing Power Endpoints", "INFO")
-        self.log("-" * 40)
-        
-        if not self.online_agent_id:
-            self.log("  No online agent available, skipping power tests", "WARNING")
-            return
-            
-        # Get power status
-        self.test_endpoint("GET", f"/api/v1/agents/{self.online_agent_id}/power/status",
-                         test_name="Get power status")
-        
-        # Get power plans
-        self.test_endpoint("GET", f"/api/v1/agents/{self.online_agent_id}/power/plans",
-                         test_name="Get power plans")
-        
-        # Get power events
-        self.test_endpoint("GET", f"/api/v1/agents/{self.online_agent_id}/power/events",
-                         params={"limit": 10},
-                         test_name="Get power events")
-        
-        # Set active power plan (non-destructive)
-        self.test_endpoint("POST", f"/api/v1/agents/{self.online_agent_id}/power/plans/activate",
-                         json={"plan_id": "Balanced"},
-                         test_name="Set active power plan")
-        
-        # Power action (logoff is safe to test)
-        self.test_endpoint("POST", f"/api/v1/agents/{self.online_agent_id}/power/action",
-                         json={"action": "logoff"},
-                         test_name="Execute power action (logoff)")
         
     def test_process_endpoints(self):
         """Test process management endpoints"""

@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-08-12T09:46:14.338847",
+  "page": "Command Library",
+  "url": "http://localhost:3000/commands",
+  "errors": [
+    "Unexpected error: 0",
+    "AI button always visible but redirects to settings when not configured",
+    "Command execution requires agent to be online",
+    "Search functionality may not filter commands in real-time",
+    "Category filter might not work properly"
+  ]
+}

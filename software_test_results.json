@@ -1,0 +1,45 @@
+{
+  "timestamp": "2025-08-11T23:42:51.366731",
+  "backend_results": [
+    {
+      "endpoint": "GET /software/packages",
+      "status": 200,
+      "success": true,
+      "packages_count": 0
+    },
+    {
+      "endpoint": "GET /software/inventory",
+      "status": 200,
+      "success": true,
+      "inventory_count": 10
+    },
+    {
+      "endpoint": "GET /software/agents/desktop-jk5g34l-dexagent/inventory",
+      "status": 404,
+      "success": false
+    },
+    {
+      "endpoint": "POST /software/mock-data",
+      "status": 404,
+      "success": false
+    },
+    {
+      "endpoint": "GET /software/stats",
+      "status": 404,
+      "success": false
+    },
+    {
+      "endpoint": "GET /software/search",
+      "status": 404,
+      "success": true
+    }
+  ],
+  "frontend_success": true,
+  "criteria_met": false,
+  "summary": {
+    "total_tests": 7,
+    "successful": 4,
+    "failed": 3,
+    "success_rate": 57.14285714285714
+  }
+}

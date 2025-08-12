@@ -13,6 +13,7 @@ When Claude Code starts, these custom commands are available:
 | **"test raporunu oku"** | Read and fix test report | Reads `C:\test_report.md`, analyzes findings, implements fixes, tests in Docker, and requests commit approval |
 | **"projeyi başlat"** | Start the project | Runs `docker-compose up -d --build` to start all services |
 | **"testleri çalıştır"** | Run comprehensive tests | Restarts Docker services and runs complete test suite including new AI features |
+| **"frontend testlerini çalıştır"** | Run frontend navigation tests | Executes Playwright tests for all navigation menu items and generates comprehensive reports |
 
 Simply type any of these commands to execute the corresponding workflow.
 
@@ -181,15 +182,59 @@ dex_agent/
 - **Chrome/Chromium**: For Playwright tests (auto-installed)
 
 ### Frontend Tests (Playwright)
-- **Location**: `/frontend/tests/e2e/`
-- **Coverage**: Authentication, Dashboard, Agents, Commands, API Integration, AI Features
-- **AI Features**: Tests "Create Command with AI" button functionality and ChatGPT settings UI
+- **Location**: `/apps/frontend/tests/e2e/`
+- **Coverage**: Complete navigation menu testing for all 13 menu items
+- **Test Files**: 
+  - `auth.spec.ts` - Authentication tests
+  - `dashboard.spec.ts` - Dashboard functionality
+  - `agents.spec.ts` - Agent management
+  - `events.spec.ts` - Event logs
+  - `software.spec.ts` - Software management
+  - `services.spec.ts` - Windows services
+  - `files.spec.ts` - File management
+  - `processes.spec.ts` - Process management
+  - `power.spec.ts` - Power management
+  - `registry.spec.ts` - Registry editor
+  - `commands.spec.ts` - Command library (includes AI features)
+  - `schedules.spec.ts` - Task scheduler
+  - `audit.spec.ts` - Audit logs
+  - `settings.spec.ts` - Settings (includes ChatGPT configuration)
+  - `navigation.spec.ts` - Overall navigation testing
 - **Credentials**: admin/admin123
 - **Base URL**: http://localhost:3000
 - **Prerequisites**: 
   - `npm install` in frontend directory
   - `npx playwright install` (installs browsers)
   - Services running via `docker-compose up -d`
+
+#### Running Frontend Tests
+
+**Option 1: Python Test Runner (Comprehensive)**
+```bash
+python /home/ali/dex_agent/apps/frontend/run-navigation-tests.py
+```
+This generates:
+- Console output with pass/fail for each menu item
+- JSON report: `test-reports/navigation-test-results.json`
+- Markdown report: `test-reports/navigation-test-report.md`
+- Screenshots on failure: `test-reports/screenshots/`
+
+**Option 2: Playwright Direct**
+```bash
+cd /home/ali/dex_agent/apps/frontend
+npm run test:e2e           # Headless mode
+npm run test:e2e:headed    # Browser visible
+npm run test:e2e:ui        # Interactive UI
+```
+
+**Option 3: Single Test File**
+```bash
+cd /home/ali/dex_agent/apps/frontend
+npx playwright test tests/e2e/dashboard.spec.ts
+```
+
+**Option 4: Custom Command**
+Simply type: `"frontend testlerini çalıştır"`
 
 ### Backend Tests
 - **API Tests**: `comprehensive_api_test.py`
